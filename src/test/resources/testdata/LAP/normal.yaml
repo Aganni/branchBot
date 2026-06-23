@@ -1,0 +1,99 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# LAP End-to-End Test Data
+# Profile: Default UAT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+dsa_secured:
+  business_details:
+    loan_type: "Loan Against Property"
+
+  partner_details:
+      partnerNameOptionIndex: "1"
+      scheme: "BT"
+      subProduct: "Warehouse"
+      branch: "INDIQUBE LEXINGTON AUDUGODI- BENGALURU"
+      sales_manager: "nikitha"
+
+  lead_details:
+    name: "Automation - playwright"
+    phone_number: "9001310069"
+    loan_amount: "500000"
+    tenure: "36"
+    rate_of_interest: "12.5"
+    employment_type: "Salaried"
+    interest_payment_preference: "Floating" # Provide value matching your environment drop-down options
+    loan_purpose: "Repair and Renovation of Residential property"
+
+  consent_details:
+    SEND OTP: "123456"
+
+  primary_applicant:
+    kyc:
+      pan: "ABGPS7398N"
+      email: "nikitha.s@creditsaison-in.com"
+      father_name: "David Brown"
+      mother_name: "Sarah Wilson"
+      spouse_name: "Riya sharma"
+      category: "Gen"
+      religion: "HINDU"
+      education: "HSC"
+      marital_status: "Single"
+      nationality: "IN"
+      disability: "No"
+      preferred_address: "Permanent"
+      related_interest: "No"
+      related_party_control: "No"
+    addresses:
+      line1: "5th Cross Green Valley Residency Near Orchid Mall Opposite Sunrise Convention Center"
+      line2: "Grand Majestic Hotel"
+      pincode: "384325"
+      ownership: "Family Owned"
+    obligations:
+      type: "Loan against property"
+      financier: "HDFC Bank"
+      emi: "12500"
+      tenure: "24"
+      account_number: "1020340450807"
+      obligate: "Yes"
+      closure_type: "Self Close"
+    employment:
+      type: "Salaried"
+      employer: "WALMARK MEDITECH PRIVATE LIMITED"
+      income: "120000"
+      office_email: "nikitha.s@creditsaison-in.com"
+      designation: "Individual"
+      line1: "Prestige Bella Vista Apartments"
+      line2: "Ramapuram Main Road"
+      pincode: "560031"
+      ownership: "Family Owned"
+    references:
+      ref1_name: "Nicalse Jen"
+      ref1_phone: "9380800036"
+      ref1_rel: "Father"
+      ref1_line1: "Prestige Bella Vista Apartments Ramapuram Main Road"
+      ref1_line2: "Ramapuram Main Road"
+      ref1_pin: "560094"
+      ref1_own: "Self Owned"
+
+      ref2_name: "Michael Brown"
+      ref2_phone: "9380800021"
+      ref2_rel: "Spouse"
+      ref2_line1: "Near Sri Chaitanya Junior College Old Alwal Main Road"
+      ref2_line2: "Maple Residency 4th Floor Beside Phoenix Arena Behind Tech Park Square"
+      ref2_pin: "560094"
+      ref2_own: "Self Owned"
+    bank:
+      bank1_name: "HDFC Bank, India"
+      bank1_acc_name: "Nicalse Jen"
+      bank1_acc_num: "1020484676789"
+      bank1_type: "savings"
+      bank1_ifsc: "HDFC0002233"
+      bank2_name: "HDFC Bank, India"
+      bank2_acc_name: "Daniel Harris"
+      bank2_acc_num: "987654345678"
+      bank2_type: "savings"
+      bank2_ifsc: "HDFC0000094"
+
+
+

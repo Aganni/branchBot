@@ -5,13 +5,16 @@ import backend.Utils.DataGeneratorUtils;
 import backend.constants.Constants;
 import data.TestDataProvider;
 import hooks.BaseTest;
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 
-import static dynamicData.DynamicDataClass.*;
+import static dynamicData.DynamicDataClass.getValue;
+import static dynamicData.DynamicDataClass.setValue;
 
-public class ApiStepDefinitions extends BaseTest {
+public class LAP_ApiStepDefinitions extends BaseTest {
 
-    @Given("User generates test data for LAP and whitelists PAN in Mystique")
+
+    @Given("User generates test data and whitelists PAN in Mystique")
     public void generateDataAndWhitelistPan() {
         String profile = TestDataProvider.get("dsa.qde.pan_profile");
 
@@ -23,7 +26,7 @@ public class ApiStepDefinitions extends BaseTest {
 
         ApiUtils.updatePanInMystique(profile);
     }
-    @And("User moves LAP to stage") // Changed text here
+    @And("User moves LAP to QC Approval stage") // Changed text here
     public void moveToQcApproval() {
         ApiUtils.moveAppFormToStage("QC_APPROVE");
     }
