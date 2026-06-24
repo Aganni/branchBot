@@ -15,6 +15,7 @@ public class PartnerDetailsPage extends BaseTest {
     private static final String BRANCH_INPUT_ID = "#branch";
     private static final String SALES_MANAGER_INPUT_ID = "#SalesManager";
     private static final String SCHEME_SELECT_ID = "#scheme";
+
     private static final String SAVE_AND_NEXT_BTN = "button:has-text('SAVE AND NEXT')";
 
     public PartnerDetailsPage(Page page) {

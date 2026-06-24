@@ -5,189 +5,227 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
-import java.util.Map;
 
 public class PrimaryApplicantPage extends BaseTest {
     private final Page page;
-    private static final String NEXT_BTN = "role=button[name='NEXT']";
-    private static final String CO_APPLICANTS_BTN = "role=button[name='CO APPLICANTS']";
+    private static final String SELECT_APPLICANT_TYPE   = "#applicantType";
+    private static final String APPLICANT_TYPE   = "li[data-value='Individual']";
+    private static final String INPUT_EMAIL              = "Enter email address";
+    private static final String LABEL_FATHER_NAME       = "Father Name *";
+    private static final String LABEL_MOTHER_NAME       = "Mother Name *";
+    private static final String LABEL_SPOUSE_NAME       = "Spouse Name";
+    private static final String LABEL_CATEGORY          = "Category *";
+    private static final String LABEL_RELIGION          = "Religion *";
+    private static final String LABEL_EDUCATION         = "Education *";
+    private static final String SELECT_MARITAL_STATUS   = "Select Marital Status";
+    private static final String LABEL_NATIONALITY       = "Nationality *";
+    private static final String LABEL_DISABILITY        = "Disability *";
+    private static final String LABEL_PREFERRED_ADDRESS  = "Preferred Address *";
+    private static final String LABEL_RELATED_INTEREST   = "Related Party Interest *";
+    private static final String LABEL_RELATED_CONTROL    = "Related Party Control *";
 
+    private static final String PLACEHOLDER_ADDRESS_L1  = "Current Address (Line 1)";
+    private static final String LABEL_ADDRESS_L2        = "Current Address Line 2 *";
+    private static final String LABEL_ADDRESS_PINCODE   = "Current Address Pincode *";
+    private static final String LABEL_ADDRESS_OWNERSHIP = "Current Address Ownership *";
+
+    private static final String PLACEHOLDER_COMPANY     = "Search Your Company Here";
+    private static final String LABEL_MONTHLY_INCOME    = "Total Monthly Income *";
+    private static final String LABEL_OFFICE_EMAIL      = "Office Email *";
+    private static final String LABEL_DESIGNATION       = "Designation *";
+    private static final String LABEL_OFFICE_L1         = "Office Address Line 1 *";
+    private static final String LABEL_OFFICE_L2         = "Office Address Line 2 *";
+    private static final String LABEL_OFFICE_PINCODE    = "Office Address Pincode *";
+    private static final String LABEL_OFFICE_OWNERSHIP  = "Office Address Ownership *";
     public PrimaryApplicantPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
-
-    public void completeKycTab(Map<String, String> data) {
-  
-
-        // 1. Select Applicant Type
-        page.getByLabel("Applicant Type").click();
-
-        // FIX 1: Change role to OPTION so it registers the click event and dismisses the dropdown menu container
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Individual")).click();
-
-        // Safeguard: Force close the overlay if it gets stuck to clean the viewport state
-        page.keyboard().press("Escape");
+    public void handlePageInitRefresh() {
+        page.waitForTimeout(2000);
+        page.reload();
+        log.info("Refreshed Primary Applicant Page for initialization.");
+    }
+    public void selectApplicantType(String applicantType, String individualText) {
+        Locator dropdown = page.locator(SELECT_APPLICANT_TYPE);
+        dropdown.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        dropdown.click();
+        log.info("Opened Applicant Type dropdown.");
         page.waitForTimeout(500);
-
-        // 2. Interact with PAN Number
-        // FIX 2: Use the exact underlying DOM selector path to remain immune to aria-hidden locks
-        Locator panInput = page.locator("#panNumber");
-        panInput.waitFor();
+        Locator option = page.locator("li:has-text('" + individualText + "')").first();
+        option.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        option.click(new Locator.ClickOptions().setForce(true));
+        page.waitForTimeout(750);
+        log.info("Successfully selected Applicant Type: {}", individualText);
+    }
+    public void verifyPanNumber(String pan) {
+        Locator panInput = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("PAN Number"));
         panInput.click();
-        panInput.fill(data.get("pan"));
-
-        // 3. Press Enter to submit/trigger the profile check callback
-        page.keyboard().press("Enter");
-        log.info("Submitted PAN for verification: " + data.get("pan"));
-        page.waitForTimeout(2000); // Wait for profile auto-fetch to resolve
-
-        // 4. Email Verification Link
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Email ID")).fill(data.get("email"));
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("VERIFY")).click();
-        page.waitForSelector("text=Email+SMS with the consent link sent successfully");
-
-        // 5. Personal Relationships
-        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Father Name")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("father_name"))).click();
-
-        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Mother Name")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("mother_name"))).click();
-
-        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Spouse Name")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("spouse_name"))).click();
-
-        // Demographics & Background profile
-        selectDropdown("Category", data.get("category"));
-        selectDropdown("Religion", data.get("religion"));
-        selectDropdown("Education", data.get("education"));
-        selectDropdown("Marital Status", data.get("marital_status"));
-        selectDropdown("Nationality", data.get("nationality"));
-        selectDropdown("Disability", data.get("disability"));
-        selectDropdown("Preferred Address", data.get("preferred_address"));
-        selectDropdown("Related Interest?", data.get("related_interest"));
-        selectDropdown("Related Party Control**", data.get("related_party_control"));
-
-        page.click(NEXT_BTN);
-        log.info("KYC sub-tab details submitted successfully.");
+        panInput.fill(pan);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).nth(0).click();
+        log.info("Submitted and verified PAN: {}", pan);
     }
 
-    public void completeAddressesTab(Map<String, String> data) {
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Current Address (Line 1)*")).fill(data.get("line1"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Current Address Line 2*")).fill(data.get("line2"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Current Address Pincode*")).fill(data.get("pincode"));
-        page.keyboard().press("Tab"); // Trigger city/state database lookup mapping
-
-        selectDropdown("Current Address Ownership *", data.get("ownership"));
-
-        // Toggle 'Same as Current Address' checkboxes
-        page.locator("text=Same as Current Address").first().click();
-        page.locator("text=Same as Current Address").last().click();
-
-        page.click(NEXT_BTN);
-        log.info("Address profiles configured and synchronized.");
+    public void verifyEmailAddress(String email) {
+        page.getByPlaceholder(INPUT_EMAIL).fill(email);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).nth(1).click();
+        log.info("Submitted and verified Email: {}", email);
     }
 
-    public void completeObligationsTab(Map<String, String> data) {
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ADD OBLIGATION")).click();
-
-        selectDropdown("Obligation Type *", data.get("type"));
-        selectDropdown("Financier*", data.get("financier"));
-
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("EMI *")).fill(data.get("emi"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Remaining Tenure")).fill(data.get("tenure"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Account Number")).fill(data.get("account_number"));
-
-        selectDropdown("Obligate", data.get("obligate"));
-        selectDropdown("Closure Type *", data.get("closure_type"));
-
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SAVE")).click();
-        page.click(NEXT_BTN);
-        log.info("Active credit liabilities and obligations logged successfully.");
+    public void fillFamilyDetails(String fatherName, String motherName, String spouseName) {
+        page.getByLabel(LABEL_FATHER_NAME).fill(fatherName);
+        page.getByLabel(LABEL_MOTHER_NAME).fill(motherName);
+        page.getByLabel(LABEL_SPOUSE_NAME).fill(spouseName);
+        log.info("Filled Family Details -> Father: {}, Mother: {}, Spouse: {}", fatherName, motherName, spouseName);
     }
 
-    public void completeEmploymentTab(Map<String, String> data) {
-        selectDropdown("Employment Type", data.get("type"));
+    public void selectBackgroundProfile(String category, String religion, String education, String maritalStatus, String nationality, String disability) {
+        page.getByLabel(LABEL_CATEGORY).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(category)).click();
 
-        // Handle Autocomplete corporate lookup field
-        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Employer*")).fill(data.get("employer"));
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("employer"))).click();
+        page.getByLabel(LABEL_RELIGION).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(religion)).click();
 
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Total Monthly Income *")).fill(data.get("income"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Office Email*")).fill(data.get("office_email"));
+        page.getByLabel(LABEL_EDUCATION).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(education)).click();
 
-        selectDropdown("Designation*", data.get("designation"));
+        page.getByPlaceholder(SELECT_MARITAL_STATUS).click();
+        page.getByText(maritalStatus).click();
 
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Office Address Line 1*")).fill(data.get("line1"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Office Address Line 2*")).fill(data.get("line2"));
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Office Address Pincode *")).fill(data.get("pincode"));
-        selectDropdown("Office Address Ownership *", data.get("ownership"));
+        page.getByLabel(LABEL_NATIONALITY).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(nationality)).click();
 
-        page.click(NEXT_BTN);
-        log.info("Employment configuration and office address verified.");
+        page.getByLabel(LABEL_DISABILITY).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(disability)).click();
+
+        log.info("Selected Background Profile Options successfully.");
     }
 
-    public void completeReferencesTab(Map<String, String> data) {
-        // Reference 1 Configuration
-        page.locator("input[name*='references'][name*='name']").first().fill(data.get("ref1_name"));
-        page.locator("input[name*='references'][name*='phone']").first().fill(data.get("ref1_phone"));
-        page.locator("div[id*='references'][id*='relationship']").first().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("ref1_rel"))).click();
+    public void selectInternalDeclarations(String preferredAddress, String relatedInterest, String relatedControl) {
+        page.getByLabel(LABEL_PREFERRED_ADDRESS).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(preferredAddress)).click();
 
-        page.locator("input[name*='references'][name*='addressLine1']").first().fill(data.get("ref1_line1"));
-        page.locator("input[name*='references'][name*='addressLine2']").first().fill(data.get("ref1_line2"));
-        page.locator("input[name*='references'][name*='pincode']").first().fill(data.get("ref1_pin"));
-        page.locator("div[id*='references'][id*='addressOwnership']").first().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("ref1_own"))).click();
+        page.getByLabel(LABEL_RELATED_INTEREST).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(relatedInterest)).click();
 
-        // Reference 2 Configuration
-        page.locator("input[name*='references'][name*='name']").last().fill(data.get("ref2_name"));
-        page.locator("input[name*='references'][name*='phone']").last().fill(data.get("ref2_phone"));
-        page.locator("div[id*='references'][id*='relationship']").last().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("ref2_rel"))).click();
+        page.getByLabel(LABEL_RELATED_CONTROL).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(relatedControl)).click();
 
-        page.locator("input[name*='references'][name*='addressLine1']").last().fill(data.get("ref2_line1"));
-        page.locator("input[name*='references'][name*='addressLine2']").last().fill(data.get("ref2_line2"));
-        page.locator("input[name*='references'][name*='pincode']").last().fill(data.get("ref2_pin"));
-        page.locator("div[id*='references'][id*='addressOwnership']").last().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("ref2_own"))).click();
-
-        page.click(NEXT_BTN);
-        log.info("Personal and professional references captured.");
+        log.info("Selected Internal Declarations and Preferred Address.");
     }
 
-    public void completeBankDetailsTab(Map<String, String> data) {
-        // Record 1 Allocation
-        page.locator("input[id*='bankName']").first().fill(data.get("bank1_name"));
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank1_name"))).click();
-        page.locator("input[id*='accountHolderName']").first().fill(data.get("bank1_acc_name"));
-        page.locator("input[id*='accountNumber']").first().fill(data.get("bank1_acc_num"));
-        page.locator("div[id*='accountType']").first().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank1_type"))).click();
-        page.locator("input[id*='ifscCode']").first().fill(data.get("bank1_ifsc"));
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank1_ifsc"))).click();
-
-        // Record 2 Allocation
-        page.locator("input[id*='bankName']").last().fill(data.get("bank2_name"));
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank2_name"))).click();
-        page.locator("input[id*='accountHolderName']").last().fill(data.get("bank2_acc_name"));
-        page.locator("input[id*='accountNumber']").last().fill(data.get("bank2_acc_num"));
-        page.locator("div[id*='accountType']").last().click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank2_type"))).click();
-        page.locator("input[id*='ifscCode']").last().fill(data.get("bank2_ifsc"));
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("bank2_ifsc"))).click();
-
-        // Submit and transition to the next phase
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
-        page.waitForSelector("text=Linked individual added");
-
-        page.click(CO_APPLICANTS_BTN);
-        log.info("Bank profiles submitted. Redirecting to Co-Applicant workflow stage.");
+    // ── Address Details Actions ──────────────────────────────────────────────
+    public void fillCurrentAddress(String line1, String line2, String pincode, String ownership) {
+        page.getByPlaceholder(PLACEHOLDER_ADDRESS_L1).fill(line1);
+        page.getByLabel(LABEL_ADDRESS_L2).fill(line2);
+        page.getByLabel(LABEL_ADDRESS_PINCODE).fill(pincode);
+        page.getByLabel(LABEL_ADDRESS_OWNERSHIP).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
+        log.info("Filled Current Address Details.");
     }
 
-    private void selectDropdown(String labelName, String value) {
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(labelName)).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(value)).click();
-        page.keyboard().press("Escape"); // Force close the active overlay drop-down view container
+    public void checkAddressConsents() {
+        page.getByLabel("Yes").first().check();
+        page.getByLabel("Yes").nth(1).check();
+        log.info("Checked Address Consent checkboxes.");
+    }
+
+    // ── Financial Obligations Actions ────────────────────────────────────────
+    public void addFinancialObligation(String type, String financier, String emi) {
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Obligation")).click();
+        page.getByLabel("Obligation Type *").click();
+        page.getByText(type).click();
+
+        page.getByLabel("Financier *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(financier)).click();
+
+        page.getByLabel("EMI *").fill(emi);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        log.info("Added Obligation -> Type: {}, Financier: {}, EMI: {}", type, financier, emi);
+    }
+
+    // ── Employment Details Actions ───────────────────────────────────────────
+    public void fillEmploymentProfile(String type, String employer, String income, String officeEmail, String designation) {
+        page.getByLabel("Employment Type").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type)).click();
+
+        page.getByPlaceholder(PLACEHOLDER_COMPANY).fill(employer);
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(employer)).click();
+
+        page.getByLabel(LABEL_MONTHLY_INCOME).fill(income);
+        page.getByLabel(LABEL_OFFICE_EMAIL).fill(officeEmail);
+        page.getByLabel(LABEL_DESIGNATION).fill(designation);
+        log.info("Filled Employment Profile Information for employer: {}", employer);
+    }
+
+    public void fillOfficeAddress(String line1, String line2, String pincode, String ownership) {
+        page.getByLabel(LABEL_OFFICE_L1).fill(line1);
+        page.getByLabel(LABEL_OFFICE_L2).fill(line2);
+        page.getByLabel(LABEL_OFFICE_PINCODE).fill(pincode);
+        page.getByLabel(LABEL_OFFICE_OWNERSHIP).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
+        log.info("Filled Office Address Fields.");
+    }
+
+    // ── References Actions ───────────────────────────────────────────────────
+    public void fillReference1(String name, String phone, String relation, String line1, String line2, String pin, String ownership) {
+        page.locator("input[name=\"ref1Name\"]").fill(name);
+        page.locator("#ref1Phone").fill(phone);
+        page.locator("#ref1Relation").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(relation)).click();
+        page.locator("textarea[name=\"ref1AddressLine1\"]").fill(line1);
+        page.locator("textarea[name=\"ref1AddressLine2\"]").fill(line2);
+        page.locator("#ref1AddressPincode").fill(pin);
+        page.locator("#ref1AddressOwnership").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
+        log.info("Filled Reference 1 Data: {}", name);
+    }
+
+    public void fillReference2(String name, String phone, String relation, String line1, String line2, String pin, String ownership) {
+        page.locator("input[name=\"ref2Name\"]").fill(name);
+        page.locator("#ref2Phone").fill(phone);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Relationship \u200B").setExact(true)).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(relation)).click();
+        page.locator("textarea[name=\"ref2AddressLine1\"]").fill(line1);
+        page.locator("textarea[name=\"ref2AddressLine2\"]").fill(line2);
+        page.locator("#ref2AddressPincode").fill(pin);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Address Ownership \u200B").setExact(true)).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
+        log.info("Filled Reference 2 Data: {}", name);
+    }
+
+    // ── Bank Details Actions ─────────────────────────────────────────────────
+    public void fillDisbursalBankDetails(String bankName, String holderName, String accNum, String accType, String ifsc) {
+        page.locator("#disbursalBankName").fill(bankName);
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(bankName)).click();
+        page.locator("#disbursalHolderName").fill(holderName);
+        page.locator("#disbursalAccountNumber").fill(accNum);
+        page.locator("#disbursalType").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(accType)).click();
+        page.locator("#disbursalIfscCode").fill(ifsc);
+        log.info("Filled Disbursal Bank Details.");
+    }
+
+    public void fillCollectionsBankDetails(String bankName, String holderName, String accNum, String accType, String ifsc) {
+        page.locator("#collectionsBankName").fill(bankName);
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(bankName)).click();
+        page.locator("#collectionsHolderName").fill(holderName);
+        page.locator("#collectionsAccountNumber").fill(accNum);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Account Type \u200B").setExact(true)).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(accType)).click();
+        page.locator("#collectionsIfscCode").fill(ifsc);
+        log.info("Filled Collections Bank Details.");
+    }
+
+    // ── Navigation Elements ──────────────────────────────────────────────────
+    public void clickNext() {
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+        log.info("Clicked 'Next' to shift layouts.");
+    }
+
+    public void submitAndNavigateToCoApplicants() {
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Co Applicants")).click();
+        log.info("Form Submitted successfully. Routed onto Co-Applicants page context.");
     }
 }
