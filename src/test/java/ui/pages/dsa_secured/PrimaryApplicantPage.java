@@ -9,7 +9,7 @@ import hooks.BaseTest;
 public class PrimaryApplicantPage extends BaseTest {
     private final Page page;
     private static final String SELECT_APPLICANT_TYPE   = "#applicantType";
-    //private static final String APPLICANT_TYPE   = "li[data-value='Individual']";
+    private static final String APPLICANT_TYPE   = "li[data-value='Individual']";
     private static final String INPUT_EMAIL              = "Enter email address";
     private static final String FATHER_NAME       = "Father Name *";
     private static final String MOTHER_NAME       = "Mother Name *";
@@ -39,28 +39,32 @@ public class PrimaryApplicantPage extends BaseTest {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
-    public void selectApplicantType(String applicantType, String individualText) {
-        Locator dropdown = page.locator(SELECT_APPLICANT_TYPE);
-        dropdown.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        dropdown.click();
+    public void selectApplicantType(String applicantType, String individualText) throws InterruptedException {
+        page.locator(SELECT_APPLICANT_TYPE).click();
         log.info("Opened Applicant Type dropdown.");
 
-        Locator dropdownListbox = page.locator("div[role='listbox']").first();
-        dropdownListbox.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        page.waitForTimeout(400);
-        Locator option = dropdownListbox.getByRole(AriaRole.OPTION,
-                new Locator.GetByRoleOptions().setName(individualText).setExact(true));
-        option.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
-        try {
-            option.dispatchEvent("mousedown");
-            log.info("Dispatched 'mousedown' event to select option.");
-        } catch (Exception e) {
-            log.warn("Mousedown dispatch failed. Attempting JavaScript execution click fallback.");
-            option.evaluate("el => el.click()");
-        }
+      //  Locator dropdownListbox = page.locator("li[data-value='Individual']").first();
+        Locator dropdownListbox = page.locator("//li[text()='Individual']");
+        Thread.sleep(4000);
+   //     dropdownListbox.click();
+        dropdownListbox.dblclick();
+
+//        dropdownListbox.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+//        page.waitForTimeout(400);
+//        Locator option = dropdownListbox.getByRole(AriaRole.OPTION,
+//                new Locator.GetByRoleOptions().setName("Individual").setExact(true));
+//        option.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
+//        try {
+//            option.dispatchEvent("mousedown");
+//            log.info("Dispatched 'mousedown' event to select option.");
+//        } catch (Exception e) {
+//            log.warn("Mousedown dispatch failed. Attempting JavaScript execution click fallback.");
+//            option.evaluate("el => el.click()");
+//        }
         page.waitForLoadState();
         log.info("Successfully selected Applicant Type: {}", individualText);
     }
+
     public void verifyPanNumber(String pan) {
         Locator panInput = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("PAN Number"));
         panInput.click();

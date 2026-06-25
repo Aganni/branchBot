@@ -8,7 +8,7 @@ import ui.pages.dsa_secured.PrimaryApplicantPage;
 public class PrimaryApplicantSteps extends BaseTest {
 
     @And("User completes Primary Applicant details and proceeds")
-    public void completePrimaryApplicantFlow() {
+    public void completePrimaryApplicantFlow() throws Exception {
         PrimaryApplicantPage applicantPage = new PrimaryApplicantPage(BaseTest.getPage());
         applicantPage.selectApplicantType("applicantType", "Individual");
         applicantPage.verifyPanNumber(TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan"));
