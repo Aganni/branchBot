@@ -45,7 +45,6 @@ public class PrimaryApplicantPage extends BaseTest {
 
         Locator dropdownListbox = page.locator("//li[text()='Individual']");
         Thread.sleep(4000);
-   //     dropdownListbox.click();
         dropdownListbox.dblclick();
         page.waitForLoadState();
         Thread.sleep(4000);

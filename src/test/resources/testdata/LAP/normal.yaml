@@ -17,7 +17,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310152"
+    phone_number: "9001310162"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -94,6 +94,36 @@ dsa_secured:
       bank2_acc_num: "987654345678"
       bank2_type: "savings"
       bank2_ifsc: "HDFC0000094"
+
+    co_applicant:
+      kyc:
+        applicant_type: "Individual"
+        type: "Financial"
+        pan: "ABGPS7398Z"
+        relationship: "Sister"
+        phone_number: "9380800213"
+        email: "nikitha.s@creditsaison-in.com"
+        gender: "Female"
+        father_name: "FATH"
+        mother_name: "MOTH"
+        category: "SC"
+        religion: "HINDU"
+        education: "MS"
+        nationality: "IN"
+        disability: "No"
+      addresses:
+        line1: "5th Cross Green Valley"
+        ownership: "Rented"
+      employment:
+        type: "Salaried"
+        employer: "Lumens aircon private limited"
+        income: "250000"
+        office_email: "nikitha.s@creditsaison-in.com"
+        designation: "QA Engineer"
+        line1: "Near Sri Chaitanya Junior College Old Alwal Main Road"
+        line2: "Near Sri Chaitanya Junior College Old Alwal Main Road"
+        pincode: "400009"
+        ownership: "Rented"
 
 
 
