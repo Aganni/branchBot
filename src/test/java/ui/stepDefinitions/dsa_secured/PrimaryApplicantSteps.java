@@ -10,7 +10,6 @@ public class PrimaryApplicantSteps extends BaseTest {
     @And("User completes Primary Applicant details and proceeds")
     public void completePrimaryApplicantFlow() {
         PrimaryApplicantPage applicantPage = new PrimaryApplicantPage(BaseTest.getPage());
-        applicantPage.handlePageInitRefresh();
         applicantPage.selectApplicantType("applicantType", "Individual");
         applicantPage.verifyPanNumber(TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan"));
         applicantPage.verifyEmailAddress(TestDataProvider.get("dsa_secured.primary_applicant.kyc.email"));

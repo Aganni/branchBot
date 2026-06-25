@@ -14,41 +14,24 @@ public class SalariedCoappPage extends BaseTest {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Navigate to Co-Applicants and add a new applicant
-    // ─────────────────────────────────────────────────────────────────────────
     public void clickAddApplicant() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("CO APPLICANTS")).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ADD APPLICANT")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Clicked ADD APPLICANT on Co-Applicants page.");
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // KYC / Personal Details
-    // ─────────────────────────────────────────────────────────────────────────
-    public void fillPersonalDetails(Map<String, String> data) {
+    public void PersonalDetails(Map<String, String> data) {
         log.info("Filling Co-Applicant personal details...");
-
-        // Wait for form to mount
         page.getByLabel("PAN Number *").waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
-
-        // Applicant Type — native select, same pattern as PrimaryApplicantPage
         page.getByLabel("Applicant Type").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("applicant_type"))).click();
-
-        // Co-applicant Type (Salaried / Self-employed etc.)
         page.getByLabel("Type *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("type")).setExact(true)).click();
-
-        // PAN + Verify
         page.getByLabel("PAN Number *").click();
         page.getByLabel("PAN Number *").fill(data.get("pan"));
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).click();
         log.info("Clicked Verify for co-applicant PAN: {}", data.get("pan"));
 
-        // Handle existing profile — click COPY PROFILE if banner appears
         Locator copyProfileBtn = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("COPY PROFILE"));
         try {
@@ -59,22 +42,17 @@ public class SalariedCoappPage extends BaseTest {
             page.waitForTimeout(2000);
         } catch (Exception e) {
             log.info("No existing profile for co-applicant — filling fields manually.");
-            fillRemainingPersonalFields(data);
+            PersonalFields(data);
         }
-
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
         log.info("Co-applicant personal details submitted.");
     }
 
-    private void fillRemainingPersonalFields(Map<String, String> data) {
-        // Relationship with primary applicant
+    private void PersonalFields(Map<String, String> data) {
         page.getByLabel("Relationship with applicant *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("relationship"))).click();
-
         page.getByLabel("Phone Number *").fill(data.get("phone"));
         page.getByPlaceholder("Enter email address").fill(data.get("email"));
-
-        // Gender — rendered as a custom select with placeholder
         page.getByPlaceholder("Select Gender").click();
         page.getByText(data.get("gender"), new Page.GetByTextOptions().setExact(true)).click();
 
@@ -103,10 +81,8 @@ public class SalariedCoappPage extends BaseTest {
         selectDropdown("Disability *", data.get("disability"));
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Address Details
-    // ─────────────────────────────────────────────────────────────────────────
-    public void fillAddressDetails(Map<String, String> data) {
+    public void AddressDetails(Map<String, String> data) {
         log.info("Filling Co-Applicant address details...");
 
         page.getByPlaceholder("Current Address (Line 1)").fill(data.get("address_line1"));
@@ -122,10 +98,8 @@ public class SalariedCoappPage extends BaseTest {
         log.info("Co-applicant address details submitted.");
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Employment Details (Salaried)
-    // ─────────────────────────────────────────────────────────────────────────
-    public void fillEmploymentDetails(Map<String, String> data) {
+    public void EmploymentDetails(Map<String, String> data) {
         log.info("Filling Co-Applicant employment details...");
 
         selectDropdown("Employment Type", data.get("employment_type"));
@@ -148,19 +122,12 @@ public class SalariedCoappPage extends BaseTest {
 
         log.info("Co-applicant employment details filled.");
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
     // Submit
-    // ─────────────────────────────────────────────────────────────────────────
     public void clickSubmit() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         page.waitForSelector("text=Linked individual added");
         log.info("Co-applicant submitted successfully.");
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helper
-    // ─────────────────────────────────────────────────────────────────────────
     private void selectDropdown(String buttonName, String value) {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(buttonName)).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(value)).click();

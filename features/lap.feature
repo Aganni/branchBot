@@ -11,4 +11,4 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes adding LAP Lead Details
     Then User provides customer consent via OTP verification
     And User completes Primary Applicant details and proceeds
-    #And User completes Salaried Co-Applicant details and proceeds
+    And User completes Salaried Co-Applicant details and proceeds
