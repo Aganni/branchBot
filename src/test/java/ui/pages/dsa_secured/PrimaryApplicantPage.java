@@ -43,25 +43,12 @@ public class PrimaryApplicantPage extends BaseTest {
         page.locator(SELECT_APPLICANT_TYPE).click();
         log.info("Opened Applicant Type dropdown.");
 
-      //  Locator dropdownListbox = page.locator("li[data-value='Individual']").first();
         Locator dropdownListbox = page.locator("//li[text()='Individual']");
         Thread.sleep(4000);
    //     dropdownListbox.click();
         dropdownListbox.dblclick();
-
-//        dropdownListbox.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-//        page.waitForTimeout(400);
-//        Locator option = dropdownListbox.getByRole(AriaRole.OPTION,
-//                new Locator.GetByRoleOptions().setName("Individual").setExact(true));
-//        option.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
-//        try {
-//            option.dispatchEvent("mousedown");
-//            log.info("Dispatched 'mousedown' event to select option.");
-//        } catch (Exception e) {
-//            log.warn("Mousedown dispatch failed. Attempting JavaScript execution click fallback.");
-//            option.evaluate("el => el.click()");
-//        }
         page.waitForLoadState();
+        Thread.sleep(4000);
         log.info("Successfully selected Applicant Type: {}", individualText);
     }
 
