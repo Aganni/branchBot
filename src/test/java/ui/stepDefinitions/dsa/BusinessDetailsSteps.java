@@ -1,10 +1,13 @@
 package ui.stepDefinitions.dsa;
 
+import backend.constants.Constants;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.*;
 import ui.Utils.Utils;
 import ui.pages.dsa.BusinessDetailsPage;
+
+import static dynamicData.DynamicDataClass.getValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,8 +21,8 @@ public class BusinessDetailsSteps extends BaseTest {
         // Extract partner loan ID from URL
         Utils.extractAndStorePartnerLoanId();
 
-        // PAN verification
-        page.enterPanAndVerify(TestDataProvider.get("dsa.business_details.entity_pan"));
+        // PAN verification - use the Mystique-generated PAN
+        page.enterPanAndVerify((String) getValue(Constants.PAN_CARD));
         page.verifyAutoPopulatedEntityName(TestDataProvider.get("dsa.business_details.entity_name"));
         page.clickContinueToFetchDetails();
 

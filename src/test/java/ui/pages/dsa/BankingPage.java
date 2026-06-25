@@ -63,7 +63,7 @@ public class BankingPage extends BaseTest {
         perfiosPage.locator(I_CONFIRM_BTN).click();
 
         log.info("Uploading bank statement PDF...");
-        perfiosPage.setInputFiles(FILE_INPUT, Paths.get("src/test/resources/testdata/bank_statement.pdf"));
+        perfiosPage.setInputFiles(FILE_INPUT, Paths.get("src/test/resources/testdata/June2026.pdf"));
 
         log.info("Waiting for analysis to complete...");
         perfiosPage.locator(FINISH_BTN).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
