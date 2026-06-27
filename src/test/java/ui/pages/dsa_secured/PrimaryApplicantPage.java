@@ -42,12 +42,11 @@ public class PrimaryApplicantPage extends BaseTest {
     public void selectApplicantType(String applicantType, String individualText) throws InterruptedException {
         page.locator(SELECT_APPLICANT_TYPE).click();
         log.info("Opened Applicant Type dropdown.");
-
         Locator dropdownListbox = page.locator("//li[text()='Individual']");
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         dropdownListbox.dblclick();
         page.waitForLoadState();
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         log.info("Successfully selected Applicant Type: {}", individualText);
     }
 
@@ -219,5 +218,6 @@ public class PrimaryApplicantPage extends BaseTest {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Co Applicants")).click();
         log.info("Form Submitted successfully. Routed onto Co-Applicants page context.");
+        page.reload();
     }
 }

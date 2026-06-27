@@ -1,5 +1,6 @@
 package ui.pages.dsa_secured;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import hooks.BaseTest;
@@ -30,18 +31,28 @@ public class CoAppSalariedPage extends BaseTest {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
-    public void clickAddApplicant() {
+    public void clickAddApplicant() throws InterruptedException {
+        Thread.sleep(8000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Clicked on Add Applicant entry window.");
+        Thread.sleep(2000);
     }
-    public void selectApplicantType(String applicantType) {
+    public void selectApplicantType(String applicantType) throws InterruptedException {
         page.getByLabel("Applicant Type").click();
+        log.info("Clicked on Add Applicant Type CTA.");
+        //applicant_type: "Individual" - which was declared in normal.yaml file
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(applicantType)).click();
+        Thread.sleep(5000);
     }
+
     public void selectType(String type) {
-        page.getByLabel("Type *").click();
+        // 1. Single click to open the dropdown menu
+        page.locator("//div[@id='type']").click();
+
+        // 2. Click the desired option dynamically based on the 'type' parameter
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type).setExact(true)).click();
     }
+
     public void verifyPanNumber(String pan) {
         page.getByLabel("PAN Number *").click();
         page.getByLabel("PAN Number *").fill(pan);

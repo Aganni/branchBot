@@ -17,7 +17,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310162"
+    phone_number: "9001310188"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -95,35 +95,61 @@ dsa_secured:
       bank2_type: "savings"
       bank2_ifsc: "HDFC0000094"
 
-    co_applicant:
-      kyc:
-        applicant_type: "Individual"
-        type: "Financial"
-        pan: "ABGPS7398Z"
-        relationship: "Sister"
-        phone_number: "9380800213"
-        email: "nikitha.s@creditsaison-in.com"
-        gender: "Female"
-        father_name: "FATH"
-        mother_name: "MOTH"
-        category: "SC"
-        religion: "HINDU"
-        education: "MS"
-        nationality: "IN"
-        disability: "No"
-      addresses:
-        line1: "5th Cross Green Valley"
-        ownership: "Rented"
-      employment:
-        type: "Salaried"
-        employer: "Lumens aircon private limited"
-        income: "250000"
-        office_email: "nikitha.s@creditsaison-in.com"
-        designation: "QA Engineer"
-        line1: "Near Sri Chaitanya Junior College Old Alwal Main Road"
-        line2: "Near Sri Chaitanya Junior College Old Alwal Main Road"
-        pincode: "400009"
-        ownership: "Rented"
+  co_applicant:
+    kyc:
+      applicant_type: "Individual"
+      type: "Financial"
+      pan: "ABGPS7398Z"
+      relationship: "Sister"
+      phone_number: "9380800213"
+      email: "nikitha.s@creditsaison-in.com"
+      gender: "Female"
+      father_name: "FATH"
+      mother_name: "MOTH"
+      category: "SC"
+      religion: "HINDU"
+      education: "MS"
+      nationality: "IN"
+      disability: "No"
+    addresses:
+      line1: "5th Cross Green Valley"
+      ownership: "Rented"
+    employment:
+      type: "Salaried"
+      employer: "Lumens aircon private limited"
+      income: "250000"
+      office_email: "nikitha.s@creditsaison-in.com"
+      designation: "QA Engineer"
+      line1: "Near Sri Chaitanya Junior College Old Alwal Main Road"
+      line2: "Near Sri Chaitanya Junior College Old Alwal Main Road"
+      pincode: "400009"
+      ownership: "Rented"
 
-
+  co_applicant_dl:
+    kyc:
+      applicant_type: "Individual"
+      type: "Non-Financial"
+      ovd_type: "Driving License"
+      dob: "14-03-1974"
+      dl_number: "WB2320150223071"
+      dl_expiry: "12/09/2045"
+      relationship: "Brother"
+      phone_number: "9380802178"
+      email: "nikitha.s@creditsaison-in.com"
+      gender: "Female"
+      father_name: "fath"
+      mother_name: "moth"
+      category: "OBC"
+      religion: "MUSLIM"
+      education: "MS"
+      marital_status: "Single"
+      nationality: "NR"
+      disability: "No"
+    addresses:
+      line1: "Plot No.56 Sree Venkateshwara Nagar 2nd Main Near Lotus Park"
+      line2: "Adjoining Blue Diamond Supermarket Outer Ring Road"
+      pincode: "560091"
+      ownership: "Rented"
+    consent:
+      otp: "123456"
 
