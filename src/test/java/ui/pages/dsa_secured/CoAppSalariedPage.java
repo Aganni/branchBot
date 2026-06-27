@@ -32,7 +32,7 @@ public class CoAppSalariedPage extends BaseTest {
         this.page = page;
     }
     public void clickAddApplicant() throws InterruptedException {
-        Thread.sleep(8000);
+        Thread.sleep(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Clicked on Add Applicant entry window.");
         Thread.sleep(2000);
@@ -42,7 +42,7 @@ public class CoAppSalariedPage extends BaseTest {
         log.info("Clicked on Add Applicant Type CTA.");
         //applicant_type: "Individual" - which was declared in normal.yaml file
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(applicantType)).click();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
     }
 
     public void selectType(String type) {
