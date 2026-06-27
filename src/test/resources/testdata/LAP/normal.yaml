@@ -1,9 +1,4 @@
-# ═══════════════════════════════════════════════════════════════════════════════
 # LAP End-to-End Test Data
-# Profile: Default UAT
-# ═══════════════════════════════════════════════════════════════════════════════
-
-
 dsa_secured:
   business_details:
     loan_type: "Loan Against Property"
@@ -17,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310208"
+    phone_number: "9001310216"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -152,4 +147,53 @@ dsa_secured:
       ownership: "Rented"
     consent:
       otp: "123456"
+
+  co_applicantpassport:
+    kyc:
+      applicant_type: "Individual"
+      type: "Non-Financial"
+      ovd_type: "Passport"
+      dob: "18/03/1999"
+      passport_file_number: "LK2060381736416"
+      passport_number: "P5603113"
+      passport_expiry: "12/09/2045"
+      relationship: "Brother"
+      phone_number: "9830213456"
+      email: "nikitha.s@creditsaison-in.com"
+      gender: "Male"
+      father_name: "Chris Taylor"
+      mother_name: "Sarah Wilson"
+      category: "SC"
+      religion: "HINDU"
+      education: "PG"
+      marital_status: "Married"
+      spouse_name: "Jessica White"
+      nationality: "NR"
+      disability: "Yes"
+      disability_type: "Autism Spectrum Disorder"
+      disability_percentage: "25"
+    addresses:
+      line1: "Maple Residency 4th Floor Beside Phoenix Arena"
+      line2: "Behind Tech Park Square close to Sai Baba Temple"
+      pincode: "560093"
+      ownership: "Family Owned"
+    obligations:
+      type: "Consumer Durable loan"
+      financier: "Kotak Mahindra Bank"
+      emi: "8250"
+
+  co_applicant_entity:
+    kyc:
+      applicant_type: "Entity"
+      pan: "ABGTS7399A"
+      udyam: "UDYAM-AD-12-1234567"
+      registration_date: "12/09/2000"
+      business_type: "Small"
+      phone_number: "9380800021"
+      email: "nikitha.s@creditsaison-in.com"
+    addresses:
+      line1: "Sai Krupa Nilayam Lane Opposite Ganesh Temple"
+      line2: "Opposite Platinum Plaza Close to City Convention Hall Adjacent to Global IT Solutions Campus"
+      pincode: "560091"
+      ownership: "Rented"
 

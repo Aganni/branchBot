@@ -87,6 +87,8 @@ public class CoAppDLPage extends BaseTest {
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(disability)).click();
         log.info("Co-Applicant background profile configurations completed.");
         Thread.sleep(3000);
+        //Click outside to enable 'Next' button. Click Phone Number field.
+        page.getByLabel("Phone Number *").click();
     }
 
     public void AddressDetails(String line1, String line2, String pincode, String ownership) throws InterruptedException {
@@ -112,6 +114,6 @@ public class CoAppDLPage extends BaseTest {
     public void submitForm() throws InterruptedException{
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         log.info("Form configuration completed and submitted.");
-        Thread.sleep(3000);
+        Thread.sleep(5000);
     }
 }
