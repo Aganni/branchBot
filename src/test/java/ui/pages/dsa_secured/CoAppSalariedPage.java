@@ -32,10 +32,10 @@ public class CoAppSalariedPage extends BaseTest {
         this.page = page;
     }
     public void clickAddApplicant() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Clicked on Add Applicant entry window.");
-        Thread.sleep(2000);
+        Thread.sleep(5000);
     }
     public void selectApplicantType(String applicantType) throws InterruptedException {
         page.getByLabel("Applicant Type").click();
@@ -46,10 +46,7 @@ public class CoAppSalariedPage extends BaseTest {
     }
 
     public void selectType(String type) {
-        // 1. Single click to open the dropdown menu
         page.locator("//div[@id='type']").click();
-
-        // 2. Click the desired option dynamically based on the 'type' parameter
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type).setExact(true)).click();
     }
 
@@ -95,6 +92,8 @@ public class CoAppSalariedPage extends BaseTest {
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(disability)).click();
         log.info("Completed Co-Applicant dynamic layout demographics entries.");
         Thread.sleep(4000);
+        //Click outside to enable 'Next' button. Click parent field.
+        page.getByLabel(FATHER_NAME).click();
     }
 
     public void AddressDetails(String line1, String ownership) throws InterruptedException{
@@ -104,7 +103,7 @@ public class CoAppSalariedPage extends BaseTest {
         //page.getByText(line1).click();
         page.getByLabel(ADDRESS_OWNERSHIP).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
     }
 
     public void checkAddressConsents() {
@@ -112,7 +111,7 @@ public class CoAppSalariedPage extends BaseTest {
         page.getByLabel("Yes").nth(1).check();
     }
 
-    public void EmploymentDetails(String type, String company, String income, String email, String designation, String line1, String line2, String pincode, String ownership) {
+    public void EmploymentDetails(String type, String company, String income, String email, String designation, String line1, String line2, String pincode, String ownership) throws InterruptedException {
         page.getByLabel("Employment Type").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type)).click();
         page.getByPlaceholder(COMPANY).click();
@@ -128,6 +127,10 @@ public class CoAppSalariedPage extends BaseTest {
         page.getByLabel(OFFICE_OWNERSHIP).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
         log.info("Filled Corporate Employment Address Configurations.");
+        Thread.sleep(2000);
+
+        //Click outside to enable 'Next' button. Click office address 1 field.
+        page.getByLabel(OFFICE_L1).click();
     }
     public void clickNext() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();

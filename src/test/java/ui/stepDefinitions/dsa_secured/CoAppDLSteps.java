@@ -11,20 +11,18 @@ public class CoAppDLSteps extends BaseTest {
     public void completeCoAppDlFlow() throws Exception {
         CoAppDLPage dlPage = new CoAppDLPage(BaseTest.getPage());
 
-        // 1. Process KYC / Identification Tab
+        // 1. Process KYC
         dlPage.clickAddApplicant();
         dlPage.selectApplicantType(TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.applicant_type"));
         dlPage.selectType(TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.type"));
         dlPage.checkFormTypeOption();
-
-        dlPage.verifyDrivingLicense(
+        dlPage.DrivingLicense(
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.ovd_type"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.dob"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.dl_number"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.dl_expiry")
         );
-
-        dlPage.fillKYCDetails(
+        dlPage.KYCDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.relationship"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.phone_number"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.email"),
@@ -41,7 +39,7 @@ public class CoAppDLSteps extends BaseTest {
         dlPage.clickNext();
 
         // 2. Process Address Tab
-        dlPage.fillAddressDetails(
+        dlPage.AddressDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_dl.addresses.line1"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.addresses.line2"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.addresses.pincode"),
@@ -50,9 +48,8 @@ public class CoAppDLSteps extends BaseTest {
         dlPage.checkAddressConsents();
         dlPage.clickNext();
 
-        // 3. Complete Submission and Validate via Otp Panel
-        dlPage.submitInitialForm();
-        dlPage.processOtpVerification(TestDataProvider.get("dsa_secured.co_applicant_dl.consent.otp"));
-        dlPage.clickFinalNext();
+        // 3. Submit Form
+        dlPage.submitForm();
+
     }
 }
