@@ -67,7 +67,7 @@ public class CoAppEntityPage extends BaseTest {
         log.info("Operating Office Address details populated.");
         //Click outside to enable 'Next' button. Click ADDR_L2_LABEL field.
         page.getByLabel(ADDR_L2).click();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
     }
 
     public void submitForm() {

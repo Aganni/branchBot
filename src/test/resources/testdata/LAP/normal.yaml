@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310216"
+    phone_number: "9001310226"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -196,4 +196,7 @@ dsa_secured:
       line2: "Opposite Platinum Plaza Close to City Convention Hall Adjacent to Global IT Solutions Campus"
       pincode: "560091"
       ownership: "Rented"
+
+  Applicant_consent_details:
+    SEND OTP: "123456"
 

@@ -15,3 +15,4 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User adds Driving License Co-Applicant details and submits Appform
     And User adds Passport Co-Applicant details and submits Appform
     And User adds Entity Co-Applicant details and submits Appform
+    And User completes OTP consent verification for individual applicants

@@ -57,7 +57,5 @@ public class customerConsentPage extends BaseTest {
         // Click the enabled NEXT transition button navigation target
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("NEXT")).click();
         log.info("Clicked NEXT button to move to Primary Applicant Stage.");
-
-
     }
 }

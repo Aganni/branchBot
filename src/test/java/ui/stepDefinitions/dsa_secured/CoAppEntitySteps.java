@@ -1,12 +1,9 @@
 package ui.stepDefinitions.dsa_secured;
-
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
 import ui.pages.dsa_secured.CoAppEntityPage;
-
 public class CoAppEntitySteps extends BaseTest {
-
     @And("User adds Entity Co-Applicant details and submits Appform")
     public void completeCoAppEntityFlow() throws Exception {
         CoAppEntityPage entityPage = new CoAppEntityPage(BaseTest.getPage());
@@ -19,7 +16,7 @@ public class CoAppEntitySteps extends BaseTest {
         entityPage.verifyCompanyPan(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.pan"));
         entityPage.verifyUdyamDetails(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.udyam"));
 
-        // 3. Populate Corporate Profile Details
+        // 3.Corporate Profile Details
         entityPage.EntityProfileDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.registration_date"),
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.business_type"),
@@ -27,7 +24,7 @@ public class CoAppEntitySteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email")
         );
 
-        // 4. Fill Corporate Operating Address Details
+        // 4.Corporate Operating Address Details
         entityPage.OperatingAddressDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_entity.addresses.line1"),
                 TestDataProvider.get("dsa_secured.co_applicant_entity.addresses.line2"),
