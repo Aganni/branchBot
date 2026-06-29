@@ -217,8 +217,9 @@ public class PrimaryApplicantPage extends BaseTest {
         log.info("Clicked 'Next' to shift layouts.");
     }
 
-    public void submitAndNavigateToCoApplicants() {
+    public void submitAndNavigateToCoApplicants() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
+        Thread.sleep(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Co Applicants")).click();
         log.info("Form Submitted successfully. Routed onto Co-Applicants page context.");
         page.reload();

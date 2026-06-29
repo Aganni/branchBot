@@ -80,17 +80,18 @@ public class CoAppEntityPage extends BaseTest {
 
     public void clickSendEmail() {
         log.info("Clicking Re-trigger Consent button for Entity Email");
-        page.locator("Re-trigger Consent").click();
-        page.waitForTimeout(3000);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Re-trigger Consent")).click();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
     }
 
     public void clickSubmitConsent() {
         log.info("Waiting for backend SQS processing...");
-        page.waitForTimeout(3000);
+        page.waitForTimeout(4000);
 
         log.info("Refreshing the page to fetch the latest consent status...");
         page.reload();
-        log.info("Successfully clicked Submit on Consent Page");
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        log.info("Successfully fetched updated Consent Page status state.");
     }
 }
 
