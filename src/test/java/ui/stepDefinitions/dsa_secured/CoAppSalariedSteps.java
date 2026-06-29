@@ -51,5 +51,8 @@ public class CoAppSalariedSteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.co_applicant.employment.ownership")
         );
         coApplicantPage.submitForm();
+
+        coApplicantPage.processOtpVerification(TestDataProvider.get("dsa_secured.co_applicant.consent.otp"));
+        //coApplicantPage.clickFinalNext();
     }
 }

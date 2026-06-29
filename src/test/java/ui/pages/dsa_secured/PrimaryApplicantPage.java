@@ -40,6 +40,7 @@ public class PrimaryApplicantPage extends BaseTest {
         this.page = page;
     }
     public void selectApplicantType(String applicantType, String individualText) throws InterruptedException {
+        page.reload();
         page.locator(SELECT_APPLICANT_TYPE).click();
         log.info("Opened Applicant Type dropdown.");
         Locator dropdownListbox = page.locator("//li[text()='Individual']");

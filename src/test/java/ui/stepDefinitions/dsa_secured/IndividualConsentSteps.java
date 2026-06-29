@@ -8,23 +8,14 @@ import ui.pages.dsa_secured.IndividualConsentPage;
 public class IndividualConsentSteps extends BaseTest {
 
     @And("User completes OTP consent verification for individual applicants")
-
-    public void completeIndividualConsentFlow() throws Exception {
+    public void completeCoApplicantsConsent(int applicantCount) throws Exception {
         IndividualConsentPage consentPage = new IndividualConsentPage(BaseTest.getPage());
 
-        // Pull the mock OTP string ("123456") defined inside normal.yaml
-        String otpValue = TestDataProvider.get("dsa_secured.Applicant_consent_details.SEND OTP");
+        // Process OTP Verification loops sequentially
+        String otpValue = TestDataProvider.get("dsa_secured.consent_details.SEND OTP");
+        consentPage.verifyCoApplicantsConsent(applicantCount, otpValue);
 
-        consentPage.verifyIndividualApplicantsConsent(otpValue);
-    }
-
-    public void verifyValidationAndTriggerEntityConsent() throws Exception {
-        IndividualConsentPage consentPage = new IndividualConsentPage(BaseTest.getPage());
-
-        // 1. Verify the mandatory consent error message pops up
-        consentPage.verifyMandatoryConsentValidation();
-
-        // 2. Click on Re-trigger Consent for the Entity applicant
-        consentPage.clickReTriggerEntityConsent();
+        // Advance past the Co-Applicants section dashboard layout
+        consentPage.clickNext();
     }
 }

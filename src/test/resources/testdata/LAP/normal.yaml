@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310226"
+    phone_number: "9001310253"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -119,6 +119,8 @@ dsa_secured:
       line2: "Near Greenwood International School Adjacent to Imperial Banquet Hall"
       pincode: "400009"
       ownership: "Rented"
+    consent:
+        otp: "123456"
 
   co_applicant_dl:
     kyc:
@@ -197,6 +199,58 @@ dsa_secured:
       pincode: "560091"
       ownership: "Rented"
 
-  Applicant_consent_details:
-    SEND OTP: "123456"
+  co_applicant_aadhaar:
+    kyc:
+      applicant_type: "Individual"
+      type: "Non-Financial"
+      ovd_type: "Aadhaar Last 4 digits"
+      dob: "24/12/1995"
+      aadhaar_last_4: "3205"
+      salutation: "Mr"
+      name: "Chris Taylor"
+      relationship: "Brother"
+      phone_number: "9380802314"
+      email: "nikitha.s@creditsaison-in.com"
+      gender: "Male"
+      father_name: "Isaiah"
+      mother_name: "Sarah"
+      category: "SC"
+      religion: "HINDU"
+      education: "PG"
+      marital_status: "Single"
+      nationality: "NR"
+      disability: "No"
+    addresses:
+      line1: "Door No 45/22 Maple Residency 4th Floor Beside Phoenix Arena"
+      line2: "Behind Tech Park Square Whitefield Main Road IT Corridor"
+      pincode: "600092"
+      ownership: "Self Owned"
+    obligations:
+      type: "Business Loan"
+      financier: "ICICI Bank"
+      emi: "12000"
+      account_number: "50901001983200"
+      outstanding: "120"
+      remaining_tenure: "20"
+      obligate: "No"
+      closure_type: "Bank Close"
+    consent:
+      otp: "123456"
+
+  collateral_details:
+    property_type: "Shop"
+    status: "Rented"
+    construction_stage: "Early Stage of Construction"
+    scheme: "MH_Gunthewari (within MC)"
+    area_built_up: "1200"
+    area_carpet: "1200"
+    pincode: "560092"
+    street: "STREET"
+    landmark: "LANDMARK"
+
+  document_attachments:
+    driving_license_file: "Screenshot 2026-06-28 at 5.15.52 PM.png"
+    bank_statement_file_1: "Screenshot 2026-06-28 at 5.15.52 PM.png"
+    bank_statement_file_2: "Screenshot 2026-06-27 at 8.22.08 AM.png"
+    aadhaar_file: "Screenshot 2026-06-25 at 2.54.19 PM.png"
 

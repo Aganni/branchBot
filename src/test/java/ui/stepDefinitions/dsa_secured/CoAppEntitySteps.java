@@ -34,5 +34,8 @@ public class CoAppEntitySteps extends BaseTest {
 
         // 5. Submit Form Configuration
         entityPage.submitForm();
+
+        entityPage.clickSendEmail();
+        entityPage.clickSubmitConsent();
     }
 }

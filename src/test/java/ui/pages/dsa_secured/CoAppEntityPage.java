@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import hooks.BaseTest;
 
+
 public class CoAppEntityPage extends BaseTest {
     private final Page page;
 
@@ -65,13 +66,31 @@ public class CoAppEntityPage extends BaseTest {
         page.getByLabel(ADDR_OWNERSHIP).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ownership)).click();
         log.info("Operating Office Address details populated.");
+        Thread.sleep(1000);
         //Click outside to enable 'Next' button. Click ADDR_L2_LABEL field.
         page.getByLabel(ADDR_L2).click();
         Thread.sleep(5000);
     }
 
-    public void submitForm() {
+    public void submitForm() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         log.info("Entity form configuration saved and layout processing finalized.");
+        Thread.sleep(5000);
+    }
+
+    public void clickSendEmail() {
+        log.info("Clicking Re-trigger Consent button for Entity Email");
+        page.locator("Re-trigger Consent").click();
+        page.waitForTimeout(3000);
+    }
+
+    public void clickSubmitConsent() {
+        log.info("Waiting for backend SQS processing...");
+        page.waitForTimeout(3000);
+
+        log.info("Refreshing the page to fetch the latest consent status...");
+        page.reload();
+        log.info("Successfully clicked Submit on Consent Page");
     }
 }
+

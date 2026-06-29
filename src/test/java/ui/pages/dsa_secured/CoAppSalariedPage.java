@@ -3,6 +3,7 @@ package ui.pages.dsa_secured;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import data.TestDataProvider;
 import hooks.BaseTest;
 
 public class CoAppSalariedPage extends BaseTest {
@@ -139,4 +140,20 @@ public class CoAppSalariedPage extends BaseTest {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         log.info("Co-Applicant details finalized and layout submitted.");
     }
+
+    public void processOtpVerification(String otpValue) {
+        page.getByText("Give OTP Consent").first().click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Get OTP")).click();
+
+        // Targets active dynamic input grids securely by fetching components visible on the viewport
+        Locator visibleOtpInputs = page.locator("input[id^=':r']:visible");
+        for (int i = 0; i < otpValue.length(); i++) {
+            char otpChar = otpValue.charAt(i);
+            visibleOtpInputs.nth(i).fill(String.valueOf(otpChar));
+        }
+
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
+        log.info("OTP verification layer confirmed.");
+    }
+
 }
