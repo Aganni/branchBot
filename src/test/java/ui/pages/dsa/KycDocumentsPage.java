@@ -21,31 +21,41 @@ public class KycDocumentsPage extends BaseTest {
     }
 
     public void uploadMandatoryKycDocument() {
-        log.info("Locating 'KYC Documents' section on the page");
+        log.info("On KYC Documents page - uploading mandatory document");
 
-        // Find the KYC Documents section and upload the file
-        Locator section = page.getByText("KYC Documents");
-        section.waitFor(new Locator.WaitForOptions().setTimeout(15000));
-        log.info("Found KYC Documents section");
+        // Click to expand the KYC Documents section
+        page.getByText("KYC Documents*").click();
+        page.waitForTimeout(1000);
+        log.info("Expanded KYC Documents section");
 
-        // Upload the PDF using absolute path
+        // Directly set file on the hidden input (Playwright allows this without visibility)
         java.nio.file.Path absolutePath = Paths.get(SAMPLE_DOC_PATH).toAbsolutePath();
         log.info("Uploading document from: {}", absolutePath);
         page.locator(UPLOAD_INPUT).setInputFiles(absolutePath);
-        log.info("Document uploaded successfully");
+        log.info("Document uploaded via file input");
 
-        // Select document type as "Pan"
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Type")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan")).click();
+        // Wait for upload modal to appear
+        page.waitForTimeout(2000);
+
+        // Select document type as "Pan" in the modal (MUI Select component)
+        page.locator("#docType").click();
+        page.waitForTimeout(500);
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan"))
+            .or(page.locator("li:has-text('Pan')"))
+            .or(page.getByText("Pan", new Page.GetByTextOptions().setExact(true)))
+            .first().click();
         log.info("Selected document type: Pan");
 
         // Save the document
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SAVE")).click();
         log.info("Clicked Save button");
+
+        // Wait for the upload to complete before submitting
+        page.waitForTimeout(5000);
     }
 
     public void submitDocuments() {
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
         log.info("Clicked Submit on KYC Documents page.");
     }
 }
