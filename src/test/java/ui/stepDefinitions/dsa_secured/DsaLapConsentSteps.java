@@ -1,33 +1,30 @@
 package ui.stepDefinitions.dsa_secured;
 
+import data.TestDataProvider;
 import hooks.BaseTest;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Then;
-import ui.pages.dsa.DsaLapConsentPage;
+import ui.pages.dsa_secured.DsaLapConsentPage;
 
 public class DsaLapConsentSteps extends BaseTest {
 
     private DsaLapConsentPage consentPage;
 
-    @Given("User is on the main loan application page")
-    public void userIsOnMainLoanApplicationPage() {
+    @And("User provides the consent for Entity applicant")
+    public void userProvidesConsentForEntityApplicant() {
         consentPage = new DsaLapConsentPage(BaseTest.getPage());
-    }
 
-    @When("User opens Google Groups in a new tab to log in with email {string} and password {string}")
-    public void userOpensGoogleGroupsInANewTabAndLogsIn(String email, String password) {
+        // 1. Click Re-trigger Consent on the DSA page to send the email notification
+        consentPage.clickRetriggerConsent();
+
+        // 2. Open Google Groups, sign in if needed, and navigate to the notification email
+        String email = TestDataProvider.get("dsa_secured.co_applicant_entity.Consent.email");
+        String password = TestDataProvider.get("dsa_secured.co_applicant_entity.Consent.password");
         consentPage.loginAndNavigateToGroups(email, password);
-    }
 
-    @And("User locates the latest confirmation email to process verification consent")
-    public void userLocatesLatestConfirmationEmailAndConsents() {
+        // 3. Open the latest email, scroll down, click "Verify My Email" and complete consent
         consentPage.openLatestEmailAndConsent();
-    }
 
-    @Then("User returns to the front-facing main application dashboard")
-    public void userReturnsToTheFrontFacingMainApplicationDashboard() {
+        // 4. Return focus to the main DSA application page
         consentPage.returnToMainWorkspace();
     }
 }

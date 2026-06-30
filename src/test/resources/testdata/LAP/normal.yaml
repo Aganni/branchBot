@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310280"
+    phone_number: "9001310291"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -198,6 +198,9 @@ dsa_secured:
       line2: "Opposite Platinum Plaza Close to City Convention Hall Adjacent to Global IT Solutions Campus"
       pincode: "560091"
       ownership: "Rented"
+    Consent:
+        email: "tenjin.user@creditsaison-in.com"
+        password: "CreditQA@4869"
 
   co_applicant_aadhaar:
     kyc:
