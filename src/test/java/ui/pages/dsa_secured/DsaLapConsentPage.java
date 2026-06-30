@@ -169,8 +169,8 @@ public class DsaLapConsentPage {
         mainPage.reload();
         mainPage.waitForLoadState(LoadState.NETWORKIDLE);
 
-        // Verify consent status updated
-        mainPage.getByText("Consent Received").waitFor(new Locator.WaitForOptions()
+        // Verify consent status updated — multiple applicants may show "Consent Received", use first()
+        mainPage.getByText("Consent Received").first().waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE)
                 .setTimeout(30000));
         log.info("Entity consent status confirmed: Consent Received.");
