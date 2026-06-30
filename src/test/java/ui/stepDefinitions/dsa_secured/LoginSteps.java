@@ -5,6 +5,7 @@ import hooks.BaseTest;
 import io.cucumber.java.en.When;
 import ui.pages.dsa_secured.DashboardPage;
 import ui.pages.dsa_secured.LoginPage;
+import static dynamicData.DynamicDataClass.get;
 
 public class LoginSteps extends BaseTest {
     @When("User logs into DSA Portal for Secured Loan and initiates a LAP Loan application")

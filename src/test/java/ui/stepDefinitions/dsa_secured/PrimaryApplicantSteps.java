@@ -3,12 +3,17 @@ package ui.stepDefinitions.dsa_secured;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
+import ui.Utils.Utils;
 import ui.pages.dsa_secured.PrimaryApplicantPage;
+import static dynamicData.DynamicDataClass.getValue;
 
 public class PrimaryApplicantSteps extends BaseTest {
-
     @And("User completes Primary Applicant details and proceeds")
     public void completePrimaryApplicantFlow() throws Exception {
+
+        // Extract partner loan ID from URL
+        Utils.extractAndStorePartnerLoanId();
+
         PrimaryApplicantPage applicantPage = new PrimaryApplicantPage(BaseTest.getPage());
         applicantPage.selectApplicantType("applicantType", "Individual");
         applicantPage.verifyPanNumber(TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan"));

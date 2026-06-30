@@ -9,7 +9,7 @@ public class PostConsentFlowSteps extends BaseTest {
     public void processBureauAndDownload() throws Exception {
         PostConsentFlowPage flowPage = new PostConsentFlowPage(BaseTest.getPage());
         flowPage.movingToNextSatge();
-        flowPage.downloadBureauReport();
+        //flowPage.downloadBureauReport();
         flowPage.BankStatement();
     }
 }

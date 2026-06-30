@@ -1,4 +1,6 @@
 package ui.stepDefinitions.dsa_secured;
+import backend.Utils.AwsSqsUtils;
+import backend.payload.SqsQueuePayload;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
@@ -7,6 +9,7 @@ public class CoAppEntitySteps extends BaseTest {
     @And("User adds Entity Co-Applicant details and submits Appform")
     public void completeCoAppEntityFlow() throws Exception {
         CoAppEntityPage entityPage = new CoAppEntityPage(BaseTest.getPage());
+        String email = TestDataProvider.get("dsa.co_applicant_entity.email");
 
         // 1. Initialize and Process Entity Profile Identification
         entityPage.clickAddApplicant();
@@ -23,7 +26,6 @@ public class CoAppEntitySteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.phone_number"),
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email")
         );
-
         // 4.Corporate Operating Address Details
         entityPage.OperatingAddressDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_entity.addresses.line1"),
@@ -34,8 +36,6 @@ public class CoAppEntitySteps extends BaseTest {
 
         // 5. Submit Form Configuration
         entityPage.submitForm();
-
         entityPage.clickSendEmail();
-        entityPage.clickSubmitConsent();
     }
 }

@@ -14,7 +14,8 @@ public class CollateralSteps {
         flowPage.selectOwners();
 
         flowPage.PropertyDemographics(
-                TestDataProvider.get("dsa_secured.collateral_details.property_type"),
+                TestDataProvider.get("dsa_secured.collateral_details.type"),
+                TestDataProvider.get("dsa_secured.collateral_details.sub_type"),
                 TestDataProvider.get("dsa_secured.collateral_details.status"),
                 TestDataProvider.get("dsa_secured.collateral_details.construction_stage"),
                 TestDataProvider.get("dsa_secured.collateral_details.scheme")

@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310261"
+    phone_number: "9001310280"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -238,10 +238,11 @@ dsa_secured:
       otp: "123456"
 
   collateral_details:
-    property_type: "Shop"
+    type: "Commercial"
+    sub_type: "Shop"
     status: "Rented"
     construction_stage: "Early Stage of Construction"
-    scheme: "MH_Gunthewari (within MC)"
+    scheme: "Plot_MCDA"
     area_built_up: "1200"
     area_carpet: "1200"
     pincode: "560092"

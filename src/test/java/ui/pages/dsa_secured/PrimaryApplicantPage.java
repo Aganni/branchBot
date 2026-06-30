@@ -5,6 +5,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
+import ui.Utils.Utils;
 
 public class PrimaryApplicantPage extends BaseTest {
     private final Page page;

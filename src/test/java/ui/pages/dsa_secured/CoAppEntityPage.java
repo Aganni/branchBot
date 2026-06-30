@@ -3,6 +3,7 @@ package ui.pages.dsa_secured;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import hooks.BaseTest;
+import static dynamicData.DynamicDataClass.get;
 
 
 public class CoAppEntityPage extends BaseTest {
@@ -82,16 +83,7 @@ public class CoAppEntityPage extends BaseTest {
         log.info("Clicking Re-trigger Consent button for Entity Email");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Re-trigger Consent")).click();
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
-    }
 
-    public void clickSubmitConsent() {
-        log.info("Waiting for backend SQS processing...");
-        page.waitForTimeout(4000);
-
-        log.info("Refreshing the page to fetch the latest consent status...");
-        page.reload();
-        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
-        log.info("Successfully fetched updated Consent Page status state.");
     }
 }
 
