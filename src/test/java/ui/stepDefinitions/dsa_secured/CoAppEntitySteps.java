@@ -12,7 +12,7 @@ public class CoAppEntitySteps extends BaseTest {
     @And("User adds Entity Co-Applicant details and submits Appform")
     public void completeCoAppEntityFlow() throws Exception {
         CoAppEntityPage entityPage = new CoAppEntityPage(BaseTest.getPage());
-        String email = TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email");
+        //String email = TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email");
         entityPage.clickAddApplicant();
         entityPage.selectApplicantType(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.applicant_type"));
         entityPage.verifyCompanyPan(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.pan"));

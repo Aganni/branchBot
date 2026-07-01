@@ -17,7 +17,6 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     #And User adds Driving License Co-Applicant details and submits Appform
     #And User adds Passport Co-Applicant details and submits Appform
     And User adds Aadhaar Co-Applicant details and submits Appform
-    #And User completes OTP consent verification for individual applicants
     And User navigates to Exposure dedupe and bureau output, downloads bureau report
-    And User Adds the property collateral details
+    #And User Adds the property collateral details
     #And User uploads required verification documents and generates link

@@ -8,8 +8,8 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class DsaLapConsentPage {
-    private static final Logger log = LogManager.getLogger(DsaLapConsentPage.class);
+public class EntityConsentPage {
+    private static final Logger log = LogManager.getLogger(EntityConsentPage.class);
 
     private final Page mainPage;
     private Page groupsTab;
@@ -24,7 +24,7 @@ public class DsaLapConsentPage {
     private final String clickHereName = "Verify My Email";
     private final String verifyBtnName = "Verify";
 
-    public DsaLapConsentPage(Page page) {
+    public EntityConsentPage(Page page) {
         this.mainPage = page;
     }
 
