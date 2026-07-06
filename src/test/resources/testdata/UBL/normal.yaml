@@ -65,6 +65,7 @@ dsa:
     religion: "HINDU"
     designation: "Individual"
     annual_income: "400000"
+    person_with_disability: "Yes"
     permanent_same: "Yes"
     current_same: "Yes"
 

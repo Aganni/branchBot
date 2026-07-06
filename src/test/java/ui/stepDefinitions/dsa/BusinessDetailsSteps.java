@@ -23,7 +23,7 @@ public class BusinessDetailsSteps extends BaseTest {
 
         // PAN verification - use the Mystique-generated PAN
         page.enterPanAndVerify((String) getValue(Constants.PAN_CARD));
-        page.verifyAutoPopulatedEntityName(TestDataProvider.get("dsa.business_details.entity_name"));
+        page.verifyAutoPopulatedEntityName((String) getValue(Constants.BUSINESS_NAME));
         page.clickContinueToFetchDetails();
 
         // Operational address

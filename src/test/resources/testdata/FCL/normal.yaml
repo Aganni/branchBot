@@ -57,7 +57,9 @@ dsa:
     trade_ref2_relation: "Customer"
     trade_ref2_mobile: "9839099092"
     email: "adarsh.gani@gmail.com"
+    shareholding: "23"
     correspondence_address: "AGARWAL NGR CAVES RD"
+    correspondence_address_line2: "AGARWAL NGR CAVES RD"
     correspondence_ownership: "Self Owned"
     father_first_name: "Vikas"
     father_last_name: "Kamble"
@@ -65,6 +67,7 @@ dsa:
     religion: "HINDU"
     designation: "Individual"
     annual_income: "400000"
+    person_with_disability: "Yes"
     permanent_same: "Yes"
     current_same: "Yes"
 

@@ -16,7 +16,8 @@ public class KycDocumentsPage extends BaseTest {
     private static final String SAMPLE_DOC_PATH = "src/test/resources/testdata/bank_statement.pdf";
 
     public KycDocumentsPage(Page page) {
-        if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
+        if (page == null)
+            throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
@@ -28,7 +29,8 @@ public class KycDocumentsPage extends BaseTest {
         page.waitForTimeout(1000);
         log.info("Expanded KYC Documents section");
 
-        // Directly set file on the hidden input (Playwright allows this without visibility)
+        // Directly set file on the hidden input (Playwright allows this without
+        // visibility)
         java.nio.file.Path absolutePath = Paths.get(SAMPLE_DOC_PATH).toAbsolutePath();
         log.info("Uploading document from: {}", absolutePath);
         page.locator(UPLOAD_INPUT).setInputFiles(absolutePath);
@@ -41,9 +43,9 @@ public class KycDocumentsPage extends BaseTest {
         page.locator("#docType").click();
         page.waitForTimeout(500);
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan"))
-            .or(page.locator("li:has-text('Pan')"))
-            .or(page.getByText("Pan", new Page.GetByTextOptions().setExact(true)))
-            .first().click();
+                .or(page.locator("li:has-text('Pan')"))
+                .or(page.getByText("Pan", new Page.GetByTextOptions().setExact(true)))
+                .first().click();
         log.info("Selected document type: Pan");
 
         // Save the document
@@ -51,11 +53,13 @@ public class KycDocumentsPage extends BaseTest {
         log.info("Clicked Save button");
 
         // Wait for the upload to complete before submitting
-        page.waitForTimeout(5000);
+        page.waitForTimeout(25000);
     }
 
     public void submitDocuments() {
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
+        Locator submitBtn = page.locator("button:has-text('SUBMIT')");
+        submitBtn.waitFor(new Locator.WaitForOptions().setTimeout(15000));
+        submitBtn.click();
         log.info("Clicked Submit on KYC Documents page.");
     }
 }

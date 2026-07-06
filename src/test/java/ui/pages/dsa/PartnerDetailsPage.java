@@ -37,6 +37,9 @@ public class PartnerDetailsPage extends BaseTest {
         if (details.containsKey("Sales Manager")) {
             selectCombobox("Sales Manager", details.get("Sales Manager"));
         }
+        if (details.containsKey("Channel Manager")) {
+            selectCombobox("Channel Manager", details.get("Channel Manager"));
+        }
         if (details.containsKey("Scheme")) {
             selectButtonDropdown("Scheme", details.get("Scheme"));
         }

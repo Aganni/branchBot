@@ -49,6 +49,12 @@ mvn clean compile
 mvn test
 ```
 
+# Run individual Lpc Test Suite
+```
+mvn test -Dcucumber.filter.tags="@UBL"
+mvn test -Dcucumber.filter.tags="@FCL"
+mvn test -Dcucumber.filter.tags="@SEP"
+
 ---
 
 ## 📞 Contact Members

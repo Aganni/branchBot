@@ -36,6 +36,27 @@ public class ApiUtils extends BaseTest {
         }
     }
 
+    public static void updatePanInMystiqueForKey(String panKey, String panProfile) {
+
+        String panValue = (String) getValue(panKey);
+        String payload = ApiPayload.whitelistPanCardInMystique(panValue, panProfile);
+
+        try {
+            log.info("Whitelisting co-applicant PAN [{}] with profile [{}] in Mystique", panValue, panProfile);
+            Response response = ApiClientUtils.doPostKyc(Constants.MYSTIQUE_BASE_URI, Constants.WHITELIST_PANCARD_IN_MYSTIQUE, payload);
+
+            Assert.assertEquals(response.getStatusCode(), 200, "Mystique Co-Applicant PAN Whitelist API failed!");
+
+            JsonPath jsonPath = response.jsonPath();
+            String expectedMessage = "Added a new kyc of type pancard with id- " + panValue;
+            Assert.assertEquals(jsonPath.getString("message"), expectedMessage, "Co-Applicant API Response message mismatch!");
+
+        } catch (Exception e) {
+            log.error("Failed to update co-applicant PAN in Mystique", e);
+            Assert.fail("Exception during Mystique Co-Applicant PAN Whitelist: " + e.getMessage());
+        }
+    }
+
     public static void moveAppFormToStage(String stage) {
         // Fetch the dynamic Application ID stored in the current session
         String appId = getValue("appFormId").toString();

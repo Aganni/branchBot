@@ -10,7 +10,7 @@ Feature: SEP End-to-End Workflow
     Then User completes Partner Details and proceeds
     And User completes Business Details with PAN verification and submits
     And User passes Eligibility Prechecks
-    And User completes QDE with co-applicant details and submits
+    And User fills SEP doctor co-applicant details
     And User completes Consent page with SQS bypass
     And User passes Eligibility Prechecks
     And User completes Banking details and submits
