@@ -6,11 +6,12 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
-
 import java.nio.file.Paths;
+
 
 public class Dedupe_bureauPage extends BaseTest {
     private final Page page;
+    private static final String CLOSE_TAB_BTN = "button:has-text('close Tab')";
 
     public Dedupe_bureauPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
@@ -83,7 +84,7 @@ public class Dedupe_bureauPage extends BaseTest {
         // Upload each bank statement file
         for (String file : bankStatementFiles) {
             uploadPopup.getByText("UPLOAD YOUR BANK E-STATEMENTS").click();
-            uploadPopup.locator("body").setInputFiles(Paths.get(file));
+            uploadPopup.locator("input[type='file']").setInputFiles(Paths.get(file));
             log.info("Uploaded bank statement file: {}", file);
         }
 
@@ -91,12 +92,18 @@ public class Dedupe_bureauPage extends BaseTest {
         uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Or click here to finish")).click();
         uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Finish")).click();
         log.info("Bank statement upload completed and popup finished.");
+        uploadPopup.locator(CLOSE_TAB_BTN).click();
     }
 
     // Clicks Save and Next to proceed to the next section.
-    public void clickSaveAndNext() {
+    public void clickSaveAndNext()  {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save and Next")).click();
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Clicked Save and Next. Moving to next section.");
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

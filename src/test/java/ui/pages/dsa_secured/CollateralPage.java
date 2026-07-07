@@ -15,10 +15,10 @@ public class CollateralPage extends BaseTest {
     }
 
     public void clickAddCollateral() {
-        // Refresh to ensure collateral page renders (screen can go blank after bank statement step)
-//        page.reload();
-//        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
-//        log.info("Page refreshed before adding collateral.");
+
+        page.reload();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        log.info("Page refreshed before adding collateral.");
 
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Collateral"))
                 .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(30000));

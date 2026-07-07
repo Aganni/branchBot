@@ -79,6 +79,12 @@ public class BankingPage extends BaseTest {
 
         page.locator(SUBMIT_BANK_DETAILS_BTN).click();
 
+        log.info("Waiting for bank to be added...");
+        page.getByText("Added").waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE)
+                .setTimeout(120000));
+        log.info("Bank added successfully - card is visible");
+
         log.info("Waiting for Save and Next button to enable...");
         page.locator(SAVE_AND_NEXT_BTN).click(new Locator.ClickOptions().setTimeout(30000));
     }

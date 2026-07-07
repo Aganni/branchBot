@@ -20,7 +20,10 @@ public class Dedupe_bureauSteps extends BaseTest {
         dedupePage.downloadBureauReport();
 
         // 4. Navigate to Bank Statement, select applicant, fill dates, upload files
-        String[] bankFiles = {"June2026.pdf", "july2026.pdf"};
+        String[] bankFiles = {
+                "src/test/resources/testdata/June2026.pdf",
+                "src/test/resources/testdata/july2026.pdf"
+        };
         dedupePage.completeBankStatement(
                 "Noah johnson (Primary)",
                 "01/06/2025",
