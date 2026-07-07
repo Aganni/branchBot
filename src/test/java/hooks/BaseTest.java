@@ -53,7 +53,11 @@ public class BaseTest {
                     .launch(new BrowserType.LaunchOptions().setHeadless(false));
             browserThreadLocal.set(browser);
 
-            BrowserContext context = browser.newContext();
+            BrowserContext context = browser.newContext(
+                    new Browser.NewContextOptions()
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
+            );
             contextThreadLocal.set(context);
 
             Page page = context.newPage();

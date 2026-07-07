@@ -7,6 +7,8 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
 
+import java.nio.file.Paths;
+
 public class Dedupe_bureauPage extends BaseTest {
     private final Page page;
 
@@ -15,19 +17,19 @@ public class Dedupe_bureauPage extends BaseTest {
         this.page = page;
     }
 
-    //Clicks NEXT to move from Co-Applicant section to Exposure Dedupe section.
+    // Clicks NEXT to move from Co-Applicant section to Exposure Dedupe section.
     public void moveToDedupeSection() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("NEXT")).click();
         log.info("Moved from Co-Applicant to Exposure Dedupe section.");
     }
 
-    //Clicks next to move from Dedupe to Bureau Output screen.
+    // Clicks next to move from Dedupe to Bureau Output screen.
     public void moveToBureauOutput() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("next")).click();
         log.info("Moved from Dedupe to Bureau Output screen.");
     }
 
-    //Downloads the bureau report. Waits for the page to settle, then clicks "Download Report" and handles the file download.
+    // Downloads the bureau report via a popup page triggered by "Download Report" button.
     public void downloadBureauReport() {
         page.waitForTimeout(5000);
         Locator downloadBtn = page.getByRole(AriaRole.BUTTON,
@@ -35,31 +37,66 @@ public class Dedupe_bureauPage extends BaseTest {
         downloadBtn.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE)
                 .setTimeout(30000));
+
         Download download = page.waitForDownload(() -> {
-            downloadBtn.click();
+            Page popupPage = page.waitForPopup(() -> {
+                downloadBtn.click();
+            });
+            popupPage.close();
         });
         log.info("Bureau report downloaded: {}", download.suggestedFilename());
     }
 
-    //Navigates to Bank Statement section and fills the date range for statement upload.
-    public void completeBankStatement(String fromDate, String toDate) {
+    // Navigates to Bank Statement screen, selects applicant, fills dates, handles
+    // the statement upload popup (confirm, upload files, finish), then returns to main page.
+    public void completeBankStatement(String applicantName, String fromDate, String toDate,
+                                      String[] bankStatementFiles) {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Bank Statement")).click();
         log.info("Clicked Bank Statement button.");
 
+        // Select applicant
+        page.getByPlaceholder("Select Applicant").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(applicantName)).click();
+        log.info("Selected applicant: {}", applicantName);
+
+        // Fill date range
         page.getByLabel("From Date *").click();
         page.getByLabel("From Date *").fill(fromDate);
 
         page.getByLabel("To Date *").click();
         page.getByLabel("To Date *").fill(toDate);
+        log.info("Filled date range {} to {}.", fromDate, toDate);
+
+        // Click Continue
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Continue").setExact(true)).click();
-        log.info("Filled date range {} to {} and clicked Continue.", fromDate, toDate);
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Continue to Statement Upload")).click();
-        log.info("Clicked Continue to Statement Upload.");
+        log.info("Clicked Continue.");
+
+        // Handle the statement upload popup
+        Page uploadPopup = page.waitForPopup(() -> {
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Continue to Statement Upload")).click();
+        });
+        log.info("Statement upload popup opened.");
+
+        uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("I Confirm")).click();
+        log.info("Clicked I Confirm on upload popup.");
+
+        // Upload each bank statement file
+        for (String file : bankStatementFiles) {
+            uploadPopup.getByText("UPLOAD YOUR BANK E-STATEMENTS").click();
+            uploadPopup.locator("body").setInputFiles(Paths.get(file));
+            log.info("Uploaded bank statement file: {}", file);
+        }
+
+        // Finish the upload
+        uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Or click here to finish")).click();
+        uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Finish")).click();
+        log.info("Bank statement upload completed and popup finished.");
     }
 
-    //Clicks Save and Next to proceed to the next section.
+    // Clicks Save and Next to proceed to the next section.
     public void clickSaveAndNext() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save and Next")).click();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Clicked Save and Next. Moving to next section.");
     }
 }

@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310302"
+    phone_number: "9001310336"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -54,7 +54,7 @@ dsa_secured:
       closure_type: "Self Close"
     employment:
       type: "Salaried"
-      employer: "WALMARK MEDITECH PRIVATE LIMITED"
+      employer: "TATA CUMMINS PRIVATE LIMITED"
       income: "120000"
       office_email: "nikitha.s@creditsaison-in.com"
       designation: "Individual"
@@ -241,6 +241,8 @@ dsa_secured:
       otp: "123456"
 
   collateral_details:
+    owner1: "Amazon.com Inc."
+    owner2: "Chris Taylor"
     type: "Commercial"
     sub_type: "Shop"
     status: "Rented"

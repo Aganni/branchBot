@@ -220,9 +220,10 @@ public class PrimaryApplicantPage extends BaseTest {
 
     public void submitAndNavigateToCoApplicants() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
-        Thread.sleep(2000);
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Co Applicants")).click();
         log.info("Form Submitted successfully. Routed onto Co-Applicants page context.");
         page.reload();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
     }
 }

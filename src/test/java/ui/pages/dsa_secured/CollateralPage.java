@@ -6,67 +6,86 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
 import java.nio.file.Paths;
-import java.util.regex.Pattern;
 
 public class CollateralPage extends BaseTest {
     private final Page page;
-
     public CollateralPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
     public void clickAddCollateral() {
-        log.info("Navigating away from Bank Statement...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save and Next").setExact(true)).click();
-        log.info("Triggering proactive page reload to prevent layout freeze...");
-        page.reload();
-        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        // Refresh to ensure collateral page renders (screen can go blank after bank statement step)
+//        page.reload();
+//        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+//        log.info("Page refreshed before adding collateral.");
+
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Collateral"))
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Collateral")).click();
-        log.info("Initialized property collateral addition sub-form workflow.");
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        log.info("Clicked + Add Collateral button.");
     }
 
-    public void selectOwners() {
-        Locator ownerDropdown = page.getByLabel(Pattern.compile("Collateral Owner Name", Pattern.CASE_INSENSITIVE));
-        try {
-            ownerDropdown.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.VISIBLE)
-                    .setTimeout(5000));
-        } catch (com.microsoft.playwright.TimeoutError e) {
-            log.warn("Form field missing! Detecting potential dead click. Retrying interaction on '+ Add Collateral' button...");
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Collateral")).click();
-            ownerDropdown.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.VISIBLE)
-                    .setTimeout(15000));
-        }
-        ownerDropdown.click();
-        page.waitForSelector("[role='listbox'], .MuiPopover-root",
-                new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
-        page.getByText("Hannah Isaac").click();
-        page.getByText("Noah johnson").click();
+    public void selectOwners(String owner1, String owner2) {
+        // Wait for the collateral form to render after clicking "+ Add Collateral"
+        page.getByLabel("Collateral Owner Name *").waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(60000));
+        page.getByLabel("Collateral Owner Name *").click();
+
+        // Multi-select owners via checkboxes inside the dropdown options
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(owner1))
+                .getByRole(AriaRole.CHECKBOX).check();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(owner2))
+                .getByRole(AriaRole.CHECKBOX).check();
+
+        // Close the dropdown
         page.keyboard().press("Escape");
-        log.info("Successfully selected collateral property owners.");
-    }
-    public void PropertyDemographics(String type, String sub_type, String status, String stage, String scheme) {
-        selectDropdownOption("Type *", type);
-        selectDropdownOption("Sub Type *", sub_type);
-        selectDropdownOption("Status *", status);
-        selectDropdownOption("Stage of Under Construction *", stage);
-        selectDropdownOption("Collateral Scheme *", scheme);
-        log.info("Property background profiles and scheme specifications saved.");
+        log.info("Selected collateral owners: {} and {}", owner1, owner2);
     }
 
-    public void PropertyDimensions(String builtUp, String carpet, String pincode, String street, String landmark) {
+    public void selectPropertyType(String type) {
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type)).click();
+        log.info("Selected property type: {}", type);
+    }
+
+    public void fillPropertyDetails(String status, String stage, String scheme) {
+        page.getByLabel("Status *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(status)).click();
+
+        page.getByLabel("Stage of Under Construction *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(stage)).click();
+
+        page.getByLabel("Collateral Scheme *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(scheme)).click();
+
+        log.info("Property details filled — Status: {}, Stage: {}, Scheme: {}", status, stage, scheme);
+    }
+
+    public void fillPropertyDimensions(String builtUp, String carpet, String pincode, String street, String landmark) {
         page.getByLabel("Square Feet").check();
-        page.getByLabel("Build Up *").fill(builtUp);
-        page.getByLabel("Carpet Area *").fill(carpet);
-        page.getByLabel("Pincode *").fill(pincode);
-        page.keyboard().press("Tab");
 
+        page.getByLabel("Build Up *").click();
+        page.getByLabel("Build Up *").fill(builtUp);
+
+        page.getByLabel("Carpet Area *").click();
+        page.getByLabel("Carpet Area *").fill(carpet);
+
+        page.getByLabel("Pincode *").click();
+        page.getByLabel("Pincode *").fill(pincode);
+
+        page.getByLabel("Street Name *").click();
         page.getByLabel("Street Name *").fill(street);
+
+        page.getByLabel("Land Mark *").click();
         page.getByLabel("Land Mark *").fill(landmark);
+
+        log.info("Property dimensions filled — {}sqft built-up, {}sqft carpet, pincode: {}", builtUp, carpet, pincode);
+    }
+
+    public void clickSave() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
-        log.info("Collateral property dimensions and address parameters saved.");
+        log.info("Clicked Save. Collateral details saved.");
     }
 
     public void navigateToDocumentsTab() {
@@ -83,7 +102,7 @@ public class CollateralPage extends BaseTest {
         page.keyboard().press("Escape");
 
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).nth(inputIndex).click();
-        log.info("Successfully processed type attachment upload for: {}", docType);
+        log.info("Uploaded document: {}", docType);
     }
 
     public void clickNext() {
@@ -93,26 +112,6 @@ public class CollateralPage extends BaseTest {
     public void finalizeFeeCalculationAndLinkGeneration() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Calculate Login Fee")).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Generate New Link")).click();
-        log.info("Fee calculations executed successfully. Application link generation completed.");
-    }
-
-    // ── Optimized Dropdown Picker Helper Method ──────────────────────────────
-    private void selectDropdownOption(String labelSelector, String targetOption) {
-
-        page.getByLabel(labelSelector, new Page.GetByLabelOptions().setExact(true)).click();
-        page.waitForSelector("[role='listbox'], .MuiPopover-root",
-                new Page.WaitForSelectorOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
-
-        // 3. FIX: Replaced getByRole with a highly resilient attribute lookup + case-insensitive text filter.
-        // This cleanly targets items matching "Commercial" or "MH_Gunthewari (within MC)" regardless of layout structure or padding spaces.
-        Locator optionItem = page.locator("[role='option'], .MuiMenuItem-root")
-                .filter(new Locator.FilterOptions().setHasText(Pattern.compile(targetOption.trim(), Pattern.CASE_INSENSITIVE)))
-                .first();
-
-        optionItem.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
-        optionItem.click();
-
-        // 4. Safely clear the active focus
-        page.keyboard().press("Escape");
+        log.info("Fee calculations executed. Application link generated.");
     }
 }

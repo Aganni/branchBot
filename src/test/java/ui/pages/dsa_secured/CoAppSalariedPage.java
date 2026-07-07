@@ -33,10 +33,14 @@ public class CoAppSalariedPage extends BaseTest {
         this.page = page;
     }
     public void clickAddApplicant() throws InterruptedException {
-        Thread.sleep(5000);
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        Locator addBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant"));
+        addBtn.waitFor(new Locator.WaitForOptions()
+                .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE)
+                .setTimeout(60000));
+        addBtn.click();
         log.info("Clicked on Add Applicant entry window.");
-        Thread.sleep(5000);
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
     }
     public void selectApplicantType(String applicantType) throws InterruptedException {
         page.getByLabel("Applicant Type").click();

@@ -37,6 +37,7 @@ public class CoAppEntityPage extends BaseTest {
     }
 
     public void verifyCompanyPan(String pan) throws InterruptedException {
+        Thread.sleep(5000);
         page.getByLabel("Company PAN *").fill(pan);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).click();
         Thread.sleep(5000);
