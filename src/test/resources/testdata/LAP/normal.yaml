@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310343"
+    phone_number: "9001310353"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -241,18 +241,18 @@ dsa_secured:
       otp: "123456"
 
   collateral_details:
-    owner1: "Amazon.com Inc."
-    owner2: "Chris Taylor"
+    owner1: "Noah johnson"
+    owner2: "Hannah Isaac"
     type: "Commercial"
     sub_type: "Shop"
     status: "Rented"
-    construction_stage: "Early Stage of Construction"
-    scheme: "Plot_MCDA"
+    construction_stage: "Construction has not started"
+    scheme: "E Khata - 9 & 11 A"
     area_built_up: "1200"
     area_carpet: "1200"
-    pincode: "560092"
-    street: "STREET"
-    landmark: "LANDMARK"
+    pincode: "560097"
+    street: "Wilson garden 10 main road"
+    landmark: "Near to ganesh temple"
 
   document_attachments:
     driving_license_file: "Screenshot 2026-06-28 at 5.15.52 PM.png"

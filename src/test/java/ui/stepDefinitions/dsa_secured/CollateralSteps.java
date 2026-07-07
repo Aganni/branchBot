@@ -14,25 +14,34 @@ public class CollateralSteps extends BaseTest {
         // 1. Click + Add Collateral
         page.clickAddCollateral();
 
-        // 2. Select collateral owners (multi-select with checkboxes)
+        // 2. Select collateral owners
         page.selectOwners(
                 TestDataProvider.get("dsa_secured.collateral_details.owner1"),
                 TestDataProvider.get("dsa_secured.collateral_details.owner2")
         );
 
-        // 3. Select property type (e.g., "Flat")
-        page.selectPropertyType(
+        // 3. Select Type (e.g., "Commercial")
+        page.selectType(
                 TestDataProvider.get("dsa_secured.collateral_details.type")
         );
 
-        // 4. Fill property details — status, stage, scheme
+        // 4. Select Sub Type (e.g., "Shop")
+        page.selectSubType(
+                TestDataProvider.get("dsa_secured.collateral_details.sub_type")
+        );
+
+        // 5. Select Status (e.g., "Rented")
+        page.selectStatus(
+                TestDataProvider.get("dsa_secured.collateral_details.status")
+        );
+
+        // 6. Fill property details — stage, scheme
         page.fillPropertyDetails(
-                TestDataProvider.get("dsa_secured.collateral_details.status"),
                 TestDataProvider.get("dsa_secured.collateral_details.construction_stage"),
                 TestDataProvider.get("dsa_secured.collateral_details.scheme")
         );
 
-        // 5. Fill dimensions and address
+        // 7. Fill dimensions and address
         page.fillPropertyDimensions(
                 TestDataProvider.get("dsa_secured.collateral_details.area_built_up"),
                 TestDataProvider.get("dsa_secured.collateral_details.area_carpet"),
@@ -41,7 +50,7 @@ public class CollateralSteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.collateral_details.landmark")
         );
 
-        // 6. Save
+        // 8. Save
         page.clickSave();
     }
 

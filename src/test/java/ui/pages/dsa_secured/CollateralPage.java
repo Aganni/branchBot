@@ -9,13 +9,13 @@ import java.nio.file.Paths;
 
 public class CollateralPage extends BaseTest {
     private final Page page;
+
     public CollateralPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
     public void clickAddCollateral() {
-
         page.reload();
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Page refreshed before adding collateral.");
@@ -28,38 +28,49 @@ public class CollateralPage extends BaseTest {
     }
 
     public void selectOwners(String owner1, String owner2) {
-        // Wait for the collateral form to render after clicking "+ Add Collateral"
         page.getByLabel("Collateral Owner Name *").waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(60000));
         page.getByLabel("Collateral Owner Name *").click();
 
-        // Multi-select owners via checkboxes inside the dropdown options
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(owner1))
-                .getByRole(AriaRole.CHECKBOX).check();
+        // Select first owner by text
+        page.getByText(owner1).click();
+
+        // Select second owner via checkbox
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(owner2))
                 .getByRole(AriaRole.CHECKBOX).check();
 
-        // Close the dropdown
-        page.keyboard().press("Escape");
+        // Close the owner dropdown
+        //page.locator("#menu-collateralType div").first().click();
         log.info("Selected collateral owners: {} and {}", owner1, owner2);
+
     }
 
-    public void selectPropertyType(String type) {
+    public void selectType(String type) {
+        page.getByLabel("Type *", new Page.GetByLabelOptions().setExact(true)).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type)).click();
-        log.info("Selected property type: {}", type);
+        log.info("Selected type: {}", type);
     }
 
-    public void fillPropertyDetails(String status, String stage, String scheme) {
+    public void selectSubType(String subType) {
+        page.getByLabel("Sub Type *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(subType)).click();
+        log.info("Selected sub type: {}", subType);
+    }
+
+    public void selectStatus(String status) {
         page.getByLabel("Status *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(status)).click();
+        log.info("Selected status: {}", status);
+    }
 
+    public void fillPropertyDetails(String stage, String scheme) {
         page.getByLabel("Stage of Under Construction *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(stage)).click();
 
         page.getByLabel("Collateral Scheme *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(scheme)).click();
 
-        log.info("Property details filled — Status: {}, Stage: {}, Scheme: {}", status, stage, scheme);
+        log.info("Property details filled — Stage: {}, Scheme: {}", stage, scheme);
     }
 
     public void fillPropertyDimensions(String builtUp, String carpet, String pincode, String street, String landmark) {
@@ -85,6 +96,7 @@ public class CollateralPage extends BaseTest {
 
     public void clickSave() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Clicked Save. Collateral details saved.");
     }
 
