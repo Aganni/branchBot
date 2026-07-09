@@ -44,6 +44,13 @@ public class BaseTest {
         return pageThreadLocal.get();
     }
 
+    public static BrowserContext getContext() {
+        if (contextThreadLocal.get() == null) {
+            startBrowserInstance();
+        }
+        return contextThreadLocal.get();
+    }
+
     public static void startBrowserInstance() {
         try {
             Playwright playwright = Playwright.create();

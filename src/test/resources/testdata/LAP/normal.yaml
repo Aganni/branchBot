@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310353"
+    phone_number: "9001310420"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -255,8 +255,19 @@ dsa_secured:
     landmark: "Near to ganesh temple"
 
   document_attachments:
-    driving_license_file: "Screenshot 2026-06-28 at 5.15.52 PM.png"
-    bank_statement_file_1: "Screenshot 2026-06-28 at 5.15.52 PM.png"
-    bank_statement_file_2: "Screenshot 2026-06-27 at 8.22.08 AM.png"
-    aadhaar_file: "Screenshot 2026-06-25 at 2.54.19 PM.png"
-
+    Bank Statement: "src/test/resources/testdata/sale deed 09 12 1992.pdf"
+    aadhaar_file_1: "src/test/resources/testdata/sale deed 09 12 1992.pdf"
+    pan_file_1: "src/test/resources/testdata/image (2).png"
+    itr_file: "src/test/resources/testdata/july2026.pdf"
+    photo_file_1: "src/test/resources/testdata/photo.png"
+    aadhaar_file_2: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
+    bank_statement_file_1: "src/test/resources/testdata/bank_statement.pdf"
+    pan_file_2: "src/test/resources/testdata/image (2).png"
+    form_file: "src/test/resources/testdata/sale deed 09 12 1992.pdf"
+    photo_file_2: "src/test/resources/testdata/photo.png"
+    driving_license_file: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
+    bank_statement_file_2: "src/test/resources/testdata/bank_statement.pdf"
+    aadhaar_file_3: "src/test/resources/testdata/sale deed 09 12 1992.pdf"
+    gst_return_file: "src/test/resources/testdata/June2026.pdf"
+    photo_file_3: "src/test/resources/testdata/photo.png"
+    application_form_file: "src/test/resources/testdata/sale deed 25 06 1993.pdf"

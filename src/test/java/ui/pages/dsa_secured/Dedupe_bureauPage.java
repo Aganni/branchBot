@@ -27,17 +27,23 @@ public class Dedupe_bureauPage extends BaseTest {
     // Clicks next to move from Dedupe to Bureau Output screen.
     public void moveToBureauOutput() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("next")).click();
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
         log.info("Moved from Dedupe to Bureau Output screen.");
     }
 
     // Downloads the bureau report via a popup page triggered by "Download Report" button.
+    // Bureau report generation can take time — waits up to 90 seconds for the button to appear.
     public void downloadBureauReport() {
-        page.waitForTimeout(5000);
+        // Wait for bureau processing to complete and Download Report button to appear
         Locator downloadBtn = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Download Report")).first();
+
+        // Poll until the button becomes visible — bureau processing may take up to 90s
         downloadBtn.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE)
-                .setTimeout(30000));
+                .setTimeout(90000));
+        log.info("Download Report button is now visible.");
 
         Download download = page.waitForDownload(() -> {
             Page popupPage = page.waitForPopup(() -> {
@@ -101,7 +107,7 @@ public class Dedupe_bureauPage extends BaseTest {
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Clicked Save and Next. Moving to next section.");
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

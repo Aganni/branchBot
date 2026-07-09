@@ -54,17 +54,17 @@ public class CollateralSteps extends BaseTest {
         page.clickSave();
     }
 
-    @And("User uploads required verification documents and generates link")
-    public void uploadDocumentsAndGenerateLink() {
-        CollateralPage collateralPage = new CollateralPage(BaseTest.getPage());
-        collateralPage.navigateToDocumentsTab();
-
-        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.driving_license_file"), "Driving License", 0);
-        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_1"), "Bank Statement", 1);
-        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_2"), "Bank Statement", 2);
-        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.aadhaar_file"), "Aadhaar", 3);
-
-        collateralPage.clickNext();
-        collateralPage.finalizeFeeCalculationAndLinkGeneration();
-    }
+//    @And("User uploads required verification documents and generates link")
+//    public void uploadDocumentsAndGenerateLink() {
+//        CollateralPage collateralPage = new CollateralPage(BaseTest.getPage());
+//        collateralPage.navigateToDocumentsTab();
+//
+//        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.driving_license_file"), "Driving License", 0);
+//        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_1"), "Bank Statement", 1);
+//        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_2"), "Bank Statement", 2);
+//        collateralPage.uploadDocumentRecord(TestDataProvider.get("dsa_secured.document_attachments.aadhaar_file"), "Aadhaar", 3);
+//
+//        collateralPage.clickNext();
+//        collateralPage.finalizeFeeCalculationAndLinkGeneration();
+//    }
 }

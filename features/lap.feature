@@ -19,4 +19,6 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User adds Aadhaar Co-Applicant details and submits Appform
     And User navigates to Exposure dedupe and bureau output, downloads bureau report
     And User Adds the property collateral details
-    And User clicks on Documents button
+    And User uploads all required documents and proceeds
+    And User completes fee payment via sandbox payment gateway
+    And User completes final submission with email verification
