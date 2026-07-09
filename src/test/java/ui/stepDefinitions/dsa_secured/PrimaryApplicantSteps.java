@@ -1,6 +1,7 @@
 package ui.stepDefinitions.dsa_secured;
 
 import data.TestDataProvider;
+import dynamicData.DynamicDataClass;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
 import ui.Utils.Utils;
@@ -16,7 +17,9 @@ public class PrimaryApplicantSteps extends BaseTest {
 
         PrimaryApplicantPage applicantPage = new PrimaryApplicantPage(BaseTest.getPage());
         applicantPage.selectApplicantType("applicantType", "Individual");
-        applicantPage.verifyPanNumber(TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan"));
+        String panCard = TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan");
+        applicantPage.verifyPanNumber(panCard);
+        DynamicDataClass.setValue("pan_card", panCard);
         applicantPage.verifyEmailAddress(TestDataProvider.get("dsa_secured.primary_applicant.kyc.email"));
 
         applicantPage.fillFamilyDetails(

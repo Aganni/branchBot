@@ -1,5 +1,6 @@
 package ui.stepDefinitions.dsa_secured;
 import data.TestDataProvider;
+import dynamicData.DynamicDataClass;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
 import ui.pages.dsa_secured.LeadDetailsPage;
@@ -12,7 +13,9 @@ public class LeadDetailsSteps extends BaseTest {
 
             // Fill out input text fields
             leadDetailsPage.fillName(TestDataProvider.get("dsa_secured.lead_details.name"));
-            leadDetailsPage.fillPhoneNumber(TestDataProvider.get("dsa_secured.lead_details.phone_number"));
+            String phoneNumber = TestDataProvider.get("dsa_secured.lead_details.phone_number");
+            leadDetailsPage.fillPhoneNumber(phoneNumber);
+            DynamicDataClass.setValue("mobile_number", phoneNumber);
             leadDetailsPage.fillLoanAmount(TestDataProvider.get("dsa_secured.lead_details.loan_amount"));
             leadDetailsPage.fillTenure(TestDataProvider.get("dsa_secured.lead_details.tenure"));
             leadDetailsPage.fillRateOfInterest(TestDataProvider.get("dsa_secured.lead_details.rate_of_interest"));
