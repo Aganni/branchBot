@@ -1,6 +1,8 @@
-package ui.pages.dsa_secured;
+package ui.pages.dsa_secured_plp;
 
-import com.microsoft.playwright.*;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
@@ -130,18 +132,18 @@ public class FinalSubmissionPage extends BaseTest {
                     new Page.GetByRoleOptions().setName(nextButtonName)).click();
         }
 
-        log.info("Waiting for Google Groups to fully load...");
+        log.info("Waiting for Google Groups to fully load");
         groupsTab.waitForLoadState(LoadState.NETWORKIDLE);
         groupsTab.waitForTimeout(10000);
 
         // Refresh the page so incoming email details load
-        log.info("Refreshing the notification-test group page to load latest emails...");
+        log.info("Refreshing the notification-test group page to load latest emails");
         groupsTab.reload();
         groupsTab.waitForLoadState(LoadState.NETWORKIDLE);
         groupsTab.waitForTimeout(5000);
 
         // Click on "Verify your email & start your loan application" email subject
-        log.info("Searching for 'Verify your email & start your loan application' email...");
+        log.info("Searching for 'Verify your email & start your loan application' ");
         Locator verifyEmailSubject = groupsTab.getByRole(AriaRole.LINK,
                 new Page.GetByRoleOptions().setName(Pattern.compile("Verify your email & start your loan application")));
         verifyEmailSubject.waitFor(new Locator.WaitForOptions()

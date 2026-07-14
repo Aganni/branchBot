@@ -1,7 +1,7 @@
 # LAP End-to-End Test Data
-dsa_secured:
+dsa_secured_plp:
   business_details:
-    loan_type: "Loan Against Property"
+    loan_type: "Prime LAP"
 
   partner_details:
       partnerNameOptionIndex: "1"
@@ -12,12 +12,12 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310447"
-    loan_amount: "500000"
+    phone_number: "9001010019"
+    loan_amount: "45654200"
     tenure: "36"
     rate_of_interest: "12.5"
     employment_type: "Salaried"
-    interest_payment_preference: "Floating" # Provide value matching your environment drop-down options
+    interest_payment_preference: "Floating"
     loan_purpose: "Repair and Renovation of Residential property"
 
   consent_details:

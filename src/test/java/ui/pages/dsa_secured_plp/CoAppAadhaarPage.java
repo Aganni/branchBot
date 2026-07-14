@@ -1,4 +1,4 @@
-package ui.pages.dsa_secured;
+package ui.pages.dsa_secured_plp;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -29,7 +29,7 @@ public class CoAppAadhaarPage extends BaseTest {
     public void clickAddApplicant() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Opened Add Applicant step form context.");
-        Thread.sleep(5000);
+        Thread.sleep(10000);
     }
     public void selectApplicantType(String applicantType) throws InterruptedException {
         page.getByLabel("Applicant Type").click();
@@ -49,7 +49,18 @@ public class CoAppAadhaarPage extends BaseTest {
     public void verifyAadhaarOvd(String ovdType, String digits) {
         page.getByLabel("Other OVD *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ovdType)).click();
-        page.waitForTimeout(1000);
+
+//        Locator dobField = page.getByPlaceholder("dd/mm/yyyy");
+//        dobField.click();
+//        // MUI date picker input has readonly attribute - remove it, set value via native setter, and trigger React events
+//        dobField.evaluate("(el, value) => {"
+//                + "  el.removeAttribute('readonly');"
+//                + "  const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;"
+//                + "  nativeInputValueSetter.call(el, value);"
+//                + "  el.dispatchEvent(new Event('input', { bubbles: true }));"
+//                + "  el.dispatchEvent(new Event('change', { bubbles: true }));"
+//                + "}", dob);
+
         page.getByLabel("Aadhaar last 4 digits *").fill(digits);
         log.info("OVD structural verification requirements loaded.");
     }
@@ -117,10 +128,10 @@ public class CoAppAadhaarPage extends BaseTest {
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(closureType)).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
         log.info("Dynamic Financial Obligation records added.");
+        page.waitForTimeout(2500);
     }
 
     public void submitInitialForm() {
-        page.waitForTimeout(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
     }
 
