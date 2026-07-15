@@ -3,6 +3,7 @@ package ui.pages.dsa_secured_plp;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
@@ -110,14 +111,35 @@ public class FinalSubmissionPage extends BaseTest {
     public void loginAndNavigateToGroups(String email, String password) {
         log.info("Opening Google Groups in a new tab...");
         this.groupsTab = context.newPage();
-        this.groupsTab.navigate("https://groups.google.com/a/creditsaison-in.com/g/notification-test");
+        // Land on the stable "My groups" page rather than deep-linking straight to the
+        // notification-test group. Deep-linking directly to a private group URL before Google
+        // has an authenticated session for this tab can land on an "Access error / Content
+        // unavailable" interstitial instead of the normal sign-in prompt - on that page "Sign in"
+        // is a plain button (not a link), so the old getByRole(LINK, "Sign in") check silently
+        // found nothing, isVisible() returned false, and login was skipped entirely.
+        this.groupsTab.navigate("https://groups.google.com/my-groups");
 
+        // If Google still shows the "Content unavailable" interstitial, recover via its retry
+        // link before attempting to sign in.
+        Locator retryLink = groupsTab.getByText("Click here to try again");
+        if (retryLink.isVisible()) {
+            log.info("Access-error interstitial detected, retrying via its recovery link...");
+            retryLink.click();
+            groupsTab.waitForLoadState(LoadState.LOAD);
+            groupsTab.waitForTimeout(2000);
+        }
+
+        // "Sign in" can render as a link or a button depending on which Groups page we land on,
+        // so check for either instead of assuming a link.
         Locator signInBtn = groupsTab.getByRole(AriaRole.LINK,
                 new Page.GetByRoleOptions().setName(signInLinkText));
+        Locator signInButtonRole = groupsTab.getByRole(AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName(signInLinkText));
+        boolean signInNeeded = signInBtn.isVisible() || signInButtonRole.isVisible();
 
-        if (signInBtn.isVisible()) {
+        if (signInNeeded) {
             log.info("Sign-in required. Authenticating with Google...");
-            signInBtn.click();
+            (signInBtn.isVisible() ? signInBtn : signInButtonRole).click();
 
             groupsTab.getByRole(AriaRole.TEXTBOX,
                     new Page.GetByRoleOptions().setName(emailInputName)).fill(email);
@@ -133,8 +155,25 @@ public class FinalSubmissionPage extends BaseTest {
         }
 
         log.info("Waiting for Google Groups to fully load");
-        groupsTab.waitForLoadState(LoadState.NETWORKIDLE);
+        groupsTab.waitForLoadState(LoadState.LOAD);
         groupsTab.waitForTimeout(10000);
+
+        // Open the "notification test" group by its visible name/link instead of assuming a URL
+        // slug. Fall back to the direct deep-link URL if the link can't be found (e.g. the group
+        // isn't listed on "My groups" for this account).
+        Locator groupLink = groupsTab.getByRole(AriaRole.LINK,
+                new Page.GetByRoleOptions().setName(groupsLinkName));
+        try {
+            groupLink.waitFor(new Locator.WaitForOptions()
+                    .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+            log.info("Opening '{}' group from My Groups list...", groupsLinkName);
+            groupLink.first().click();
+        } catch (PlaywrightException e) {
+            log.info("'{}' link not found on My Groups page, falling back to direct group URL...", groupsLinkName);
+            groupsTab.navigate("https://groups.google.com/a/creditsaison-in.com/g/notification-test");
+        }
+        groupsTab.waitForLoadState(LoadState.LOAD);
+        groupsTab.waitForTimeout(5000);
 
         // Refresh the page so incoming email details load
         log.info("Refreshing the notification-test group page to load latest emails");
@@ -147,7 +186,7 @@ public class FinalSubmissionPage extends BaseTest {
         Locator verifyEmailSubject = groupsTab.getByRole(AriaRole.LINK,
                 new Page.GetByRoleOptions().setName(Pattern.compile("Verify your email & start your loan application")));
         verifyEmailSubject.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
         verifyEmailSubject.first().click();
         groupsTab.waitForTimeout(3000);
         log.info("Opened 'Verify your email & start your loan application' email thread.");

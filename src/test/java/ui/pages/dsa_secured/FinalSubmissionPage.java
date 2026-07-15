@@ -95,77 +95,38 @@ public class FinalSubmissionPage extends BaseTest {
     }
 
     // Step 5: Open notification group, sign in, find verification email, and verify
+    // (Same pattern as EntityConsentPage.loginAndNavigateToGroups)
     public void loginAndNavigateToGroups(String email, String password) {
         log.info("Opening Google Groups in a new tab...");
         this.groupsTab = context.newPage();
-        // Land on the stable "My groups" page rather than deep-linking straight to the
-        // notification-test thread list. Google's OAuth redirect doesn't reliably honor a deep
-        // link as the post-sign-in destination (it can drop you on the generic Groups home
-        // instead), which is why the group page never actually opened. Navigating into the
-        // group by clicking its visible name is what actually lands on it.
-        this.groupsTab.navigate("https://groups.google.com/my-groups");
-        Locator signInBtn = groupsTab.getByRole(AriaRole.LINK,
-                new Page.GetByRoleOptions().setName(signInLinkText));
+        this.groupsTab.navigate("https://groups.google.com/a/creditsaison-in.com/g/notification-test");
+        Locator signInBtn = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(signInLinkText));
+
         if (signInBtn.isVisible()) {
-            log.info("Sign-in required. Authenticating with Google");
+            log.info("Sign-in required. Authenticating with Google...");
             signInBtn.click();
-            groupsTab.getByRole(AriaRole.TEXTBOX,
-                    new Page.GetByRoleOptions().setName(emailInputName)).fill(email);
-            groupsTab.getByRole(AriaRole.BUTTON,
-                    new Page.GetByRoleOptions().setName(nextButtonName)).click();
-            Locator pwdField = groupsTab.getByRole(AriaRole.TEXTBOX,
-                    new Page.GetByRoleOptions().setName(passwordInputName));
+            groupsTab.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName(emailInputName)).fill(email);
+            groupsTab.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(nextButtonName)).click();
+            Locator pwdField = groupsTab.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName(passwordInputName));
             pwdField.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
             pwdField.fill(password);
-            groupsTab.getByRole(AriaRole.BUTTON,
-                    new Page.GetByRoleOptions().setName(nextButtonName)).click();
+            groupsTab.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(nextButtonName)).click();
         }
-
-        log.info("Waiting for Google Groups to fully load");
-        groupsTab.waitForLoadState(LoadState.LOAD);
-        groupsTab.waitForTimeout(10000);
-
-        // Open the "notification test" group by its visible name/link instead of assuming a URL
-        // slug. Fall back to the direct deep-link URL if the link can't be found (e.g. the group
-        // isn't listed on "My groups" for this account).
-        Locator groupLink = groupsTab.getByRole(AriaRole.LINK,
-                new Page.GetByRoleOptions().setName(groupsLinkName));
-        try {
-            groupLink.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
-            log.info("Opening '{}' group from My Groups list...", groupsLinkName);
-            groupLink.first().click();
-        } catch (PlaywrightException e) {
-            log.info("'{}' link not found on My Groups page, falling back to direct group URL...", groupsLinkName);
-            groupsTab.navigate("https://groups.google.com/a/creditsaison-in.com/g/notification-test");
-        }
-        groupsTab.waitForLoadState(LoadState.LOAD);
+        log.info("Waiting for Google Groups to fully load...");
         groupsTab.waitForTimeout(5000);
-
-        Locator verifyEmailSubject = groupsTab.getByText(VERIFY_EMAIL_SUBJECT).first();
-        boolean emailFound = false;
-        int maxAttempts = 6;
-        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-            log.info("Searching for '{}' email (attempt {}/{})", VERIFY_EMAIL_SUBJECT, attempt, maxAttempts);
-            try {
-                verifyEmailSubject.waitFor(new Locator.WaitForOptions()
-                        .setState(WaitForSelectorState.VISIBLE).setTimeout(10000));
-                emailFound = true;
-                break;
-            } catch (PlaywrightException e) {
-                log.info("Email not visible yet, reloading and retrying");
-                groupsTab.reload();
-                groupsTab.waitForLoadState(LoadState.LOAD);
-                groupsTab.waitForTimeout(5000);
-            }
-        }
-        if (!emailFound) {
-            throw new RuntimeException("Timed out waiting for '" + VERIFY_EMAIL_SUBJECT
-                    + "' email to appear after " + maxAttempts + " attempts.");
-        }
-        verifyEmailSubject.click();
-        groupsTab.waitForTimeout(3000);
-        log.info("Opened '{}' email thread.", VERIFY_EMAIL_SUBJECT);
+        groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        // Click on the notification-test group link
+        Locator groupLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(groupsLinkName)).nth(0);
+        groupLink.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+        groupLink.click();
+        // Open the latest (most recent) email with the verification subject
+        groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        Locator emailLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(VERIFY_EMAIL_SUBJECT)).last();
+        emailLink.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+        emailLink.click();
+        log.info("Opened latest '{}' email.", VERIFY_EMAIL_SUBJECT);
     }
 
     // Step 6: Open the latest email, expand trimmed content, click Verify My Email, and verify
