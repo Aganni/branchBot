@@ -20,6 +20,8 @@ public class CoAppEntityPage extends BaseTest {
     private static final String ADDR_PINCODE        = "Operating Office Address Pincode *";
     private static final String ADDR_OWNERSHIP      = "Operating Office Address Ownership *";
 
+    private static final String GSTIN   = "Enter or select GSTIN";
+
     public CoAppEntityPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
@@ -36,19 +38,37 @@ public class CoAppEntityPage extends BaseTest {
     }
 
     public void verifyCompanyPan(String pan) throws InterruptedException {
-        Thread.sleep(5000);
+        page.waitForTimeout(2500);
         page.getByLabel("Company PAN *").fill(pan);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).click();
-        Thread.sleep(5000);
+        page.waitForTimeout(2500);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Continue to fetch details")).click();
         log.info("Company PAN verified and background details fetched.");
     }
 
-    public void verifyUdyamDetails(String udyam) throws InterruptedException {
+    public void verifyUdyamDetails(String udyam) {
+        log.info("Selecting GSTIN and verifying UDYAM...");
+        // First select GSTIN from dropdown (no verify)
+        page.getByPlaceholder(GSTIN).click();
+        page.getByPlaceholder(GSTIN).nth(0).click();
+        page.waitForTimeout(2000);
+
+        com.microsoft.playwright.Locator gstinOptions = page.locator("li[role='option']:visible, .el-select-dropdown__item:visible, [role='listbox'] [role='option']:visible");
+        if (gstinOptions.count() > 0) {
+            gstinOptions.first().click();
+            log.info("GSTIN option selected from dropdown.");
+        } else {
+            log.info("No GSTIN options available. Skipping.");
+            page.keyboard().press("Escape");
+        }
+        page.waitForTimeout(1000);
+
+        // Then fill UDYAM and verify
         page.getByPlaceholder(UDYAM).fill(udyam);
+        page.waitForTimeout(1000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).nth(2).click();
-        Thread.sleep(5000);
-        log.info("UDYAM Registration registration credentials verified.");
+        page.waitForTimeout(5000);
+        log.info("UDYAM verified successfully.");
     }
 
     public void EntityProfileDetails(String regDate, String bizType, String phone, String email) {

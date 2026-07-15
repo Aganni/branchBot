@@ -1,7 +1,5 @@
 package ui.stepDefinitions.dsa_secured;
 
-import backend.Utils.AwsSqsUtils;
-import backend.payload.SqsQueuePayload;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
@@ -12,10 +10,12 @@ public class CoAppEntitySteps extends BaseTest {
     @And("User adds Entity Co-Applicant details and submits Appform")
     public void completeCoAppEntityFlow() throws Exception {
         CoAppEntityPage entityPage = new CoAppEntityPage(BaseTest.getPage());
-        //String email = TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email");
+
         entityPage.clickAddApplicant();
         entityPage.selectApplicantType(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.applicant_type"));
         entityPage.verifyCompanyPan(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.pan"));
+
+        // Select GSTIN (no verify) then fill and verify UDYAM
         entityPage.verifyUdyamDetails(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.udyam"));
 
         // 3. Corporate Profile Details

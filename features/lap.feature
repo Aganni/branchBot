@@ -1,7 +1,7 @@
 @LAP @Regression
 Feature: Secured Loan Against Property loan End-to-End Workflow
 
-  Scenario: Complete LAP flow from DSA PORTAL to Jarvis Welcome kit stage.
+  Scenario: Complete LAP flow till DSA Portal.
   # ── Data Initialization ──
     Given Initialize data for "normal" loan of "LAP"
   #   ── DSA Portal Flow ──
@@ -11,8 +11,8 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     Then User provides customer consent via OTP verification
     And User completes Primary Applicant details and proceeds
     And User adds Salaried Co-Applicant details and submits Appform
-    #And User adds Entity Co-Applicant details and submits Appform
-    #And User provides the consent for Entity applicant
+    And User adds Entity Co-Applicant details and submits Appform
+    And User provides the consent for Entity applicant
     And User adds Aadhaar Co-Applicant details and submits Appform
     #And User adds Driving License Co-Applicant details and submits Appform
     #And User adds Passport Co-Applicant details and submits Appform
@@ -21,3 +21,7 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User uploads all required documents and proceeds
     And User completes fee payment via sandbox payment gateway
     And User completes final submission with email verification
+
+  # ── Jarvis Portal Flow ──
+  Scenario: Complete LAP jouney with Jarvis flow till Welcome kit stage.
+    When User switches to Jarvis and moves the LAP application to CAM

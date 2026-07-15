@@ -115,13 +115,11 @@ public class FinalSubmissionPage extends BaseTest {
         log.info("Waiting for Google Groups to fully load...");
         groupsTab.waitForTimeout(5000);
         groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
-        // Click on the notification-test group link
-        Locator groupLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(groupsLinkName)).nth(0);
-        groupLink.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
-        groupLink.click();
-        // Open the latest (most recent) email with the verification subject
+        // Reload to ensure we're on the notification-test group page with latest emails
+        groupsTab.reload();
         groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        groupsTab.waitForTimeout(5000);
+        // Open the latest (most recent) email with the verification subject
         Locator emailLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(VERIFY_EMAIL_SUBJECT)).last();
         emailLink.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));

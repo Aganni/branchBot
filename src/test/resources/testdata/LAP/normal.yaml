@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310474"
+    phone_number: "9001310487"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -271,3 +271,7 @@ dsa_secured:
     gst_return_file: "src/test/resources/testdata/June2026.pdf"
     photo_file_3: "src/test/resources/testdata/photo.png"
     application_form_file: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
+
+  jarvis_secured:
+
+
