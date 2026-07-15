@@ -27,8 +27,6 @@ public class EntityConsentPage {
     public EntityConsentPage(Page page) {
         this.mainPage = page;
     }
-
-    //Clicks the "Re-trigger Consent" button on the DSA application page. This triggers an email notification to the Google Groups inbox.
     public void clickRetriggerConsent() {
         log.info("Clicking Re-trigger Consent button to send email notification...");
         Locator retriggerBtn = mainPage.getByRole(AriaRole.BUTTON,
@@ -36,12 +34,10 @@ public class EntityConsentPage {
         retriggerBtn.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
         retriggerBtn.click();
-        // Wait for the email to be dispatched
         mainPage.waitForTimeout(5000);
         log.info("Re-trigger Consent clicked. Email notification dispatched.");
     }
 
-    //Opens a new tab, navigates to Google Groups, signs in if needed, and opens the consent verification email.
     public void loginAndNavigateToGroups(String email, String password) {
         log.info("Opening Google Groups in a new tab...");
         this.groupsTab = mainPage.context().newPage();
@@ -59,12 +55,19 @@ public class EntityConsentPage {
             groupsTab.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(nextButtonName)).click();
         }
         log.info("Waiting for Google Groups to fully load...");
-        groupsTab.waitForLoadState(LoadState.NETWORKIDLE);
         groupsTab.waitForTimeout(5000);
+        groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
         // Click on the notification-test group link
-        groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(groupsLinkName)).click();
+        Locator groupLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(groupsLinkName)).nth(0);
+        groupLink.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+        groupLink.click();
         // Open the latest (most recent) email with the consent verification subject
-        groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(uniqueLinkName)).last().click();
+        groupsTab.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        Locator emailLink = groupsTab.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName(uniqueLinkName)).last();
+        emailLink.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+        emailLink.click();
         log.info("Opened latest consent verification email.");
     }
 

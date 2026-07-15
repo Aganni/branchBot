@@ -19,6 +19,7 @@ public class CoAppAadhaarSteps extends BaseTest {
 
         aadhaarPage.verifyAadhaarOvd(
                 TestDataProvider.get("dsa_secured.co_applicant_aadhaar.kyc.ovd_type"),
+                TestDataProvider.get("dsa_secured.co_applicant_aadhaar.kyc.dob"),
                 TestDataProvider.get("dsa_secured.co_applicant_aadhaar.kyc.aadhaar_last_4")
         );
 

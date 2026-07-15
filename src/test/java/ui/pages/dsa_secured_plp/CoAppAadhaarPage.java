@@ -46,21 +46,13 @@ public class CoAppAadhaarPage extends BaseTest {
         page.getByLabel("Select if the type is Form").check();
     }
 
-    public void verifyAadhaarOvd(String ovdType, String digits) {
+    public void verifyAadhaarOvd(String ovdType, String dob, String digits) {
         page.getByLabel("Other OVD *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ovdType)).click();
-
-//        Locator dobField = page.getByPlaceholder("dd/mm/yyyy");
-//        dobField.click();
-//        // MUI date picker input has readonly attribute - remove it, set value via native setter, and trigger React events
-//        dobField.evaluate("(el, value) => {"
-//                + "  el.removeAttribute('readonly');"
-//                + "  const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;"
-//                + "  nativeInputValueSetter.call(el, value);"
-//                + "  el.dispatchEvent(new Event('input', { bubbles: true }));"
-//                + "  el.dispatchEvent(new Event('change', { bubbles: true }));"
-//                + "}", dob);
-
+        page.waitForTimeout(1000);
+        // Date of Birth is a readonly MUI date-picker input; typing/fill fails actionability checks.
+        // Open the calendar and navigate year -> month -> day instead.
+        ui.Utils.Utils.selectDateFromMuiCalendar(page.getByLabel("Choose date"), dob);
         page.getByLabel("Aadhaar last 4 digits *").fill(digits);
         log.info("OVD structural verification requirements loaded.");
     }

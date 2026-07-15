@@ -46,10 +46,13 @@ public class CoAppAadhaarPage extends BaseTest {
         page.getByLabel("Select if the type is Form").check();
     }
 
-    public void verifyAadhaarOvd(String ovdType, String digits) {
+    public void verifyAadhaarOvd(String ovdType, String dob, String digits) {
         page.getByLabel("Other OVD *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ovdType)).click();
         page.waitForTimeout(1000);
+        // Date of Birth is a readonly MUI date-picker input; typing/fill fails actionability checks.
+        // Open the calendar and navigate year -> month -> day instead.
+        ui.Utils.Utils.selectDateFromMuiCalendar(page.getByLabel("Choose date"), dob);
         page.getByLabel("Aadhaar last 4 digits *").fill(digits);
         log.info("OVD structural verification requirements loaded.");
     }
@@ -117,10 +120,10 @@ public class CoAppAadhaarPage extends BaseTest {
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(closureType)).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
         log.info("Dynamic Financial Obligation records added.");
+        page.waitForTimeout(2500);
     }
 
     public void submitInitialForm() {
-        page.waitForTimeout(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
     }
 
