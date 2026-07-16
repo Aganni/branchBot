@@ -8,6 +8,7 @@ import io.cucumber.testng.CucumberOptions;
         "data",
         "ui.stepDefinitions.dsa_secured",
         "ui.stepDefinitions.jarvis",
+        "ui.stepDefinitions.jarvis_Secure",
         "backend.stepDefinitions"
 }, tags = "@LAP")
 

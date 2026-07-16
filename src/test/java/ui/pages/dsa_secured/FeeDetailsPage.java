@@ -17,17 +17,17 @@ public class FeeDetailsPage extends BaseTest {
         Locator calculateBtn = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Calculate Login Fee"));
         calculateBtn.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
         calculateBtn.click();
         log.info("Clicked Calculate Login Fee button.");
-        page.waitForTimeout(5000);
+        page.waitForTimeout(2500);
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
     }
     public void clickGenerateNewLink() {
         Locator generateLinkBtn = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Generate New Link"));
         generateLinkBtn.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
         generateLinkBtn.click();
         log.info("Clicked Generate New Link button.");
         page.waitForTimeout(2000);
@@ -37,7 +37,7 @@ public class FeeDetailsPage extends BaseTest {
         Locator sandboxLink = page.getByRole(AriaRole.LINK,
                 new Page.GetByRoleOptions().setName("https://sandbox.assets.juspay"));
         sandboxLink.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
 
         Page paymentPage = page.waitForPopup(() -> {
             sandboxLink.click();
@@ -56,14 +56,14 @@ public class FeeDetailsPage extends BaseTest {
         paymentPage.waitForTimeout(1000);
         Locator proceedBtn = paymentPage.getByText("proceed to pay ").nth(1);
         proceedBtn.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
         proceedBtn.click();
         log.info("Clicked Proceed to Pay.");
         paymentPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         paymentPage.waitForTimeout(5000);
         Locator otpInput = paymentPage.getByPlaceholder("Enter OTP");
         otpInput.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(30000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(3000));
         otpInput.click();
         otpInput.fill("111000");
         log.info("Entered OTP: 111000");

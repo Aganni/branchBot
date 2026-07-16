@@ -165,7 +165,7 @@ public class FinalSubmissionPage extends BaseTest {
             verifyLink = scopedLink.last();
         }
         verifyLink.scrollIntoViewIfNeeded();
-        groupsTab.waitForTimeout(500);
+        groupsTab.waitForTimeout(3500);
 
         // Click the link — it opens in a new tab
         log.info("Clicking 'Verify My Email' link...");
@@ -251,7 +251,7 @@ public class FinalSubmissionPage extends BaseTest {
         // Final Submit
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         page.waitForLoadState(LoadState.NETWORKIDLE);
-        page.waitForTimeout(3000);
+        page.waitForTimeout(5000);
         log.info("Application submitted successfully.");
     }
 }

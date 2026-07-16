@@ -29,7 +29,7 @@ public class LoginPage extends BaseTest {
         log.info("Clicked on external login button");
     }
 
-    public void loginWithEmailAndOtp(String email, String otp) throws InterruptedException {
+    public void loginWithEmailAndOtp(String email, String otp) {
         page.fill(EMAIL_INPUT, email);
         page.click(SEND_OTP_BTN);
         log.info("Entered email: {} and clicked GET OTP", email);

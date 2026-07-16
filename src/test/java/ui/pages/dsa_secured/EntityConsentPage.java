@@ -32,7 +32,7 @@ public class EntityConsentPage {
         Locator retriggerBtn = mainPage.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Re-trigger Consent"));
         retriggerBtn.waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(5000));
         retriggerBtn.click();
         mainPage.waitForTimeout(5000);
         log.info("Re-trigger Consent clicked. Email notification dispatched.");

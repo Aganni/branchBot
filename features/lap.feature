@@ -23,5 +23,5 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes final submission with email verification
 
   # ── Jarvis Portal Flow ──
-  Scenario: Complete LAP jouney with Jarvis flow till Welcome kit stage.
+  Scenario: Complete LAP flow till Welcome KIT through Jarvis portal.
     When User switches to Jarvis and moves the LAP application to CAM
