@@ -134,5 +134,7 @@ public class LoginDeskPage extends BaseTest {
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
         log.info("Application moved to CAM stage successfully.");
+        page.waitForTimeout(2500);
+        page.reload();
     }
 }

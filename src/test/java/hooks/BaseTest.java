@@ -152,6 +152,8 @@ public class BaseTest {
             BrowserContext newContext = browser.newContext(
                     new Browser.NewContextOptions()
                             .setStorageStatePath(Paths.get(stateFilePath))
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
             );
             contextThreadLocal.set(newContext);
 

@@ -277,3 +277,12 @@ dsa_secured:
       level: "L4"
       user: "tenjin.user@creditsaison-in.com"
 
+    cam:
+      aadhaar_last4: "9843"
+      employer_category: "CAT B"
+      employee_id: "2134"
+      industry_sector: "FMCG including frozen food"
+      office_contact: "9876543211"
+      residential_status: "rented"
+      ovd_type: "Voter ID"
+

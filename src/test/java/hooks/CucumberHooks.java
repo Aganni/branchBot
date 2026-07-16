@@ -33,6 +33,24 @@ public class CucumberHooks {
             }
         }
 
+        // Rename video to scenario name for easy identification
+        try {
+            var page = BaseTest.getPage();
+            if (page != null && page.video() != null) {
+                var videoPath = page.video().path();
+                if (videoPath != null) {
+                    String safeName = scenario.getName().replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                    var renamedPath = videoPath.getParent().resolve(safeName + ".webm");
+                    // Close page first so video file is finalized
+                    page.close();
+                    java.nio.file.Files.move(videoPath, renamedPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    log.info("Video saved as: {}", renamedPath);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not rename video: {}", e.getMessage());
+        }
+
         // Print execution summary
         printTestSummary(scenario);
 

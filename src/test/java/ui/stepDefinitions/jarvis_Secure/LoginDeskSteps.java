@@ -26,6 +26,18 @@ public class LoginDeskSteps extends BaseTest {
         // 4. Open the first application
         loginDeskPage.openFirstApplication();
 
+        // Capture application identifiers from the URL for test summary
+        String currentUrl = BaseTest.getPage().url();
+        if (currentUrl.contains("/application/")) {
+            String appFormId = currentUrl.replaceAll(".*/application/([^/]+).*", "$1");
+            DynamicDataClass.setValue("appFormId", appFormId);
+            log.info("Captured AppForm ID from URL: {}", appFormId);
+        }
+        String partnerLoanId = System.getProperty("partnerLoanId");
+        if (partnerLoanId != null && !partnerLoanId.isEmpty()) {
+            DynamicDataClass.get().setPartnerLoanId(partnerLoanId);
+        }
+
         // 5. Reassign application
         String assigneeEmail = BaseTest.getUserEmail();
         loginDeskPage.reassignApplication("L4", assigneeEmail, "ReAssign_LAP");
