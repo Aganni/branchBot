@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310495"
+    phone_number: "9001310503"
     loan_amount: "500000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -285,4 +285,9 @@ dsa_secured:
       office_contact: "9876543211"
       residential_status: "rented"
       ovd_type: "Voter ID"
+      co_applicant_name: "Chris"
+      co_applicant_ovd_type: "Voter ID"
+      co_applicant_voter_id: "YCV0164822"
+      co_applicant_last_name: "Sharma"
+      co_applicant_residential_status: "PG"
 

@@ -47,6 +47,19 @@ public class LoginDeskPage extends BaseTest {
         page.waitForTimeout(2000);
         log.info("Filters applied.");
     }
+
+    public void searchByIndividualApplicant(String applicantName) {
+        log.info("Searching by Individual Applicant: {}", applicantName);
+        page.getByPlaceholder("Search by").click();
+        page.getByText("Individual Applicant").click();
+        page.waitForTimeout(500);
+        page.getByPlaceholder("Enter Individual Applicant").click();
+        page.getByPlaceholder("Enter Individual Applicant").fill(applicantName);
+        page.getByPlaceholder("Enter Individual Applicant").press("Enter");
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(2000);
+        log.info("Search by Individual Applicant completed.");
+    }
     public void openApplicationByName(String applicantName) {
         log.info("Opening application: {}", applicantName);
         page.getByText(applicantName).click();

@@ -23,19 +23,37 @@ public class LoginDeskSteps extends BaseTest {
         // 3. Filter by Product = LAP and Status = Login_desk in Progress
         loginDeskPage.filterByProductAndStatus("LAP", "Login_desk in Progress");
 
-        // 4. Open the first application
+        // 4. Search by Individual Applicant name
+        loginDeskPage.searchByIndividualApplicant("Noah johnson");
+
+        // 5. Open the first application
         loginDeskPage.openFirstApplication();
 
-        // Capture application identifiers from the URL for test summary
+        // Capture application identifiers from the URL and page for test summary
         String currentUrl = BaseTest.getPage().url();
         if (currentUrl.contains("/application/")) {
             String appFormId = currentUrl.replaceAll(".*/application/([^/]+).*", "$1");
             DynamicDataClass.setValue("appFormId", appFormId);
+            DynamicDataClass.get().setAppFormId(appFormId);
             log.info("Captured AppForm ID from URL: {}", appFormId);
         }
-        String partnerLoanId = System.getProperty("partnerLoanId");
-        if (partnerLoanId != null && !partnerLoanId.isEmpty()) {
-            DynamicDataClass.get().setPartnerLoanId(partnerLoanId);
+
+        // Capture Partner Loan ID from the page (displayed below applicant name)
+        try {
+            String partnerLoanId = BaseTest.getPage().locator("text=/LAP[A-Z0-9]+/").first().textContent();
+            if (partnerLoanId != null && !partnerLoanId.trim().isEmpty()) {
+                DynamicDataClass.get().setPartnerLoanId(partnerLoanId.trim());
+                DynamicDataClass.setValue("partnerLoanId", partnerLoanId.trim());
+                log.info("Captured Partner Loan ID from page: {}", partnerLoanId.trim());
+            }
+        } catch (Exception e) {
+            log.info("Could not capture Partner Loan ID from page: {}", e.getMessage());
+            // Fallback to system property
+            String partnerLoanId = System.getProperty("partnerLoanId");
+            if (partnerLoanId != null && !partnerLoanId.isEmpty()) {
+                DynamicDataClass.get().setPartnerLoanId(partnerLoanId);
+                DynamicDataClass.setValue("partnerLoanId", partnerLoanId);
+            }
         }
 
         // 5. Reassign application
