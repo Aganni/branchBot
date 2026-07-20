@@ -26,4 +26,9 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
   Scenario: Complete LAP flow till Welcome KIT through Jarvis portal.
     Given Initialize data for "normal" loan of "LAP"
     When User switches to Jarvis and moves the LAP application to CAM
-    And User completes CAM stage mandatory fields and moves to Credit Review
+    And User completes CAM stage primary applicant mandatory fields
+    And User completes non-financial co-applicant mandatory fields
+    And User completes financial co-applicant mandatory fields
+    And User completes entity co-applicant mandatory fields and moves to Credit Review
+    And User completes program validation and moves to Credit Review
+    And User verifies KYC for non-financial co-applicant

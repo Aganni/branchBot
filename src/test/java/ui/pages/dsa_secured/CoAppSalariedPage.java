@@ -34,10 +34,21 @@ public class CoAppSalariedPage extends BaseTest {
     }
     public void clickAddApplicant() throws InterruptedException {
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
+
         Locator addBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant"));
+
+        // If button not visible, try reloading the page once
+        if (!addBtn.isVisible()) {
+            log.info("'+ Add Applicant' button not visible. Reloading page...");
+            page.reload();
+            page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+            page.waitForTimeout(3000);
+        }
+
         addBtn.waitFor(new Locator.WaitForOptions()
                 .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE)
-                .setTimeout(60000));
+                .setTimeout(30000));
         addBtn.click();
         log.info("Clicked on Add Applicant entry window.");
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
