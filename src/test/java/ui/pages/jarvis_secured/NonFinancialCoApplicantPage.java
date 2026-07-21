@@ -89,7 +89,7 @@ public class NonFinancialCoApplicantPage extends BaseTest {
         page.getByPlaceholder("Enter voter id").click();
         page.getByPlaceholder("Enter voter id").fill(voterId);
         page.getByText("Verify").click();
-        page.waitForTimeout(5000);
+        page.waitForTimeout(10000);
         log.info("Voter ID entered and verification triggered.");
     }
 

@@ -1,34 +1,21 @@
 package ui.pages.jarvis_secured;
-
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
-
 import java.util.regex.Pattern;
-
-/**
- * Page Object for Entity co-applicant (e.g., Amazon.com Inc.) interactions
- * in the CAM stage of the Jarvis Secured portal.
- */
 public class EntityCoApplicantPage extends BaseTest {
-
     private final Page page;
-
     public EntityCoApplicantPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
     //  OPEN ENTITY CO-APPLICANT DETAILS
-    // ═══════════════════════════════════════════════════════════════════════════
-
     public void openCoApplicantDetails(String coApplicantName) {
         log.info("Opening Entity CoApplicant details for: {}", coApplicantName);
-        // Wait for any loading masks to disappear
         try {
             page.locator(".el-loading-mask").first()
                     .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(15000));
@@ -36,19 +23,14 @@ public class EntityCoApplicantPage extends BaseTest {
             log.info("No loading mask detected or already hidden.");
         }
         page.waitForTimeout(2000);
-
-        // Expand CoApplicant Details section
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions()
                 .setName(Pattern.compile("CoApplicant Details"))).click();
         page.waitForTimeout(2000);
 
-        // Wait for View buttons to load
         Locator viewButtons = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("View"));
         viewButtons.first().waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
         page.waitForTimeout(1000);
-
-        // Find the entity by its h3 name heading, then click the View button in the same card
         Locator nameHeading = page.locator("h3").filter(new Locator.FilterOptions().setHasText(coApplicantName));
         int count = nameHeading.count();
         log.info("Found {} h3 elements with text '{}' in CoApplicant section", count, coApplicantName);
@@ -72,10 +54,7 @@ public class EntityCoApplicantPage extends BaseTest {
         log.info("Entity CoApplicant details opened for editing.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  SUBMIT DIALOG (triggers mandatory field validation)
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // SUBMIT DIALOG (triggers mandatory field validation)
     public void submitDialog() {
         log.info("Submitting entity co-applicant dialog...");
         // Scroll to the bottom Submit button in the dialog and click it
@@ -88,10 +67,7 @@ public class EntityCoApplicantPage extends BaseTest {
         log.info("Entity co-applicant dialog submitted.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  CLICK ARROW RIGHT ICON (navigate to next section)
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // CLICK ARROW RIGHT ICON (navigate to next section)
     public void clickArrowRightIcon() {
         log.info("Clicking Arrow Right icon to navigate to next section...");
         page.getByRole(AriaRole.IMG, new Page.GetByRoleOptions().setName("Arrow Right icon"))
@@ -100,10 +76,7 @@ public class EntityCoApplicantPage extends BaseTest {
         log.info("Navigated to next section.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  FILL OPERATIONAL DATE
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // FILL OPERATIONAL DATE
     public void fillOperationalDate(String year, String month, String day) {
         log.info("Filling operational date: {}-{}-{}", year, month, day);
         page.getByPlaceholder("Pick the operational date").click();
@@ -202,6 +175,18 @@ public class EntityCoApplicantPage extends BaseTest {
             log.info("No Close button detected, proceeding.");
         }
         page.waitForLoadState(LoadState.NETWORKIDLE);
+
+        // Dismiss any lingering notification that could block subsequent clicks
+        try {
+            Locator notification = page.locator(".el-notification");
+            if (notification.count() > 0 && notification.first().isVisible()) {
+                notification.first().locator(".el-notification__closeBtn").click();
+                page.waitForTimeout(1000);
+            }
+        } catch (Exception e) {
+            log.info("No notification to dismiss after reassign.");
+        }
+
         log.info("Application re-assigned to Tenjin successfully.");
     }
 

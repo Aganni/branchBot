@@ -18,12 +18,12 @@ public class FinancialCoApplicantSteps extends BaseTest {
 
         // 3. Fill financial co-applicant mandatory fields (hardcoded values)
         financialPage.fillMandatoryFields(
-                "5647",         // aadhaar last 4 digits
+                "7554",         // aadhaar last 4 digits
                 "own",          // residential status
                 "CAT A",        // employer category
-                "654",          // employee id
+                "1153",          // employee id
                 "Plastic",      // industry sector
-                "9876543211"    // office contact number
+                "9036654355"    // office contact number
         );
 
         // 4. Submit financial co-applicant final details

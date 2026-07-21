@@ -31,4 +31,4 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes financial co-applicant mandatory fields
     And User completes entity co-applicant mandatory fields and moves to Credit Review
     And User completes program validation and moves to Credit Review
-    And User verifies KYC for non-financial co-applicant
+    And User completes Credit Review stage and moves to Credit Approval

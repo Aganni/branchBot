@@ -1,0 +1,172 @@
+package ui.pages.jarvis_secured;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
+import hooks.BaseTest;
+import java.util.regex.Pattern;
+public class CollateralDetailsPage extends BaseTest {
+    private final Page page;
+    public CollateralDetailsPage(Page page) {
+        if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
+        this.page = page;
+    }
+
+    // FILL COLLATERAL DETAILS (CERSAI)
+    public void fillCollateralDetails() {
+        log.info("Filling Collateral Details (CERSAI)...");
+
+        // Open Collateral Details section
+        page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Collateral Details")).click();
+        page.waitForTimeout(1000);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Collateral Details CERSAI")).click();
+        page.waitForTimeout(1500);
+
+        // Nature of Mortgage
+        page.locator("div:nth-child(3) > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").click();
+        page.getByText("Equitable Mortgage").click();
+        page.waitForTimeout(500);
+
+        // Seller Name
+        Locator sellerNameField = page.locator("div")
+                .filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Seller Name$")))
+                .getByRole(AriaRole.TEXTBOX);
+        sellerNameField.fill("Sadie Luke");
+        page.waitForTimeout(500);
+
+        // Construction Start Year
+        page.getByPlaceholder("Enter the Construction Start").click();
+        page.getByPlaceholder("Enter the Construction Start").fill("2002");
+        page.waitForTimeout(500);
+
+        // Built-up area
+        page.locator("div:nth-child(14) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
+        page.locator("div:nth-child(14) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("1200");
+        page.waitForTimeout(500);
+
+        // Cost of construction per sqFt/Mtr
+        page.getByPlaceholder("Cost of const per sqFt/Mtr").click();
+        page.getByPlaceholder("Cost of const per sqFt/Mtr").fill("1200");
+        page.waitForTimeout(500);
+
+        // Primary agency
+        page.locator("div:nth-child(16) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
+        page.locator("div:nth-child(16) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("primary agecny 1");
+        page.waitForTimeout(500);
+
+        // Primary valuation amount
+        page.locator("div:nth-child(16) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(16) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("102000000");
+        page.waitForTimeout(500);
+
+        // Secondary valuation amount
+        page.locator("div:nth-child(18) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(18) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("102000000");
+        page.waitForTimeout(500);
+
+        // Nature of property
+        page.locator("div:nth-child(20) > div > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").first().click();
+        page.locator("li").filter(new Locator.FilterOptions().setHasText("Land & Buildings")).click();
+        page.waitForTimeout(500);
+
+        // Charge type
+        page.locator("div:nth-child(20) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").click();
+        page.getByText("Primary - First Charge").click();
+        page.waitForTimeout(500);
+
+        // CERSAI match status
+        page.locator("div:nth-child(21) > div > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").first().click();
+        page.getByText("Match Found", new Page.GetByTextOptions().setExact(true)).click();
+        page.waitForTimeout(500);
+
+        // Property usage
+        page.locator("div:nth-child(21) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").click();
+        page.getByText("Civic", new Page.GetByTextOptions().setExact(true)).click();
+        page.waitForTimeout(500);
+
+        // Shop number
+        page.locator("div:nth-child(24) > div:nth-child(3) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(24) > div:nth-child(3) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("shop numer");
+        page.waitForTimeout(500);
+
+        // Building
+        page.locator("div:nth-child(24) > div:nth-child(4) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(24) > div:nth-child(4) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("building");
+        page.waitForTimeout(500);
+
+        // Pincode
+        page.locator("div:nth-child(7) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(7) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("560093");
+        page.waitForTimeout(500);
+
+        // Survey number
+        page.locator("div:nth-child(8) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(8) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("12/34");
+        page.waitForTimeout(500);
+
+        // Village/Locality
+        page.locator("div:nth-child(11) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(11) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("huddi");
+        page.waitForTimeout(500);
+
+        // District
+        page.getByPlaceholder("Enter District").click();
+        page.getByPlaceholder("Enter District").fill("bangalore");
+        page.waitForTimeout(500);
+
+        // Submit collateral
+        page.getByLabel("Collateral").getByText("Submit Arrow Right icon").click();
+        page.waitForTimeout(2000);
+
+        // Close/collapse collateral section
+        try {
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("")).click();
+            page.waitForTimeout(1000);
+        } catch (Exception e) {
+            log.info("No close button found after collateral submit.");
+        }
+
+        log.info("Collateral Details filled and submitted.");
+    }
+
+    // SECONDARY COLLATERAL VALIDATION
+    //Fills secondary validation fields when "Sanction loan amount" error appears.
+    public void fillSecondaryCollateralValidation() {
+        log.info("Filling secondary collateral validation fields...");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Collateral Details CERSAI")).click();
+        page.waitForTimeout(1500);
+        // Secondary agency name
+        page.locator("div:nth-child(17) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
+        page.locator("div:nth-child(17) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("secondary validation");
+        page.waitForTimeout(500);
+        // Secondary valuation amount
+        page.locator("div:nth-child(17) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
+        page.locator("div:nth-child(17) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("256800000");
+        page.waitForTimeout(500);
+        // Submit collateral again
+        page.getByLabel("Collateral").getByText("Submit Arrow Right icon").click();
+        page.waitForTimeout(2000);
+        // Collapse/close
+        try {
+            page.locator(".el-col > .cs-fab > .info").click();
+            page.waitForTimeout(1000);
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("")).click();
+            page.waitForTimeout(1000);
+        } catch (Exception e) {
+            log.info("No close/collapse button after secondary collateral submit.");
+        }
+
+        // Dismiss alert if present
+        try {
+            Locator alert = page.getByRole(AriaRole.ALERT).locator("div").nth(2);
+            if (alert.isVisible()) {
+                alert.click();
+                page.waitForTimeout(1000);
+            }
+        } catch (Exception e) {
+            log.info("No alert to dismiss.");
+        }
+
+        log.info("Secondary collateral validation fields filled.");
+    }
+}
