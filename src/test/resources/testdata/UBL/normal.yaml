@@ -31,7 +31,7 @@ dsa:
   # ── Loan Requirements ────────────────────────────────────────────────────────
   loan_requirements:
     tenure: "12"
-    loan_amount: "700000"
+    loan_amount: "2500000"
     end_use: "Business Expansion"
 
   # ── QDE (Quick Data Entry) ───────────────────────────────────────────────────

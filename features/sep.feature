@@ -5,6 +5,8 @@ Feature: SEP End-to-End Workflow
   # ── Data Initialization ──
     Given Initialize data for "normal" loan of "SEP"
     And User generates test data and whitelists PAN in Mystique
+    And User generates a random business name
+    And User generates co-applicant PAN and whitelists in Mystique
   # ── DSA Portal Flow ──
     When User logs into DSA Portal and initiates a Business Loan application
     Then User completes Partner Details and proceeds

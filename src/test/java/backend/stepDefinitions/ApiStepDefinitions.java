@@ -21,18 +21,23 @@ public class ApiStepDefinitions extends BaseTest {
         setValue(Constants.PAN_CARD, DataGeneratorUtils.generatePanNumber());
         log.info("Generated PAN: {}", getValue(Constants.PAN_CARD));
 
+        ApiUtils.whitelistPanInMystique((String) getValue(Constants.PAN_CARD), profile);
+    }
+
+    @And("User generates a random business name")
+    public void generateBusinessName() {
         setValue(Constants.BUSINESS_NAME, DataGeneratorUtils.generateBusinessName());
         log.info("Generated Business Name: {}", getValue(Constants.BUSINESS_NAME));
+    }
 
-        ApiUtils.updatePanInMystique(profile);
+    @And("User generates co-applicant PAN and whitelists in Mystique")
+    public void generateCoApplicantPan() {
+        String coApplicantProfile = TestDataProvider.get("dsa.co_applicant.pan_profile");
 
-        // For SEP, generate and whitelist a second PAN for the doctor co-applicant
-        String coApplicantProfile = TestDataProvider.getOrDefault("dsa.co_applicant.pan_profile", null);
-        if (coApplicantProfile != null) {
-            setValue(Constants.CO_APPLICANT_PAN, DataGeneratorUtils.generatePanNumber());
-            log.info("Generated Co-Applicant PAN: {}", getValue(Constants.CO_APPLICANT_PAN));
-            ApiUtils.updatePanInMystiqueForKey(Constants.CO_APPLICANT_PAN, coApplicantProfile);
-        }
+        setValue(Constants.CO_APPLICANT_PAN, DataGeneratorUtils.generatePanNumber());
+        log.info("Generated Co-Applicant PAN: {}", getValue(Constants.CO_APPLICANT_PAN));
+
+        ApiUtils.whitelistPanInMystique((String) getValue(Constants.CO_APPLICANT_PAN), coApplicantProfile);
     }
 
     @And("User moves to QC Approval stage")

@@ -5,6 +5,7 @@ Feature: Unsecured Business Loan End-to-End Workflow
   # ── Data Initialization ──
     Given Initialize data for "normal" loan of "UBL"
     And User generates test data and whitelists PAN in Mystique
+    And User generates a random business name
   # ── DSA Portal Flow ──
     When User logs into DSA Portal and initiates a Business Loan application
     Then User completes Partner Details and proceeds

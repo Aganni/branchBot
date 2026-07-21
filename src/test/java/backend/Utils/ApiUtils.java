@@ -13,70 +13,48 @@ import static dynamicData.DynamicDataClass.getValue;
 
 public class ApiUtils extends BaseTest {
 
-    public static void updatePanInMystique(String panProfile) {
-
-        // Create the payload
-        get().setApiPayload(ApiPayload.whitelistPanCardInMystique((String) getValue(Constants.PAN_CARD), panProfile)); // Storing for test session logs
-
-        try {
-            //  Execute the call ( APIEndPoints.WHITELIST_PANCARD_IN_MYSTIQUE = "/addKyc")
-            Response response = ApiClientUtils.doPostKyc(Constants.MYSTIQUE_BASE_URI, Constants.WHITELIST_PANCARD_IN_MYSTIQUE, get().getApiPayload());
-
-            //  Assert Status Code is 200
-            Assert.assertEquals(response.getStatusCode(), 200, "Mystique PAN Whitelist API failed!");
-
-            //  Assert Response Message
-            JsonPath jsonPath = response.jsonPath();
-            String expectedMessage = "Added a new kyc of type pancard with id- " + getValue(Constants.PAN_CARD);
-            Assert.assertEquals(jsonPath.getString("message"), expectedMessage, "API Response message mismatch!");
-
-        } catch (Exception e) {
-            log.error("Failed to update PAN in Mystique", e);
-            Assert.fail("Exception during Mystique PAN Whitelist: " + e.getMessage());
-        }
-    }
-
-    public static void updatePanInMystiqueForKey(String panKey, String panProfile) {
-
-        String panValue = (String) getValue(panKey);
+    /**
+     * Whitelists a PAN in Mystique with the given profile.
+     * Single method for both primary and co-applicant PAN whitelist.
+     *
+     * @param panValue   the PAN number to whitelist
+     * @param panProfile the profile name to associate (e.g. "Shea Test", "Alex Doctor")
+     */
+    public static void whitelistPanInMystique(String panValue, String panProfile) {
         String payload = ApiPayload.whitelistPanCardInMystique(panValue, panProfile);
+        get().setApiPayload(payload);
 
         try {
-            log.info("Whitelisting co-applicant PAN [{}] with profile [{}] in Mystique", panValue, panProfile);
             Response response = ApiClientUtils.doPostKyc(Constants.MYSTIQUE_BASE_URI, Constants.WHITELIST_PANCARD_IN_MYSTIQUE, payload);
 
-            Assert.assertEquals(response.getStatusCode(), 200, "Mystique Co-Applicant PAN Whitelist API failed!");
+            Assert.assertEquals(response.getStatusCode(), 200, "Mystique PAN Whitelist API failed for PAN: " + panValue);
 
             JsonPath jsonPath = response.jsonPath();
             String expectedMessage = "Added a new kyc of type pancard with id- " + panValue;
-            Assert.assertEquals(jsonPath.getString("message"), expectedMessage, "Co-Applicant API Response message mismatch!");
+            Assert.assertEquals(jsonPath.getString("message"), expectedMessage, "API Response message mismatch for PAN: " + panValue);
 
         } catch (Exception e) {
-            log.error("Failed to update co-applicant PAN in Mystique", e);
-            Assert.fail("Exception during Mystique Co-Applicant PAN Whitelist: " + e.getMessage());
+            log.error("Failed to whitelist PAN [{}] in Mystique", panValue, e);
+            Assert.fail("Exception during Mystique PAN Whitelist for " + panValue + ": " + e.getMessage());
         }
     }
 
     public static void moveAppFormToStage(String stage) {
-        // Fetch the dynamic Application ID stored in the current session
         String appId = getValue("appFormId").toString();
 
         if (appId == null || appId.isEmpty()) {
             throw new AssertionError("Cannot move to stage: appFormId is missing in TestSessionData.");
         }
 
-        // Formats the endpoint: e.g., /api/v1/UBL/TERMS/start-process/1b945302...
         String endpoint = String.format(Constants.START_PROCESS_ENDPOINT, stage, appId);
 
         try {
             log.info("Triggering Nebula API to move App ID: [{}] to Stage: [{}]", appId, stage);
 
-            // Execute the API call
             Response response = ApiClientUtils.doPostEmptyBodyWithBasicAuth(
-                    Constants.NEBULA_BASE_URI , endpoint, Headers.BASIC_AUTH
+                    Constants.NEBULA_BASE_URI, endpoint, Headers.BASIC_AUTH
             );
 
-            // Assert Success Status Code (Assuming 200 or 204 for successful process start)
             int statusCode = response.getStatusCode();
             log.info("API Response Status Code: {}", statusCode);
             log.info("API Response Body: {}", response.getBody().asString());
@@ -91,7 +69,6 @@ public class ApiUtils extends BaseTest {
     }
 
     public static void updateRepaymentDetails() {
-        // Fetch the dynamic Application ID stored in the current session
         String appId = getValue("appFormId").toString();
 
         if (appId == null || appId.isEmpty()) {
@@ -104,10 +81,8 @@ public class ApiUtils extends BaseTest {
         try {
             log.info("Triggering Lannister API to update Repayment Details for App ID: [{}]", appId);
 
-            // Execute the API call
             Response response = ApiClientUtils.doPostWithBasicAuth(Constants.LANNISTER_BASE_URI, endpoint, payload, Headers.BASIC_AUTH);
 
-            // Assert Success Status Code (Assuming 200 or 201 for success)
             int statusCode = response.getStatusCode();
             log.info("API Response Status Code: {}", statusCode);
             log.info("API Response Body: {}", response.getBody().asString());

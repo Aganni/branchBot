@@ -11,53 +11,85 @@ public class KycDocumentsPage extends BaseTest {
 
     private final Page page;
 
-    // ── Locators ─────────────────────────────────────────────────────────────
-    private static final String UPLOAD_INPUT = "#upload-button-bus2";
     private static final String SAMPLE_DOC_PATH = "src/test/resources/testdata/bank_statement.pdf";
 
     public KycDocumentsPage(Page page) {
-        if (page == null)
-            throw new IllegalArgumentException("Page instance cannot be null");
+        if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
-    public void uploadMandatoryKycDocument() {
-        log.info("On KYC Documents page - uploading mandatory document");
+    public void uploadAllMandatoryDocuments() {
+        log.info("Uploading documents for all mandatory KYC Documents sections");
 
-        // Click to expand the KYC Documents section
-        page.getByText("KYC Documents*").click();
-        page.waitForTimeout(1000);
-        log.info("Expanded KYC Documents section");
-
-        // Directly set file on the hidden input (Playwright allows this without
-        // visibility)
         java.nio.file.Path absolutePath = Paths.get(SAMPLE_DOC_PATH).toAbsolutePath();
-        log.info("Uploading document from: {}", absolutePath);
-        page.locator(UPLOAD_INPUT).setInputFiles(absolutePath);
-        log.info("Document uploaded via file input");
 
-        // Wait for upload modal to appear
-        page.waitForTimeout(2000);
+        // Find all <p> tags that contain "KYC Documents" and end with "*"
+        Locator kycLabels = page.locator("p:has-text('KYC Documents')").filter(new Locator.FilterOptions().setHasText("*"));
+        int count = kycLabels.count();
+        log.info("Found {} KYC Documents labels (p tags) on the page", count);
 
-        // Select document type as "Pan" in the modal (MUI Select component)
-        page.locator("#docType").click();
-        page.waitForTimeout(500);
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan"))
-                .or(page.locator("li:has-text('Pan')"))
-                .or(page.getByText("Pan", new Page.GetByTextOptions().setExact(true)))
-                .first().click();
-        log.info("Selected document type: Pan");
+        int uploaded = 0;
+        for (int i = 0; i < count; i++) {
+            Locator label = kycLabels.nth(i);
 
-        // Save the document
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SAVE")).click();
-        log.info("Clicked Save button");
+            if (!label.isVisible()) {
+                log.info("Skipping KYC Documents #{} - not visible", i + 1);
+                continue;
+            }
 
-        // Wait for the upload to complete before submitting
-        page.waitForTimeout(25000);
+            // Find the UPLOAD link in the parent div (sibling of this p tag)
+            Locator parentDiv = label.locator("xpath=./ancestor::div[1]");
+            Locator uploadLink = parentDiv.locator("a:has-text('UPLOAD')");
+
+            if (uploadLink.count() == 0) {
+                // Try going one level up
+                parentDiv = label.locator("xpath=./ancestor::div[2]");
+                uploadLink = parentDiv.locator("a:has-text('UPLOAD')");
+            }
+
+            if (uploadLink.count() == 0) {
+                log.info("No UPLOAD link found for KYC Documents #{}, skipping", i + 1);
+                continue;
+            }
+
+            log.info("Uploading to KYC Documents section #{}", i + 1);
+
+            page.onFileChooser(fileChooser -> {
+                fileChooser.setFiles(absolutePath);
+            });
+
+            uploadLink.first().scrollIntoViewIfNeeded();
+            uploadLink.first().click();
+            log.info("Clicked UPLOAD for section #{}", i + 1);
+
+            // Wait for upload modal
+            page.waitForTimeout(2000);
+
+            // Select document type as "Pan"
+            Locator docType = page.locator("#docType");
+            if (docType.isVisible()) {
+                docType.click();
+                page.waitForTimeout(500);
+                page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan"))
+                        .or(page.locator("li:has-text('Pan')"))
+                        .first().click();
+                log.info("Selected document type: Pan");
+            }
+
+            // Save
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SAVE")).click();
+            log.info("Saved document for section #{}", i + 1);
+
+            page.waitForTimeout(3000);
+            uploaded++;
+        }
+
+        log.info("Uploaded documents for {} KYC Documents sections", uploaded);
     }
 
     public void submitDocuments() {
         Locator submitBtn = page.locator("button:has-text('SUBMIT')");
+        submitBtn.scrollIntoViewIfNeeded();
         submitBtn.waitFor(new Locator.WaitForOptions().setTimeout(15000));
         submitBtn.click();
         log.info("Clicked Submit on KYC Documents page.");

@@ -18,64 +18,44 @@ public class SepCoApplicantPage extends BaseTest {
     public void fillDoctorCoApplicantDetails(Map<String, String> data) {
         log.info("Filling SEP doctor co-applicant details");
 
-        // PAN Number
-        if (data.containsKey("pan")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Pan Number")).fill(data.get("pan"));
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).click();
-            log.info("Entered PAN: {} and clicked Verify", data.get("pan"));
-        }
+        fillTextbox("Pan Number", data.get("pan"));
+        clickButton("Verify");
 
-        // Phone
-        if (data.containsKey("phone")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Phone No.")).fill(data.get("phone"));
-            log.info("Entered Phone: {}", data.get("phone"));
-        }
+        fillTextbox("Phone No.", data.get("phone"));
+        fillTextbox("Email", data.get("email"));
+        fillTextbox("NMC Registration Number", data.get("nmc_registration_number"));
+        fillTextbox("Year of NMC Registration", data.get("year_of_nmc_registration"));
 
-        // Email
-        if (data.containsKey("email")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Email")).fill(data.get("email"));
-            log.info("Entered Email: {}", data.get("email"));
-        }
+        selectDropdown("Qualification", data.get("qualification"));
+        selectDropdown("Medical Council", data.get("medical_council"));
 
-        // NMC Registration Number
-        if (data.containsKey("nmc_registration_number")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("NMC Registration Number")).fill(data.get("nmc_registration_number"));
-            log.info("Entered NMC Registration Number: {}", data.get("nmc_registration_number"));
-        }
+        fillTextbox("Years of Experience", data.get("years_of_experience"));
 
-        // Year of NMC Registration
-        if (data.containsKey("year_of_nmc_registration")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Year of NMC Registration")).fill(data.get("year_of_nmc_registration"));
-            log.info("Entered Year of NMC Registration: {}", data.get("year_of_nmc_registration"));
-        }
-
-        // Qualification
-        if (data.containsKey("qualification")) {
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Qualification")).click();
-            page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("qualification"))).click();
-            log.info("Selected Qualification: {}", data.get("qualification"));
-        }
-
-        // Medical Council
-        if (data.containsKey("medical_council")) {
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Medical Council")).click();
-            page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(data.get("medical_council"))).click();
-            log.info("Selected Medical Council: {}", data.get("medical_council"));
-        }
-
-        // Years of Experience
-        if (data.containsKey("years_of_experience")) {
-            page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Years of Experience")).fill(data.get("years_of_experience"));
-            log.info("Entered Years of Experience: {}", data.get("years_of_experience"));
-        }
-
-        // Save
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
-        log.info("Clicked Save on SEP Co-Applicant page");
+        clickButton("Save");
+        log.info("Saved SEP co-applicant details");
     }
 
     public void clickSubmit() {
         page.locator("button:has-text('SUBMIT')").click();
         log.info("Clicked Submit on SEP Co-Applicant page");
+    }
+
+    // ── Private Helpers ──────────────────────────────────────────────────────
+
+    private void fillTextbox(String name, String value) {
+        if (value == null || value.isEmpty()) return;
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName(name)).fill(value);
+        log.info("Filled '{}': {}", name, value);
+    }
+
+    private void selectDropdown(String name, String value) {
+        if (value == null || value.isEmpty()) return;
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(name)).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(value)).click();
+        log.info("Selected '{}': {}", name, value);
+    }
+
+    private void clickButton(String name) {
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(name)).click();
     }
 }

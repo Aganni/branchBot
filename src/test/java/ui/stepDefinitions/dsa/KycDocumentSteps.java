@@ -9,7 +9,7 @@ public class KycDocumentSteps {
     @And("User submits KYC Documents page")
     public void submitKycDocuments() {
         KycDocumentsPage page = new KycDocumentsPage(BaseTest.getPage());
-        page.uploadMandatoryKycDocument();
+        page.uploadAllMandatoryDocuments();
         page.submitDocuments();
     }
 }

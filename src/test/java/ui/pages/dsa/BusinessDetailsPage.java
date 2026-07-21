@@ -50,28 +50,17 @@ public class BusinessDetailsPage extends BaseTest {
         log.info("Clicked Verify button for PAN");
     }
 
-    public void verifyAutoPopulatedEntityName(String expectedName) {
-        log.info("Filling Entity Name: {}", expectedName);
-        page.locator(ENTITY_NAME_INPUT).fill(expectedName);
-        log.info("Entity Name filled successfully");
-
-        log.info("Verifying auto-populated Proprietor/Owner Name from PAN");
+    public void verifyAutoPopulatedProprietorName(String expectedName) {
+        log.info("Verifying auto-populated Proprietor/Owner Name is: {}", expectedName);
         Locator proprietorField = page.locator(PROPRIETOR_NAME_INPUT);
-        assertThat(proprietorField).not().isEmpty();
-        log.info("Proprietor/Owner Name verified successfully!");
+        assertThat(proprietorField).hasValue(expectedName);
+        log.info("Proprietor/Owner Name verified: {}", expectedName);
     }
 
     public void fillEntityName(String entityName) {
         log.info("Filling Entity Name: {}", entityName);
         page.locator(ENTITY_NAME_INPUT).fill(entityName);
-        log.info("Entity Name filled successfully");
-    }
-
-    public void verifyProprietorName(String expectedName) {
-        log.info("Verifying auto-populated Proprietor/Owner Name is: {}", expectedName);
-        Locator proprietorField = page.locator(PROPRIETOR_NAME_INPUT);
-        assertThat(proprietorField).hasValue(expectedName);
-        log.info("Proprietor/Owner Name verified successfully!");
+        log.info("Entity Name filled: {}", entityName);
     }
 
     public void clickContinueToFetchDetails() {
@@ -121,6 +110,15 @@ public class BusinessDetailsPage extends BaseTest {
         page.locator(INDUSTRY_SUB_SECTOR).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(sector).setExact(true)).click();
         log.info("Selected Industry Sub-Sector: {} from sector dropdown", sector);
+    }
+
+    public void selectFirstTypeOfIndustry() {
+        log.info("Selecting first available Type of Industry option");
+        Locator industryType = page.locator("#industryType");
+        industryType.scrollIntoViewIfNeeded();
+        industryType.click();
+        page.getByRole(AriaRole.OPTION).first().click();
+        log.info("Selected first Type of Industry option");
     }
 
     public void fillLoanRequirements(Map<String, String> data) {
