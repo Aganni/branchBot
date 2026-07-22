@@ -32,7 +32,6 @@ public class TestDataProvider {
     private static final ThreadLocal<String> currentLoanType = new ThreadLocal<>();
 
     private TestDataProvider() {}
-
     /**
      * Initializes test data for a specific LPC and loan type.
      * Loads from: testdata/{lpc}/{loanType}.yaml
@@ -75,14 +74,25 @@ public class TestDataProvider {
             throw new RuntimeException("Test data not initialized. Call initialize(loanType, lpc) first.");
         }
 
+        if (path.startsWith("dsa.") && !data.containsKey("dsa") && data.containsKey("dsa_secured")) {
+            path = "dsa_secured." + path.substring(4);
+        }
+
         String[] keys = path.split("\\.");
         Object current = data;
 
         for (String key : keys) {
             if (current instanceof Map) {
-                current = ((Map<String, Object>) current).get(key);
+                Map<String, Object> map = (Map<String, Object>) current;
+                // SMART CHECK: Tell us exactly what keys exist if the lookup fails
+                if (!map.containsKey(key)) {
+                    throw new RuntimeException("Data mismatch! Path failed at key: '" + key +
+                            "' inside query [" + path + "]. Available keys at this level are: " + map.keySet());
+                }
+                current = map.get(key);
             } else {
-                throw new RuntimeException("Invalid path: " + path + " (failed at key: " + key + ")");
+                throw new RuntimeException("Invalid structure path: " + path +
+                        " (failed at key: '" + key + "' because its parent is a primitive value, not a map section. Parent value: " + current + ")");
             }
         }
 
@@ -113,6 +123,11 @@ public class TestDataProvider {
         Map<String, Object> data = dataStore.get();
         if (data == null) {
             throw new RuntimeException("Test data not initialized.");
+        }
+
+        // Handle both dsa and dsa_secured roots transparently
+        if (path.startsWith("dsa.") && !data.containsKey("dsa") && data.containsKey("dsa_secured")) {
+            path = "dsa_secured." + path.substring(4);
         }
 
         String[] keys = path.split("\\.");

@@ -25,7 +25,7 @@ public class LoginPage extends BaseTest {
         page.getByLabel(EMAIL_INPUT_LABEL).last().fill(getUserEmail());
         page.getByText(NEXT_TEXT).click();
 
-        page.getByLabel(PASSWORD_INPUT_LABEL).fill(getsetUserPassWord());
+        page.getByLabel(PASSWORD_INPUT_LABEL).fill(getUserPassword());
         page.getByText(NEXT_TEXT).last().click();
 
         log.info("Jarvis Login submitted.");

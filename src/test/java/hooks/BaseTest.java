@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public class BaseTest {
-    // Environment: reads from system property -Denv=uat (default: uat)
+    // Environment: reads from system property -Denv=uat (default: int)
     public static final String environment = System.getProperty("env", "int");
 
     // ThreadLocal for thread safety during parallel execution
@@ -20,7 +20,7 @@ public class BaseTest {
     private static final ThreadLocal<BrowserContext> contextThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<Page> pageThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<String> userName = new ThreadLocal<>();
-    private static final ThreadLocal<String> xApiKey = new ThreadLocal<>();
+    private static final ThreadLocal<String> userPassword = new ThreadLocal<>(); // Renamed from xApiKey
     private static final ThreadLocal<String> otp = new ThreadLocal<>();
     private static final ThreadLocal<String> email = new ThreadLocal<>();
 
@@ -44,6 +44,13 @@ public class BaseTest {
         return pageThreadLocal.get();
     }
 
+    public static BrowserContext getContext() {
+        if (contextThreadLocal.get() == null) {
+            startBrowserInstance();
+        }
+        return contextThreadLocal.get();
+    }
+
     public static void startBrowserInstance() {
         try {
             Playwright playwright = Playwright.create();
@@ -53,7 +60,11 @@ public class BaseTest {
                     .launch(new BrowserType.LaunchOptions().setHeadless(false));
             browserThreadLocal.set(browser);
 
-            BrowserContext context = browser.newContext();
+            BrowserContext context = browser.newContext(
+                    new Browser.NewContextOptions()
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
+            );
             contextThreadLocal.set(context);
 
             Page page = context.newPage();
@@ -91,7 +102,7 @@ public class BaseTest {
             browserThreadLocal.remove();
             playwrightThreadLocal.remove();
             userName.remove();
-            xApiKey.remove();
+            userPassword.remove(); // Clean up updated ThreadLocal
             otp.remove();
             email.remove();
             storageStatePath.remove();
@@ -103,12 +114,6 @@ public class BaseTest {
     //  Context Bridge — Session Handoff Between Portals
     // ───────────────────────────────────────────────
 
-    /**
-     * Saves the current BrowserContext's storage state (cookies, localStorage)
-     * to a JSON file so it can be injected into a new context later.
-     *
-     * Call this AFTER completing all actions on the first portal (DSA Portal).
-     */
     public static String saveStorageState() {
         try {
             Path dir = Paths.get(STORAGE_STATE_DIR);
@@ -130,12 +135,6 @@ public class BaseTest {
         }
     }
 
-    /**
-     * Creates a brand-new BrowserContext pre-loaded with the storage state
-     * from a previous portal session. Updates the ThreadLocal page reference.
-     *
-     * @param stateFilePath absolute path to the storage-state JSON
-     */
     public static void createContextFromState(String stateFilePath) {
         try {
             Browser browser = browserThreadLocal.get();
@@ -153,6 +152,8 @@ public class BaseTest {
             BrowserContext newContext = browser.newContext(
                     new Browser.NewContextOptions()
                             .setStorageStatePath(Paths.get(stateFilePath))
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
             );
             contextThreadLocal.set(newContext);
 
@@ -166,14 +167,6 @@ public class BaseTest {
         }
     }
 
-    /**
-     * High-level convenience method:
-     *   1. Saves DSA Portal session
-     *   2. Creates a new context with the saved session
-     *   3. Navigates to the Jarvis Portal URL
-     *
-     * After this method returns, {@code getPage()} points at the Jarvis portal.
-     */
     public static void switchToJarvisPortal() {
         try {
             String stateFile = saveStorageState();
@@ -190,7 +183,7 @@ public class BaseTest {
     }
 
     // ───────────────────────────────────────────────
-    //  Environment & Credentials (mirrors Apollo)
+    //  Environment & Credentials
     // ───────────────────────────────────────────────
 
     public static String initializeEnvironment(String key) throws Exception {
@@ -225,7 +218,7 @@ public class BaseTest {
         try {
             String propertyFile = System.getProperty("user.dir") + "/src/test/resources/properties/" + environment + "Credentials.properties";
             log.info("Loading credentials from: {}", propertyFile);
-            
+
             if (!new File(propertyFile).exists()) {
                 log.error("Credentials file not found at: {}", propertyFile);
                 return;
@@ -234,17 +227,20 @@ public class BaseTest {
             try (InputStream inputStream = Files.newInputStream(Paths.get(propertyFile))) {
                 Properties properties = new Properties();
                 properties.load(inputStream);
-                
+
                 String user = properties.getProperty(portal.toLowerCase() + "UserEmail");
                 String pass = properties.getProperty(portal.toLowerCase() + "UserPassword");
                 String otpVal = properties.getProperty(portal.toLowerCase() +"Otp");
 
                 if (user != null) setUserEmail(user);
-                if (pass != null) setUserPassWord(pass);
+                if (pass != null) setUserPassword(pass);
                 if (otpVal != null) setOtp(otpVal);
-                
-                log.info("Loaded credentials for {}: User={}, Email={}, OTP={}", 
-                    portal, getUserEmail(), (getOtp() != null ? "****" : "null"), (getsetUserPassWord() != null ? "****" : "null"));
+
+                log.info("Loaded credentials for {}: UserEmail={}, Password={}, OTP={}",
+                        portal,
+                        getUserEmail(),
+                        (getUserPassword() != null ? "****" : "null"),
+                        (getOtp() != null ? "****" : "null"));
             }
         } catch (Exception e) {
             log.error("Exception in getCredentials: " + e.getMessage(), e);
@@ -252,10 +248,10 @@ public class BaseTest {
     }
 
     public static synchronized void setUserEmail(String user) { userName.set(user); }
-    public static    String getUserEmail() { return userName.get(); }
+    public static String getUserEmail() { return userName.get(); }
 
-    public static synchronized void setUserPassWord(String apiKey) { xApiKey.set(apiKey); }
-    public static String getsetUserPassWord() { return xApiKey.get(); }
+    public static synchronized void setUserPassword(String password) { userPassword.set(password); }
+    public static String getUserPassword() { return userPassword.get(); }
 
     public static synchronized void setOtp(String otpValue) { otp.set(otpValue); }
     public static String getOtp() { return otp.get(); }

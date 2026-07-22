@@ -11,7 +11,7 @@ import static dynamicData.DynamicDataClass.*;
 
 public class ApiStepDefinitions extends BaseTest {
 
-    @Given("User generates test data and whitelists PAN in Mystique")
+    @Given("User generates test data for LAP and whitelists PAN in Mystique")
     public void generateDataAndWhitelistPan() {
         String profile = TestDataProvider.get("dsa.qde.pan_profile");
 
@@ -39,8 +39,7 @@ public class ApiStepDefinitions extends BaseTest {
 
         ApiUtils.whitelistPanInMystique((String) getValue(Constants.CO_APPLICANT_PAN), coApplicantProfile);
     }
-
-    @And("User moves to QC Approval stage")
+    @And("User moves LAP to stage") // Changed text here
     public void moveToQcApproval() {
         ApiUtils.moveAppFormToStage("QC_APPROVE");
     }
