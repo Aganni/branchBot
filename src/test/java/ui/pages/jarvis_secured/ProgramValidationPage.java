@@ -50,10 +50,9 @@ public class ProgramValidationPage extends BaseTest {
     public void moveToCreditReview() {
         log.info("Moving application to Credit Review after program validation...");
 
-        // Reload to clear any lingering dropdown/overlay state
-        page.reload();
+        // Page was already reloaded in submitPartnerDetails, wait for it to fully settle
         page.waitForLoadState(LoadState.NETWORKIDLE);
-        page.waitForTimeout(3000);
+        page.waitForTimeout(5000);
 
         // Dismiss any notification that might block the dropdown
         try {
@@ -66,8 +65,6 @@ public class ProgramValidationPage extends BaseTest {
             log.info("No notification to dismiss.");
         }
 
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        page.waitForTimeout(500);
         page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(1000);
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Credit Review")).click();

@@ -16,22 +16,29 @@ public class CollateralDetailsPage extends BaseTest {
     public void fillCollateralDetails() {
         log.info("Filling Collateral Details (CERSAI)...");
 
-        // Open Collateral Details section
-        page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Collateral Details")).click();
-        page.waitForTimeout(1000);
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Collateral Details CERSAI")).click();
-        page.waitForTimeout(1500);
+        // Scroll to the Collateral Details section
+        Locator collateralSection = page.locator("[id='Collateral Details'], #Collateral\\ Details").first();
+        collateralSection.scrollIntoViewIfNeeded();
+        page.waitForTimeout(2000);
 
-        // Nature of Mortgage
-        page.locator("div:nth-child(3) > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").click();
+        // Click the section button to expand it
+        collateralSection.locator("button.appform-card").first().click();
+        page.waitForTimeout(3000);
+
+        // Mortgage Type - click the 3rd Select placeholder dropdown
+        page.locator("xpath=(//input[@placeholder='Select'])[3]").click();
+        page.waitForTimeout(500);
         page.getByText("Equitable Mortgage").click();
         page.waitForTimeout(500);
 
         // Seller Name
-        Locator sellerNameField = page.locator("div")
-                .filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Seller Name$")))
-                .getByRole(AriaRole.TEXTBOX);
-        sellerNameField.fill("Sadie Luke");
+        Locator sellerNameField = page.locator("xpath=//div[@class='el-col el-col-24']//input[@type='text']");
+        sellerNameField.scrollIntoViewIfNeeded();
+        page.waitForTimeout(500);
+        sellerNameField.click();
+        page.waitForTimeout(500);
+        sellerNameField.fill("");
+        page.keyboard().type("Sadie Luke");
         page.waitForTimeout(500);
 
         // Construction Start Year
@@ -116,15 +123,12 @@ public class CollateralDetailsPage extends BaseTest {
 
         // Submit collateral
         page.getByLabel("Collateral").getByText("Submit Arrow Right icon").click();
-        page.waitForTimeout(2000);
+        page.waitForTimeout(3000);
 
-        // Close/collapse collateral section
-        try {
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("")).click();
-            page.waitForTimeout(1000);
-        } catch (Exception e) {
-            log.info("No close button found after collateral submit.");
-        }
+        // Reload to clear notification and refresh the page
+        page.reload();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
 
         log.info("Collateral Details filled and submitted.");
     }
@@ -145,7 +149,8 @@ public class CollateralDetailsPage extends BaseTest {
         page.waitForTimeout(500);
         // Submit collateral again
         page.getByLabel("Collateral").getByText("Submit Arrow Right icon").click();
-        page.waitForTimeout(2000);
+        page.waitForTimeout(5000);
+        page.reload();
         // Collapse/close
         try {
             page.locator(".el-col > .cs-fab > .info").click();
