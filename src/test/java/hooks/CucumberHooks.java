@@ -11,6 +11,7 @@ import ui.Utils.ScreenshotUtil;
 
 public class CucumberHooks {
     private static final Logger log = LogManager.getLogger(CucumberHooks.class);
+    private static final java.util.concurrent.atomic.AtomicInteger videoCounter = new java.util.concurrent.atomic.AtomicInteger(0);
 
     @Before
     public void beforeScenario(Scenario scenario) {
@@ -31,6 +32,25 @@ public class CucumberHooks {
             } catch (Exception e) {
                 log.warn("Could not capture failure screenshot: {}", e.getMessage());
             }
+        }
+
+        // Rename video to scenario name for easy identification
+        try {
+            var page = BaseTest.getPage();
+            if (page != null && page.video() != null) {
+                var videoPath = page.video().path();
+                if (videoPath != null) {
+                    String safeName = scenario.getName().replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                    int videoNumber = videoCounter.incrementAndGet();
+                    var renamedPath = videoPath.getParent().resolve(videoNumber + "_" + safeName + ".webm");
+                    // Close page first so video file is finalized
+                    page.close();
+                    java.nio.file.Files.move(videoPath, renamedPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    log.info("Video saved as: {}", renamedPath);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not rename video: {}", e.getMessage());
         }
 
         // Print execution summary

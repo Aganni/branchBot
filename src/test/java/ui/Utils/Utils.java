@@ -1,8 +1,15 @@
 package ui.Utils;
 
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import dynamicData.DynamicDataClass;
 import hooks.BaseTest;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static dynamicData.DynamicDataClass.get;
@@ -93,5 +100,108 @@ public class Utils extends BaseTest {
         com.microsoft.playwright.Locator targetDayCell = dateTable.locator("xpath=.//td[contains(@class, 'available')]/div/span[normalize-space(text())='" + targetDay + "']").first();
         targetDayCell.click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         page.waitForTimeout(500);
+    }
+
+    private static final Pattern MUI_CALENDAR_HEADER_PATTERN = Pattern.compile(
+            "^(January|February|March|April|May|June|July|August|September|October|November|December) \\d{4}$");
+
+    /**
+     * Navigates an open MUI X DatePicker to select the exact target date.
+     * Opens the calendar via {@code calendarTrigger} (e.g. the "Choose date" icon button),
+     * switches to the year view, picks the target year, walks month-by-month to the
+     * target month, then clicks the target day cell.
+     * <p>
+     * Mirrors the interaction recorded via Playwright codegen: clicking the header label
+     * (e.g. "July 2026") opens the year view, clicking a year button (e.g. "1994") returns
+     * to the day view, and "Next month"/"Previous month" buttons step through months before
+     * the target day gridcell is clicked.
+     *
+     * @param calendarTrigger the locator that opens the calendar popup when clicked
+     *                        (typically {@code page.getByLabel("Choose date")}).
+     * @param targetDateDDMMYYYY the date string in "dd/MM/yyyy" format (e.g. "24/12/1995").
+     */
+    public static void selectDateFromMuiCalendar(Locator calendarTrigger, String targetDateDDMMYYYY) {
+        Page page = BaseTest.getPage();
+        String[] parts = targetDateDDMMYYYY.split("/");
+        String targetDay = String.valueOf(Integer.parseInt(parts[0]));
+        int targetMonthNum = Integer.parseInt(parts[1]);
+        int targetYearNum = Integer.parseInt(parts[2]);
+        YearMonth targetYearMonth = YearMonth.of(targetYearNum, targetMonthNum);
+
+        BaseTest.log.info("Navigating MUI calendar to: {}", targetDateDDMMYYYY);
+
+        // 1. Open the calendar popup
+        calendarTrigger.click();
+        page.waitForTimeout(300);
+
+        Locator headerLabel = page.getByText(MUI_CALENDAR_HEADER_PATTERN);
+        headerLabel.first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(5_000));
+
+        // 2. Click the header label (e.g. "July 2026") to switch into Year view
+        waitForSingleMatch(headerLabel, page).click();
+        page.waitForTimeout(300);
+
+        // 3. Pick the target year from the year list
+        Locator yearButton = page.getByRole(AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName(String.valueOf(targetYearNum)).setExact(true)).first();
+        yearButton.scrollIntoViewIfNeeded();
+        yearButton.click();
+
+        // 4. Walk from the month now displayed to the target month.
+        // MUI animates a slide transition between months (and between year/day views), which
+        // briefly leaves both the outgoing and incoming month grids in the DOM at once. Polling
+        // for a single stable match avoids reading a stale header or clicking a duplicate cell.
+        DateTimeFormatter headerFormatter = DateTimeFormatter.ofPattern("MMMM uuuu", Locale.ENGLISH);
+        int safety = 0;
+        while (safety < 24) {
+            String currentText = readStableText(headerLabel, page);
+            YearMonth currentYearMonth;
+            try {
+                currentYearMonth = YearMonth.parse(currentText, headerFormatter);
+            } catch (Exception e) {
+                throw new RuntimeException("Could not parse MUI calendar header text: '" + currentText + "'", e);
+            }
+
+            if (currentYearMonth.equals(targetYearMonth)) {
+                break;
+            }
+
+            String navLabel = currentYearMonth.isBefore(targetYearMonth) ? "Next month" : "Previous month";
+            page.getByLabel(navLabel).click();
+            safety++;
+        }
+
+        if (safety >= 24) {
+            throw new RuntimeException("Could not navigate MUI calendar to target month: " + targetYearMonth);
+        }
+
+        // 5. Select the target day, resolving to a single stable gridcell first.
+        Locator dayCell = page.getByRole(AriaRole.GRIDCELL, new Page.GetByRoleOptions().setName(targetDay).setExact(true));
+        waitForSingleMatch(dayCell, page).click();
+        page.waitForTimeout(300);
+    }
+
+    /**
+     * Polls a locator until it resolves to exactly one element (waiting out MUI's slide
+     * transition, which briefly duplicates outgoing/incoming calendar nodes), then returns a
+     * single-element locator to act on. Falls back to the most recently rendered match
+     * ({@code last()}) if the count never settles to 1 within the polling budget.
+     */
+    private static Locator waitForSingleMatch(Locator locator, Page page) {
+        for (int attempt = 0; attempt < 15; attempt++) {
+            if (locator.count() == 1) {
+                return locator.first();
+            }
+            page.waitForTimeout(150);
+        }
+        return locator.last();
+    }
+
+    /**
+     * Reads text from a locator that may be transiently duplicated during an MUI animation,
+     * returning only once a single matching element is present.
+     */
+    private static String readStableText(Locator locator, Page page) {
+        return waitForSingleMatch(locator, page).innerText().trim();
     }
 }
