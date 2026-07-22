@@ -24,7 +24,7 @@ public class LAP_ApiStepDefinitions extends BaseTest {
         setValue(Constants.PAN_CARD, DataGeneratorUtils.generatePanNumber());
         log.info("Generated PAN: {}", getValue(Constants.PAN_CARD));
 
-        ApiUtils.updatePanInMystique(profile);
+        ApiUtils.whitelistPanInMystique((String) getValue(Constants.PAN_CARD), profile);
     }
     @And("User moves LAP to QC Approval stage") // Changed text here
     public void moveToQcApproval() {

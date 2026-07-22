@@ -21,7 +21,7 @@ public class PLP_ApiStepDefinitions extends BaseTest {
         setValue(Constants.PAN_CARD, DataGeneratorUtils.generatePanNumber());
         log.info("Generated PAN: {}", getValue(Constants.PAN_CARD));
 
-        ApiUtils.updatePanInMystique(profile);
+        ApiUtils.whitelistPanInMystique((String) getValue(Constants.PAN_CARD), profile);
     }
     @And("User moves PLP to QC Approval stage")
     public void moveToQcApproval() {
