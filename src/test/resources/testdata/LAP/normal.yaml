@@ -12,8 +12,8 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310556"
-    loan_amount: "500000"
+    phone_number: "9001310561"
+    loan_amount: "6850000"
     tenure: "36"
     rate_of_interest: "12.5"
     employment_type: "Salaried"

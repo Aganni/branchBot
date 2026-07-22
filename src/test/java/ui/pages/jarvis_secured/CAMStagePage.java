@@ -1,23 +1,16 @@
 package ui.pages.jarvis_secured;
-
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import hooks.BaseTest;
-
 public class CAMStagePage extends BaseTest {
-
     private final Page page;
-
     public CAMStagePage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  MOVE TO CREDIT REVIEW (triggers mandatory field validation)
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // MOVE TO CREDIT REVIEW (triggers mandatory field validation)
     public void attemptMoveToCreditReview() {
         log.info("Attempting to move to Credit Review (will trigger mandatory field validation)...");
         page.reload();

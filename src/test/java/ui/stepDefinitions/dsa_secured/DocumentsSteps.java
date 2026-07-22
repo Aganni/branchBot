@@ -41,21 +41,21 @@ public class DocumentsSteps extends BaseTest {
         documentsPage.uploadDocument(
                 TestDataProvider.get("dsa_secured.document_attachments.photo_file_2"), "Photo", 9
         );
-//        documentsPage.uploadDocument(
-//                TestDataProvider.get("dsa_secured.document_attachments.driving_license_file"), "Driving License", 10
-//        );
-//        documentsPage.uploadDocument(
-//                TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_2"), "Bank Statement", 11
-//        );
-//        documentsPage.uploadDocument(
-//                TestDataProvider.get("dsa_secured.document_attachments.aadhaar_file_3"), "Aadhaar", 12
-//        );
-//        documentsPage.uploadDocument(
-//                TestDataProvider.get("dsa_secured.document_attachments.gst_return_file"), "Gst Return", 13
-//        );
-//        documentsPage.uploadDocument(
-//                TestDataProvider.get("dsa_secured.document_attachments.photo_file_3"), "Photo", 14
-//        );
+        documentsPage.uploadDocument(
+                TestDataProvider.get("dsa_secured.document_attachments.driving_license_file"), "Driving License", 10
+        );
+        documentsPage.uploadDocument(
+                TestDataProvider.get("dsa_secured.document_attachments.bank_statement_file_2"), "Bank Statement", 11
+        );
+        documentsPage.uploadDocument(
+                TestDataProvider.get("dsa_secured.document_attachments.aadhaar_file_3"), "Aadhaar", 12
+        );
+        documentsPage.uploadDocument(
+                TestDataProvider.get("dsa_secured.document_attachments.gst_return_file"), "Gst Return", 13
+        );
+        documentsPage.uploadDocument(
+                TestDataProvider.get("dsa_secured.document_attachments.photo_file_3"), "Photo", 14
+        );
         documentsPage.uploadApplicationForm(
                 TestDataProvider.get("dsa_secured.document_attachments.application_form_file")
         );

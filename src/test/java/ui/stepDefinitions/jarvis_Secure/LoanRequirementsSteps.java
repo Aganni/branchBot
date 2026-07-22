@@ -14,8 +14,21 @@ public class LoanRequirementsSteps extends BaseTest {
         CollateralDetailsPage collateralPage = new CollateralDetailsPage(BaseTest.getPage());
         LoanRequirementsPage loanReqPage = new LoanRequirementsPage(BaseTest.getPage());
 
-        // Move to Credit Approval (handles validation errors — fills loan requirements & secondary collateral as needed)
-        creditReviewPage.moveToCreditApproval(collateralPage, loanReqPage);
+        // 1. Reassign appform to Tenjin
+        String assigneeEmail = BaseTest.getUserEmail();
+        creditReviewPage.reassignToTenjin(assigneeEmail);
+
+        // 2. First attempt to Move to Credit Approval — will get validation error
+        creditReviewPage.moveToCreditApproval();
+
+        // 3. Fill secondary collateral details (secondary agency + valuation)
+        collateralPage.fillSecondaryCollateralValidation();
+
+        // 4. Fill Loan Requirements & Terms
+        loanReqPage.fillLoanRequirements();
+
+        // 5. Final Move to Credit Approval — should succeed
+        creditReviewPage.moveToCreditApproval();
 
         log.info("Loan requirements completed and application moved to Credit Approval.");
     }

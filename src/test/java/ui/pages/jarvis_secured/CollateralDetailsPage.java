@@ -12,10 +12,9 @@ public class CollateralDetailsPage extends BaseTest {
         this.page = page;
     }
 
-    // FILL COLLATERAL DETAILS (CERSAI)
+    // FILL COLLATERAL DETAILS
     public void fillCollateralDetails() {
         log.info("Filling Collateral Details (CERSAI)...");
-
         // Scroll to the Collateral Details section
         Locator collateralSection = page.locator("[id='Collateral Details'], #Collateral\\ Details").first();
         collateralSection.scrollIntoViewIfNeeded();
@@ -134,44 +133,36 @@ public class CollateralDetailsPage extends BaseTest {
     }
 
     // SECONDARY COLLATERAL VALIDATION
-    //Fills secondary validation fields when "Sanction loan amount" error appears.
+    // Fills secondary validation fields when "Sanction loan amount" error appears.
     public void fillSecondaryCollateralValidation() {
         log.info("Filling secondary collateral validation fields...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Collateral Details CERSAI")).click();
-        page.waitForTimeout(1500);
+
+        // Open Collateral Details section
+        Locator collateralSection = page.locator("[id='Collateral Details'], #Collateral\\ Details").first();
+        collateralSection.scrollIntoViewIfNeeded();
+        page.waitForTimeout(2000);
+        collateralSection.locator("button.appform-card").first().click();
+        page.waitForTimeout(3000);
+
         // Secondary agency name
         page.locator("div:nth-child(17) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
         page.locator("div:nth-child(17) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("secondary validation");
         page.waitForTimeout(500);
+
         // Secondary valuation amount
         page.locator("div:nth-child(17) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
         page.locator("div:nth-child(17) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("256800000");
         page.waitForTimeout(500);
+
         // Submit collateral again
         page.getByLabel("Collateral").getByText("Submit Arrow Right icon").click();
         page.waitForTimeout(5000);
+
+        // Reload to clear notifications
         page.reload();
-        // Collapse/close
-        try {
-            page.locator(".el-col > .cs-fab > .info").click();
-            page.waitForTimeout(1000);
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("")).click();
-            page.waitForTimeout(1000);
-        } catch (Exception e) {
-            log.info("No close/collapse button after secondary collateral submit.");
-        }
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
 
-        // Dismiss alert if present
-        try {
-            Locator alert = page.getByRole(AriaRole.ALERT).locator("div").nth(2);
-            if (alert.isVisible()) {
-                alert.click();
-                page.waitForTimeout(1000);
-            }
-        } catch (Exception e) {
-            log.info("No alert to dismiss.");
-        }
-
-        log.info("Secondary collateral validation fields filled.");
+        log.info("Secondary collateral validation fields filled and submitted.");
     }
 }

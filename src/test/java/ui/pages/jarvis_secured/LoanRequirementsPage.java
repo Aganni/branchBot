@@ -38,5 +38,6 @@ public class LoanRequirementsPage extends BaseTest {
         page.locator(".el-col > .cs-fab > .info").click();
         page.waitForTimeout(2000);
         log.info("Loan Requirements & Terms filled and submitted.");
+        page.reload();
     }
 }
