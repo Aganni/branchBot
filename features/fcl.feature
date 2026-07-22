@@ -1,9 +1,9 @@
-@UBL @Regression
-Feature: Unsecured Business Loan End-to-End Workflow
+@FCL @Regression
+Feature: FCL End-to-End Workflow
 
-  Scenario: Complete UBL flow from DSA intake to Disbursal
+  Scenario: Complete FCL flow from DSA intake to Disbursal
   # ── Data Initialization ──
-    Given Initialize data for "normal" loan of "UBL"
+    Given Initialize data for "normal" loan of "FCL"
     And User generates test data and whitelists PAN in Mystique
     And User generates a random business name
   # ── DSA Portal Flow ──

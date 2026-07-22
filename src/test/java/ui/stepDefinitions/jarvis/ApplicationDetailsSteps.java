@@ -1,6 +1,7 @@
 package ui.stepDefinitions.jarvis;
 
 import backend.Utils.ApiUtils;
+import backend.constants.Constants;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.*;
@@ -10,6 +11,8 @@ import ui.pages.jarvis.AppFormPage.DedupeTab.Dedupe;
 import ui.pages.jarvis.AppFormPage.RegCheckTab.RegCheck;
 import ui.pages.jarvis.AppFormPage.VerificationTab.VerificationTab;
 import ui.pages.jarvis.AppFormPage.CamTab.Cam;
+
+import static dynamicData.DynamicDataClass.getValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -118,7 +121,7 @@ public class ApplicationDetailsSteps extends BaseTest {
         CoApplicantDetails coApp = new CoApplicantDetails(BaseTest.getPage());
         coApp.addAadhaarToCoApplicant(aadhaar, "Adding_Aadhaar");
 
-        String entity = TestDataProvider.get("jarvis.beneficiary.entity");
+        String entity = (String) getValue(Constants.BUSINESS_NAME);
         String applicant = TestDataProvider.get("jarvis.beneficiary.applicant");
         BeneficiaryOwnerDetails beneficiary = new BeneficiaryOwnerDetails(BaseTest.getPage());
         beneficiary.addBeneficiaryOwner(entity, applicant, "Adding_Beneficiary");

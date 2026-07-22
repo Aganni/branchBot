@@ -14,7 +14,13 @@ public class PartnerDetailsSteps extends BaseTest {
     public void completePartnerDetails() {
         Map<String, String> details = new LinkedHashMap<>();
         details.put("Branch", TestDataProvider.get("dsa.partner_details.branch"));
-        details.put("Sales Manager", TestDataProvider.get("dsa.partner_details.sales_manager"));
+
+        // Sales Manager (UBL, FCL) or Channel Manager (SEP)
+        String salesManager = TestDataProvider.getOrDefault("dsa.partner_details.sales_manager", null);
+        String channelManager = TestDataProvider.getOrDefault("dsa.partner_details.channel_manager", null);
+        if (salesManager != null) details.put("Sales Manager", salesManager);
+        if (channelManager != null) details.put("Channel Manager", channelManager);
+
         details.put("Scheme", TestDataProvider.get("dsa.partner_details.scheme"));
 
         PartnerDetailsPage page = new PartnerDetailsPage(BaseTest.getPage());

@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class BaseTest {
     // Environment: reads from system property -Denv=uat (default: uat)
-    public static final String environment = System.getProperty("env", "uat");
+    public static final String environment = System.getProperty("env", "int");
 
     // ThreadLocal for thread safety during parallel execution
     private static final ThreadLocal<Playwright> playwrightThreadLocal = new ThreadLocal<>();
