@@ -17,6 +17,7 @@ public class BusinessDetailsPage extends BaseTest {
     // ── Locators ─────────────────────────────────────────────────────────────
     private static final String ENTITY_PAN_INPUT = "input[name='entityPan']";
     private static final String ENTITY_NAME_INPUT = "input[name='entityName']";
+    private static final String PROPRIETOR_NAME_INPUT = "input[name='proprietorName']";
     private static final String CONTINUE_FETCH_BTN = "button:has-text('Continue to fetch details linked to this PAN')";
     private static final String OP_ADDRESS_LINE_1 = "input[placeholder='Operational Address (Line 1)']";
     private static final String OP_ADDRESS_LINE_2 = "textarea[name='operationalAddressLine2']";
@@ -49,11 +50,17 @@ public class BusinessDetailsPage extends BaseTest {
         log.info("Clicked Verify button for PAN");
     }
 
-    public void verifyAutoPopulatedEntityName(String expectedName) {
-        log.info("Verifying auto-populated Entity Name is: {}", expectedName);
-        Locator entityNameField = page.locator(ENTITY_NAME_INPUT);
-        assertThat(entityNameField).hasValue(expectedName);
-        log.info("Entity Name verified successfully!");
+    public void verifyAutoPopulatedProprietorName(String expectedName) {
+        log.info("Verifying auto-populated Proprietor/Owner Name is: {}", expectedName);
+        Locator proprietorField = page.locator(PROPRIETOR_NAME_INPUT);
+        assertThat(proprietorField).hasValue(expectedName);
+        log.info("Proprietor/Owner Name verified: {}", expectedName);
+    }
+
+    public void fillEntityName(String entityName) {
+        log.info("Filling Entity Name: {}", entityName);
+        page.locator(ENTITY_NAME_INPUT).fill(entityName);
+        log.info("Entity Name filled: {}", entityName);
     }
 
     public void clickContinueToFetchDetails() {
@@ -62,18 +69,12 @@ public class BusinessDetailsPage extends BaseTest {
     }
 
     public void fillOperationalAddress() {
-        String addressValue = "2/19 RAM WADI KUNTIDEVI, JOGESHWARI EAST";
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Operational Address (Line 1)")).click();
 
-        Locator input = page.locator(OP_ADDRESS_LINE_1);
-        input.click(); 
+        // Select the first available address option from the dropdown
+        page.getByRole(AriaRole.OPTION).first().click();
 
-        Locator dropdownOption = page.getByRole(AriaRole.LISTBOX)
-                .getByText(addressValue, new Locator.GetByTextOptions().setExact(false))
-                .first();
-        dropdownOption.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        dropdownOption.click();
-
-        log.info("Selected address from dropdown: {}", addressValue);
+        log.info("Selected first available address from dropdown");
     }
 
     public void verifyAutoPopulatedAddress(Map<String, String> data) {
@@ -93,8 +94,7 @@ public class BusinessDetailsPage extends BaseTest {
     }
 
     public void selectSameAsOperationalAddress(String yesOrNo) {
-        String value = yesOrNo.toLowerCase();
-        page.locator(SAME_ADDRESS_RADIO + "[value='" + value + "']").click();
+        page.getByRole(AriaRole.RADIO, new Page.GetByRoleOptions().setName(yesOrNo)).check();
         log.info("Selected Same as Operational Address: {}", yesOrNo);
     }
 
@@ -110,6 +110,15 @@ public class BusinessDetailsPage extends BaseTest {
         page.locator(INDUSTRY_SUB_SECTOR).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(sector).setExact(true)).click();
         log.info("Selected Industry Sub-Sector: {} from sector dropdown", sector);
+    }
+
+    public void selectFirstTypeOfIndustry() {
+        log.info("Selecting first available Type of Industry option");
+        Locator industryType = page.locator("#industryType");
+        industryType.scrollIntoViewIfNeeded();
+        industryType.click();
+        page.getByRole(AriaRole.OPTION).first().click();
+        log.info("Selected first Type of Industry option");
     }
 
     public void fillLoanRequirements(Map<String, String> data) {

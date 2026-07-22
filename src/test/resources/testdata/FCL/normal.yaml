@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# UBL End-to-End Test Data
+# FCL End-to-End Test Data
 # Profile: Default UAT
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -26,12 +26,12 @@ dsa:
     date_of_registration: "12/07/1998"
     last_year_turnover: "1100000"
     industry_type: "Service"
-    loan_type: "Business Loans"
+    loan_type: "Flexi Credit Line"
 
   # ── Loan Requirements ────────────────────────────────────────────────────────
   loan_requirements:
     tenure: "12"
-    loan_amount: "2500000"
+    loan_amount: "700000"
     end_use: "Business Expansion"
 
   # ── QDE (Quick Data Entry) ───────────────────────────────────────────────────
@@ -57,7 +57,9 @@ dsa:
     trade_ref2_relation: "Customer"
     trade_ref2_mobile: "9839099092"
     email: "adarsh.gani@gmail.com"
+    shareholding: "23"
     correspondence_address: "AGARWAL NGR CAVES RD"
+    correspondence_address_line2: "AGARWAL NGR CAVES RD"
     correspondence_ownership: "Self Owned"
     father_first_name: "Vikas"
     father_last_name: "Kamble"

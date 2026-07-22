@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# UBL End-to-End Test Data
+# SEP End-to-End Test Data
 # Profile: Default UAT
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -7,8 +7,8 @@ dsa:
   # ── Partner Details ──────────────────────────────────────────────────────────
   partner_details:
     branch: "INDIQUBE LEXINGTON AUDUGODI- BENGALURU"
-    sales_manager: "Shweta (shweta.sonar@creditsaison-in.com)"
-    scheme: "Income program- Cash profit"
+    channel_manager: "Shweta (shweta.sonar@creditsaison-in.com)"
+    scheme: "Income- Doctor Cash profit program"
 
   # ── Business Details ─────────────────────────────────────────────────────────
   business_details:
@@ -26,18 +26,29 @@ dsa:
     date_of_registration: "12/07/1998"
     last_year_turnover: "1100000"
     industry_type: "Service"
-    loan_type: "Business Loans"
+    loan_type: "SEP Loans"
 
   # ── Loan Requirements ────────────────────────────────────────────────────────
   loan_requirements:
     tenure: "12"
-    loan_amount: "2500000"
+    loan_amount: "700000"
     end_use: "Business Expansion"
 
   # ── QDE (Quick Data Entry) ───────────────────────────────────────────────────
   qde:
     pan_profile: "Shea Test"
     shareholding: "45"
+
+  # ── Co-Applicant (SEP Doctor Details) ────────────────────────────────────────
+  co_applicant:
+    pan_profile: "Alex Doctor"
+    phone: "9791761390"
+    email: "george@gmail.com"
+    nmc_registration_number: "74648363AA"
+    year_of_nmc_registration: "2002"
+    qualification: "MBBS"
+    medical_council: "Gujarat Medical Council"
+    years_of_experience: "5"
 
   # ── Consent ──────────────────────────────────────────────────────────────────
   consent:
@@ -57,7 +68,9 @@ dsa:
     trade_ref2_relation: "Customer"
     trade_ref2_mobile: "9839099092"
     email: "adarsh.gani@gmail.com"
+    shareholding: "23"
     correspondence_address: "AGARWAL NGR CAVES RD"
+    correspondence_address_line2: "AGARWAL NGR CAVES RD"
     correspondence_ownership: "Self Owned"
     father_first_name: "Vikas"
     father_last_name: "Kamble"

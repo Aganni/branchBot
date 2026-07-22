@@ -1,10 +1,13 @@
 package ui.stepDefinitions.dsa;
 
+import backend.constants.Constants;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import io.cucumber.java.en.*;
 import ui.Utils.Utils;
 import ui.pages.dsa.BusinessDetailsPage;
+
+import static dynamicData.DynamicDataClass.getValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,9 +21,10 @@ public class BusinessDetailsSteps extends BaseTest {
         // Extract partner loan ID from URL
         Utils.extractAndStorePartnerLoanId();
 
-        // PAN verification
-        page.enterPanAndVerify(TestDataProvider.get("dsa.business_details.entity_pan"));
-        page.verifyAutoPopulatedEntityName(TestDataProvider.get("dsa.business_details.entity_name"));
+        // PAN verification - use the Mystique-generated PAN
+        page.enterPanAndVerify((String) getValue(Constants.PAN_CARD));
+        page.fillEntityName((String) getValue(Constants.BUSINESS_NAME));
+        page.verifyAutoPopulatedProprietorName(TestDataProvider.get("dsa.qde.pan_profile"));
         page.clickContinueToFetchDetails();
 
         // Operational address
@@ -42,6 +46,11 @@ public class BusinessDetailsSteps extends BaseTest {
         moreDetails.put("Last Year's Turnover", TestDataProvider.get("dsa.business_details.last_year_turnover"));
         page.fillMoreBusinessDetails(moreDetails);
         page.selectIndustrySubSector(TestDataProvider.get("dsa.business_details.industry_type"));
+
+        // Type of Industry - only for UBL
+        if ("UBL".equals(TestDataProvider.getLpc())) {
+            page.selectFirstTypeOfIndustry();
+        }
 
         // Loan requirements + submit
         Map<String, String> loanReq = new LinkedHashMap<>();

@@ -30,6 +30,14 @@ public class DataGeneratorUtils {
         return pan.toString();
     }
 
+    public static String generateBusinessName() {
+        String[] prefixes = {"Alpha", "Prime", "Nova", "Apex", "Zenith", "Summit", "Vertex", "Eagle", "Titan", "Orbit"};
+        String[] suffixes = {"Enterprises", "Solutions", "Ventures", "Corp", "Industries", "Group", "Associates", "Trading", "Services", "Works"};
+        Random rnd = new Random();
+        String name = prefixes[rnd.nextInt(prefixes.length)] + " " + suffixes[rnd.nextInt(suffixes.length)];
+        return name;
+    }
+
     public static String generateMobileNumber() {
         Random rnd = new Random();
         // Indian mobile numbers typically start with 6, 7, 8, or 9

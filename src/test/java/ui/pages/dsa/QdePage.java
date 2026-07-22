@@ -14,7 +14,7 @@ public class QdePage extends BaseTest {
     // ── Locators ─────────────────────────────────────────────────────────────
     private static final String PAN_INPUT = "input[name='panNumber']";
     private static final String NAME_INPUT = "input[name='name']";
-    private static final String PHONE_INPUT = "input[placeholder='Phone No.']";
+    private static final String PHONE_INPUT = "input[placeholder='Phone No.'], input[placeholder='Mobile No.'], input[placeholder='Phone Number']";
     private static final String SHAREHOLDING_INPUT = "input[name='shareHolding']";
 
     // Button Names

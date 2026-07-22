@@ -4,7 +4,9 @@ public interface Constants {
 
     String UAT = "uat";
     String PAN_CARD = "pan_card";
+    String CO_APPLICANT_PAN = "co_applicant_pan";
     String MOBILE_NUMBER = "mobile_number";
+    String BUSINESS_NAME = "business_name";
 
     // Mystique Api keys
     String MYSTIQUE_BASE_URI = "mystiqueUri";

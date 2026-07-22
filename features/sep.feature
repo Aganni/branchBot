@@ -1,17 +1,18 @@
-@UBL @Regression
-Feature: Unsecured Business Loan End-to-End Workflow
+@SEP @Regression
+Feature: SEP End-to-End Workflow
 
-  Scenario: Complete UBL flow from DSA intake to Disbursal
+  Scenario: Complete SEP flow from DSA intake to Disbursal
   # ── Data Initialization ──
-    Given Initialize data for "normal" loan of "UBL"
+    Given Initialize data for "normal" loan of "SEP"
     And User generates test data and whitelists PAN in Mystique
     And User generates a random business name
+    And User generates co-applicant PAN and whitelists in Mystique
   # ── DSA Portal Flow ──
     When User logs into DSA Portal and initiates a Business Loan application
     Then User completes Partner Details and proceeds
     And User completes Business Details with PAN verification and submits
     And User passes Eligibility Prechecks
-    And User completes QDE with co-applicant details and submits
+    And User fills SEP doctor co-applicant details
     And User completes Consent page with SQS bypass
     And User passes Eligibility Prechecks
     And User completes Banking details and submits
