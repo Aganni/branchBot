@@ -34,3 +34,4 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User resolves KYC verification and reassigns application in Credit Review
     And User fills collateral details in Credit Review
     And User fills loan requirements and moves to Credit Approval
+    And User completes PD and Property Visit for all applicants

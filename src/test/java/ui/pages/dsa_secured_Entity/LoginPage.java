@@ -13,7 +13,7 @@ public class LoginPage extends BaseTest {
     private static final String SEND_OTP_BTN = "button:has-text('SEND OTP')";
     private static final String VERIFY_OTP_BTN = "button:has-text('VERIFY OTP')";
     private static final String DSA_DASHBOARD_TITLE = "KSF DSA Portal";
-    private static final String DSA_DASHBOARD_URL = "https://portal.dev.creditsaison.xyz/dashboard";
+    private static final String DSA_DASHBOARD_URL = "https://portal.uat.creditsaison.xyz/dashboard";
 
     public LoginPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");

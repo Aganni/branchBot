@@ -29,17 +29,17 @@ public class CoAppAadhaarPage extends BaseTest {
     public void clickAddApplicant() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+ Add Applicant")).click();
         log.info("Opened Add Applicant step form context.");
-        Thread.sleep(5000);
+        Thread.sleep(500);
     }
     public void selectApplicantType(String applicantType) throws InterruptedException {
         page.getByLabel("Applicant Type").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(applicantType)).click();
-        Thread.sleep(5000);
+        Thread.sleep(500);
     }
     public void selectType(String type) throws InterruptedException {
         page.getByLabel("Type *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(type).setExact(true)).click();
-        Thread.sleep(5000);
+        Thread.sleep(500);
     }
 
     public void checkFormTypeOption() {
@@ -49,7 +49,7 @@ public class CoAppAadhaarPage extends BaseTest {
     public void verifyAadhaarOvd(String ovdType, String dob, String digits) {
         page.getByLabel("Other OVD *").click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(ovdType)).click();
-        page.waitForTimeout(1000);
+        page.waitForTimeout(100);
         // Date of Birth is a readonly MUI date-picker input; typing/fill fails actionability checks.
         // Open the calendar and navigate year -> month -> day instead.
         ui.Utils.Utils.selectDateFromMuiCalendar(page.getByLabel("Choose date"), dob);
@@ -138,12 +138,12 @@ public class CoAppAadhaarPage extends BaseTest {
         }
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         log.info("OTP verification layer confirmed.");
-        Thread.sleep(5000);
+        Thread.sleep(1000);
     }
 
     public void clickNext() throws InterruptedException {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        Thread.sleep(5000);
+        Thread.sleep(1000);
     }
     }
 

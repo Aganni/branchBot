@@ -24,20 +24,14 @@ public class LoginDeskSteps extends BaseTest {
         // 3. Filter by Product = LAP and Status = Login_desk in Progress
         loginDeskPage.filterByProductAndStatus("LAP", "Login_desk in Progress");
 
-        // 4. Search by Individual Applicant name
-        loginDeskPage.searchByIndividualApplicant("Noah johnson");
+        // 4. Copy App ID from first row (hover → copy button) and search by it
+        String appFormId = loginDeskPage.copyAndSearchByAppId();
+        DynamicDataClass.setValue("appFormId", appFormId);
+        DynamicDataClass.get().setAppFormId(appFormId);
+        log.info("Stored AppForm ID: {}", appFormId);
 
         // 5. Open the first application
         loginDeskPage.openFirstApplication();
-
-        // Capture AppForm ID from the URL
-        String currentUrl = BaseTest.getPage().url();
-        if (currentUrl.contains("/application/")) {
-            String appFormId = currentUrl.replaceAll(".*/application/([^/]+).*", "$1");
-            DynamicDataClass.setValue("appFormId", appFormId);
-            DynamicDataClass.get().setAppFormId(appFormId);
-            log.info("Captured AppForm ID from URL: {}", appFormId);
-        }
 
         // Capture Partner Loan ID from the page (LPC code displayed below applicant name)
         try {

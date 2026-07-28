@@ -12,10 +12,8 @@ public class FinancialCoApplicantSteps extends BaseTest {
         // 1. Reload and open financial co-applicant
         camPage.reloadPage();
         financialPage.openCoApplicantDetails("Hannah");
-
         // 2. Submit the dialog to trigger mandatory field validation
         financialPage.submitDialog();
-
         // 3. Fill financial co-applicant mandatory fields (hardcoded values)
         financialPage.fillMandatoryFields(
                 "7554",         // aadhaar last 4 digits
@@ -25,7 +23,6 @@ public class FinancialCoApplicantSteps extends BaseTest {
                 "Plastic",      // industry sector
                 "9036654355"    // office contact number
         );
-
         // 4. Submit financial co-applicant final details
         financialPage.submitFinalDetails();
         log.info("Financial co-applicant mandatory fields completed.");
