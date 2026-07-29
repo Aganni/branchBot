@@ -22,27 +22,59 @@ public class TelePdSteps extends BaseTest {
         // 3. Navigate to PD & Property Visit
         pdPage.navigateToPdAndPropertyVisit();
 
-        // 4. Select pending applicant (Hannah Isaac)
-        pdPage.selectApplicantFromCombo("Hannah IsaacPENDING");
+        // 4. Complete Tele PD for all 3 applicants
+        completeTelePdForApplicant(pdPage, "Hannah IsaacPENDING", "Hannah IsaacIN_PROGRESS", false);
+        completeTelePdForApplicant(pdPage, "Noah johnsonPENDING", "Noah johnsonIN_PROGRESS", false);
+        completeTelePdForApplicant(pdPage, "Amazon.com Inc.PENDING", "Amazon.com Inc.IN_PROGRESS", true);
 
-        // 5. Fill Tele PD sections
+        log.info("Tele PD completed for all applicants.");
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  COMPLETE TELE PD FOR A SINGLE APPLICANT
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    private void completeTelePdForApplicant(TelePdPage pdPage, String pendingName, String inProgressName, boolean isEntity) {
+        log.info("Starting Tele PD for: {}", pendingName);
+
+        // Select the PENDING applicant
+        pdPage.selectApplicantFromCombo(pendingName);
+
+        // Fill all sections
         fillBasicDetails(pdPage);
-        fillEmploymentDetails(pdPage);
+        fillEmploymentDetails(pdPage, isEntity);
         fillIncomeDetails(pdPage);
         fillBureauDetails(pdPage);
         fillPropertyAndCollateralDetails(pdPage);
         fillTelePdStatusAndDoneBy(pdPage);
 
-        // 6. Save
+        // First Save (page reloads, resets to applicant selection)
         pdPage.clickSave();
 
-        // 7. Fill Schedule (post-save the datetime field becomes editable)
-        pdPage.fillScheduleDateTime("2026-07-10T12:25");
+        // Re-select the applicant (now IN_PROGRESS)
+        pdPage.selectApplicantFromCombo(inProgressName);
 
-        // 8. Submit
+        // Fill Schedule datetime
+        pdPage.fillScheduleDateTime("2026-06-20T12:12");
+
+        // Second Save (page reloads again)
+        pdPage.clickSave();
+
+        // Re-select the applicant again after second save
+        pdPage.selectApplicantFromCombo(inProgressName);
+
+        // Fill Additional Collateral and Income
+        pdPage.selectDropdownByLabelAndText("Additional Collateral/Address", "Yes", "Yes");
+        pdPage.fillByPlaceholder("Enter your remarks here", "random text");
+        pdPage.selectDropdownByLabelExact("Additional Income of applicant", "No");
+
+        // Submit
         pdPage.clickSubmit();
 
-        log.info("Tele PD completed for Hannah Isaac.");
+        // Reload page to get fresh state for next applicant
+        pdPage.reloadPage();
+
+        log.info("Tele PD completed for: {}", pendingName);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -60,10 +92,13 @@ public class TelePdSteps extends BaseTest {
     //  SECTION: Employment / Business Details
     // ═══════════════════════════════════════════════════════════════════════════
 
-    private void fillEmploymentDetails(TelePdPage pdPage) {
+    private void fillEmploymentDetails(TelePdPage pdPage, boolean isEntity) {
         log.info("Filling Employment / Business Details...");
         pdPage.clickSectionButton("Employment / Business Details");
         pdPage.selectDropdownByLabel("Nature of Company / Business", "LTD");
+        if (isEntity) {
+            pdPage.fillByLabel("Designation / Ownership", "Director");
+        }
         pdPage.fillByLabel("Total Experience / Business", "12");
         pdPage.fillByLabel("Current Job / Business Vintage", "9");
         pdPage.fillByLabel("Family / Friends Involvement", "No");
@@ -132,12 +167,6 @@ public class TelePdSteps extends BaseTest {
         log.info("Filling Tele PD Status and Done By...");
         // Tele PD Status
         pdPage.selectDropdownByLabelAndText("Tele PD Status", "Positive", "Positive");
-
-        // Schedule for in-person PD (click multiple times to activate the datetime input)
-        pdPage.clickScheduleField();
-        pdPage.clickScheduleField();
-        pdPage.clickScheduleField();
-        pdPage.clickScheduleField();
 
         // Tele PD Done By
         pdPage.selectTelePdDoneBy("ten", "Tenjin");

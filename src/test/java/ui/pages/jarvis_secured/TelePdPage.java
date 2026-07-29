@@ -91,6 +91,12 @@ public class TelePdPage extends BaseTest {
 
     public void navigateToPdAndPropertyVisit() {
         log.info("Navigating to PD & Property Visit section...");
+        // Click the 3-dot menu button next to applicant name
+        Locator threeDotBtn = page.locator("(//button[contains(@class, 'inline-flex') and contains(@class, 'rounded-md') and contains(@class, 'h-10') and contains(@class, 'w-10')])[3]");
+        threeDotBtn.waitFor(new Locator.WaitForOptions().setTimeout(10000));
+        threeDotBtn.click(new Locator.ClickOptions().setForce(true));
+        page.waitForTimeout(2000);
+        // Now click PD & Property Visit from the menu
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("PD & Property Visit")).click();
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
@@ -103,10 +109,19 @@ public class TelePdPage extends BaseTest {
 
     public void selectApplicantFromCombo(String applicantText) {
         log.info("Selecting applicant: {}", applicantText);
-        page.getByRole(AriaRole.COMBOBOX).click();
-        page.waitForTimeout(500);
-        page.getByText(applicantText).click();
+        // Scroll to top to ensure the dropdown is visible
+        page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(1000);
+        // Click the "Select Applicant/Co-applicant" dropdown
+        Locator dropdown = page.getByRole(AriaRole.COMBOBOX).first();
+        dropdown.scrollIntoViewIfNeeded();
+        page.waitForTimeout(500);
+        dropdown.click();
+        page.waitForTimeout(1000);
+        // Select the option containing the applicant name
+        page.getByText(applicantText).first().click();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(2000);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -132,7 +147,7 @@ public class TelePdPage extends BaseTest {
     public void selectDropdownByLabel(String comboLabel, String optionLabel) {
         page.getByLabel(comboLabel).click();
         page.waitForTimeout(500);
-        page.getByLabel(optionLabel).click();
+        page.getByLabel(optionLabel, new Page.GetByLabelOptions().setExact(true)).click();
         page.waitForTimeout(500);
     }
 
@@ -144,6 +159,17 @@ public class TelePdPage extends BaseTest {
         page.getByLabel(comboLabel).click();
         page.waitForTimeout(500);
         page.getByLabel(optionLabel).getByText(optionText).click();
+        page.waitForTimeout(500);
+    }
+
+    /**
+     * For dropdowns where the option label needs exact matching.
+     * e.g., selecting "No" without matching "No issues" etc.
+     */
+    public void selectDropdownByLabelExact(String comboLabel, String optionLabel) {
+        page.getByLabel(comboLabel).click();
+        page.waitForTimeout(500);
+        page.getByLabel(optionLabel, new Page.GetByLabelOptions().setExact(true)).click();
         page.waitForTimeout(500);
     }
 
@@ -204,15 +230,14 @@ public class TelePdPage extends BaseTest {
 
     public void fillScheduleDateTime(String dateTimeValue) {
         Locator scheduleField = page.getByLabel("Schedule for in-person PD");
+        scheduleField.waitFor(new Locator.WaitForOptions().setTimeout(15000));
         scheduleField.click();
-        page.waitForTimeout(300);
-        scheduleField.dblclick();
         page.waitForTimeout(300);
         scheduleField.click();
         page.waitForTimeout(300);
         scheduleField.press("ArrowRight");
         scheduleField.fill(dateTimeValue);
-        scheduleField.press("ArrowUp");
+        scheduleField.press("ArrowDown");
         page.waitForTimeout(500);
     }
 
@@ -222,11 +247,19 @@ public class TelePdPage extends BaseTest {
 
     public void clickSave() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
-        page.waitForTimeout(3000);
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(5000);
     }
 
     public void clickSubmit() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(5000);
+    }
+
+    public void reloadPage() {
+        page.reload();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
     }
 }

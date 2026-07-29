@@ -12,7 +12,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310594"
+    phone_number: "9001310619"
     loan_amount: "6850000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -226,7 +226,7 @@ dsa_secured:
     addresses:
       line1: "Door No 45/22 Maple Residency 4th Floor Beside Phoenix Arena"
       line2: "Behind Tech Park Square Whitefield Main Road IT Corridor"
-      pincode: "600092"
+      pincode: "560098"
       ownership: "Self Owned"
     obligations:
       type: "Business Loan"
@@ -268,7 +268,7 @@ dsa_secured:
     driving_license_file: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
     bank_statement_file_2: "src/test/resources/testdata/july2026.pdf"
     aadhaar_file_3: "src/test/resources/testdata/sale deed 09 12 1992.pdf"
-    gst_return_file: "src/test/resources/testdata/June2026.pdf"
+    gst_return_file: "src/test/resources/testdata/ITR2024-25.pdf"
     photo_file_3: "src/test/resources/testdata/photo.png"
     application_form_file: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
 

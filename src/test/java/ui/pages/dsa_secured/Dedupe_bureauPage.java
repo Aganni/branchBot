@@ -107,7 +107,7 @@ public class Dedupe_bureauPage extends BaseTest {
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         log.info("Clicked Save and Next. Moving to next section.");
         try {
-            Thread.sleep(15000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -36,7 +36,7 @@ public class DocumentsSteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.document_attachments.pan_file_2"), "Pan", 7
         );
         documentsPage.uploadDocument(
-                TestDataProvider.get("dsa_secured.document_attachments.form_file"), "Form 16", 8
+                TestDataProvider.get("dsa_secured.document_attachments.form_file"), "Itr", 8
         );
         documentsPage.uploadDocument(
                 TestDataProvider.get("dsa_secured.document_attachments.photo_file_2"), "Photo", 9
@@ -51,7 +51,7 @@ public class DocumentsSteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.document_attachments.aadhaar_file_3"), "Aadhaar", 12
         );
         documentsPage.uploadDocument(
-                TestDataProvider.get("dsa_secured.document_attachments.gst_return_file"), "Gst Return", 13
+                TestDataProvider.get("dsa_secured.document_attachments.gst_return_file"), "Itr", 13
         );
         documentsPage.uploadDocument(
                 TestDataProvider.get("dsa_secured.document_attachments.photo_file_3"), "Photo", 14
