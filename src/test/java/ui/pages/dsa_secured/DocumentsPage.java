@@ -1,23 +1,19 @@
 package ui.pages.dsa_secured;
-
 import com.microsoft.playwright.FileChooser;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
-
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 public class DocumentsPage extends BaseTest {
     private final Page page;
-
     public DocumentsPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
-
     public void clickDocumentsButton() {
         page.reload();
         page.waitForTimeout(2000);
@@ -28,7 +24,6 @@ public class DocumentsPage extends BaseTest {
         page.waitForTimeout(2000);
         log.info("Clicked Documents button.");
     }
-
     public void uploadDocument(String filePath, String documentType, int inputIndex) {
         page.waitForTimeout(2000);
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
@@ -38,7 +33,6 @@ public class DocumentsPage extends BaseTest {
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
         uploadButton.scrollIntoViewIfNeeded();
         page.waitForTimeout(500);
-
         // Step 1: Handle the file picker popup using FileChooser API
         FileChooser fileChooser = page.waitForFileChooser(() -> {
             uploadButton.click();
@@ -68,9 +62,8 @@ public class DocumentsPage extends BaseTest {
         log.info("Saved document: {} with type: {}", filePath, documentType);
     }
 
-    public void uploadApplicationForm(String filePath) {
+    public void uploadApplicationForm(String filePath, String applicationForm, int i) {
         page.waitForTimeout(2000);
-        // Reload page to get fresh DOM after previous uploads
         page.reload();
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         page.waitForTimeout(2000);

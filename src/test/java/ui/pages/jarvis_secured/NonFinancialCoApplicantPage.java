@@ -89,7 +89,7 @@ public class NonFinancialCoApplicantPage extends BaseTest {
         page.getByPlaceholder("Enter voter id").click();
         page.getByPlaceholder("Enter voter id").fill(voterId);
         page.getByText("Verify").click();
-        page.waitForTimeout(10000);
+        page.waitForTimeout(5000);
         log.info("Voter ID entered and verification triggered.");
     }
 
@@ -97,7 +97,7 @@ public class NonFinancialCoApplicantPage extends BaseTest {
     public void fillLastNameAndResidentialStatus(String lastName, String residentialStatus) {
         page.getByPlaceholder("Enter the last name").click();
         page.getByPlaceholder("Enter the last name").fill(lastName);
-        page.waitForTimeout(500);
+        page.waitForTimeout(3500);
         page.getByPlaceholder("Select the residential status").click();
         page.locator("li").filter(new Locator.FilterOptions()
                 .setHasText(Pattern.compile("^" + residentialStatus + "$"))).click();

@@ -17,12 +17,28 @@ public class LoginDeskPage extends BaseTest {
 
     public void login() {
         log.info("Starting Jarvis Secured Login process...");
-        page.getByLabel("Email or phone").fill(getUserEmail());
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        page.getByLabel("Enter your password").click();
-        page.getByLabel("Enter your password").fill(getUserPassword());
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        page.waitForTimeout(1000);
+
+        // Wait for either: Google SSO login page OR Jarvis dashboard to load
+        // Use a race between the email field and the Jarvis application link
+        try {
+            // Wait up to 15 seconds for the email field to appear
+            page.getByLabel("Email or phone").waitFor(
+                    new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+
+            // Email field found — manual login required
+            page.getByLabel("Email or phone").fill(getUserEmail());
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+            page.getByLabel("Enter your password").click();
+            page.getByLabel("Enter your password").fill(getUserPassword());
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+            page.waitForTimeout(1000);
+        } catch (com.microsoft.playwright.TimeoutError e) {
+            // Email field not found within 15s — Google auto-authenticated
+            log.info("Google SSO auto-authenticated, waiting for Jarvis to load...");
+            page.waitForLoadState(LoadState.NETWORKIDLE);
+            page.waitForTimeout(3000);
+        }
+
         log.info("Jarvis Secured Login submitted.");
     }
 

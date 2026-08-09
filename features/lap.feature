@@ -11,9 +11,9 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     Then User provides customer consent via OTP verification
     And User completes Primary Applicant details and proceeds
     And User adds Salaried Co-Applicant details and submits Appform
+    And User adds Aadhaar Co-Applicant details and submits Appform
     And User adds Entity Co-Applicant details and submits Appform
     And User provides the consent for Entity applicant
-    And User adds Aadhaar Co-Applicant details and submits Appform
     #And User adds Driving License Co-Applicant details and submits Appform
     #And User adds Passport Co-Applicant details and submits Appform
     And User navigates to Exposure dedupe and bureau output, downloads bureau report
@@ -30,8 +30,7 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes non-financial co-applicant mandatory fields
     And User completes financial co-applicant mandatory fields
     And User completes entity co-applicant mandatory fields and moves to Credit Review
-    And User completes program validation and moves to Credit Review
     And User resolves KYC verification and reassigns application in Credit Review
     And User fills collateral details in Credit Review
     And User fills loan requirements and moves to Credit Approval
-    And User completes PD and Property Visit for all applicants
+    And User completes Tele PD Visit for all applicants

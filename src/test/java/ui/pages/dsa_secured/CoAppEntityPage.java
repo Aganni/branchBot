@@ -69,7 +69,7 @@ public class CoAppEntityPage extends BaseTest {
         page.getByPlaceholder(UDYAM).fill(udyam);
         page.waitForTimeout(1000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).nth(2).click();
-        page.waitForTimeout(5000);
+        page.waitForTimeout(2500);
         log.info("UDYAM verified successfully.");
     }
 
@@ -92,13 +92,13 @@ public class CoAppEntityPage extends BaseTest {
         page.waitForTimeout(1000);
         //Click outside to enable 'Next' button
         page.getByLabel(ADDR_L1).click();
-        page.waitForTimeout(5000);
+        page.waitForTimeout(2000);
     }
 
     public void submitForm() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         log.info("Entity form configuration saved and layout processing finalized.");
-        page.waitForTimeout(5000);
+        page.waitForTimeout(2000);
     }
 
     public void clickSendEmail() {

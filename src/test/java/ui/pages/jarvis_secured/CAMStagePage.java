@@ -94,7 +94,11 @@ public class CAMStagePage extends BaseTest {
     //  RELOAD PAGE
     public void reloadPage() {
         log.info("Reloading appform page");
-        page.reload();
+        try {
+            page.reload(new Page.ReloadOptions().setWaitUntil(com.microsoft.playwright.options.WaitUntilState.DOMCONTENTLOADED).setTimeout(30000));
+        } catch (com.microsoft.playwright.PlaywrightException e) {
+            log.warn("Reload encountered an issue: {}. Waiting for page to stabilize.", e.getMessage());
+        }
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
     }

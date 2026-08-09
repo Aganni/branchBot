@@ -99,7 +99,7 @@ public class Dedupe_bureauPage extends BaseTest {
         uploadPopup.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Finish")).click();
         log.info("Bank statement upload completed and popup finished.");
         uploadPopup.locator(CLOSE_TAB_BTN).click();
-    }
+   }
 
     // Clicks Save and Next to proceed to the next section.
     public void clickSaveAndNext()  {
