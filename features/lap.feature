@@ -34,3 +34,7 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User fills collateral details in Credit Review
     And User fills loan requirements and moves to Credit Approval
     And User completes Tele PD Visit for all applicants
+    And User completes Sales Gating for the application
+    And User completes Technical Vetting for the application
+    And User fills mandatory details and moves to Credit Approval
+    And User moves application from Credit Approval to Terms

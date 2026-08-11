@@ -2,6 +2,7 @@ package ui.stepDefinitions.jarvis_Secure;
 
 import com.microsoft.playwright.Page;
 import data.TestDataProvider;
+import dynamicData.DynamicDataClass;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.When;
@@ -173,6 +174,9 @@ public class TelePdStandaloneSteps extends BaseTest {
     @When("User opens Jarvis and navigates to application {string}")
     public void openJarvisAndNavigateToApplication(String appFormId) throws Exception {
         log.info("Opening Jarvis and navigating to application: {}", appFormId);
+
+        // Store appFormId in DynamicDataClass for downstream steps (e.g. Technical Vetting)
+        DynamicDataClass.setValue("appFormId", appFormId);
 
         // Load Jarvis credentials and switch portal context
         BaseTest.getCredentials("jarvis");
@@ -497,5 +501,18 @@ public class TelePdStandaloneSteps extends BaseTest {
         pdPage.selectTelePdDoneBy(
                 TestDataProvider.get(TP + "tele_pd_done_by_search"),
                 TestDataProvider.get(TP + "tele_pd_done_by_user"));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  STANDALONE PROPERTY VISIT TEST
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @And("User completes Property Visit on Jarvis")
+    public void completePropertyVisitOnJarvis() {
+        log.info("Starting standalone Property Visit test on Jarvis...");
+        Page jarvisPage = BaseTest.getPage();
+        PropertyVisitSteps propertyVisitSteps = new PropertyVisitSteps();
+        propertyVisitSteps.completePropertyVisit(jarvisPage);
+        log.info("Standalone Property Visit test completed.");
     }
 }

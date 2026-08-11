@@ -185,10 +185,7 @@ public class TelePdPage extends BaseTest {
         page.waitForTimeout(500);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  SAVE & SUBMIT
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // SAVE & SUBMIT
     public void clickSave() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
         page.waitForLoadState(LoadState.NETWORKIDLE);

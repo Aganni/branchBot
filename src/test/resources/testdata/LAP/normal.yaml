@@ -13,7 +13,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310708"
+    phone_number: "9001310728"
     loan_amount: "6850000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -408,3 +408,103 @@ dsa_secured:
       income_particulars: "Business Income"
       income_monthly: "765000"
 
+
+    # Property Visit (Jarvis - PD & Property Visit → Property Visit tab)
+    property_visit:
+      # Applicant selection
+      applicant_1: "Hannah Isaac"
+      applicant_2: "Noah johnson"
+      # Property Visit Details (grid fields)
+      property_address: "Address"
+      type_of_property: "Industrial"
+      types_of_collateral: "West Grampanchayat"
+      property_value_as_per_customer: "250000"
+      property_area: "1200"
+      within_geo_limits: "Yes"
+      spoke_name: "Nikitha"
+      contact_no_person_met: "9876543234"
+      age_of_property: "25"
+      total_no_of_units: "5"
+      vacant_units: "2"
+      access_road_to_property_1: "Cement Road"
+      access_road_to_property_2: "Cement Road"
+      habitation: "% - 25%"
+      habitation_value: "250000"
+      rate_reference_vicinity: "250000"
+      agency_property_visit_done_by: "Nikitha"
+      agency_property_visit_feedback: "Positive"
+      deviations_remarks: "nothing"
+      technical_vendor_remarks: "nothing"
+
+      # Visit Done By (search and select multiple users)
+      visit_done_by_search: "tenji"
+      visit_done_by_user_1: "tenjin.user@creditsaison-in.com"
+      visit_done_by_user_2: "sukhesh.balegar@creditsaison-"
+      visit_done_by_user_3: "vishal.mishra@creditsaison-in"
+      visit_done_by_user_4: "iranna.korishettar@"
+
+      # Upload images (reuse same images from PD Visit)
+      image_path_1: "src/test/resources/testdata/image2.png"
+      image_path_2: "src/test/resources/testdata/image2.png"
+      image_path_3: "src/test/resources/testdata/image1.png"
+      image_path_4: "src/test/resources/testdata/image1.png"
+
+    # Technical Vetting (Jarvis - FI/FCU Dashboard → Vendor Portal → Admin Portal)
+    technical_vetting:
+      level: "L4"
+      user_email: "tenjin.user@creditsaison-in."
+      vendor_user: "tenjin.user@creditsaison-in."
+      vendor_search_text: "tech"
+      vendor_name: "Technical Vendor"
+      admin_vendor_search: "tec"
+      admin_vendor_name: "TECH VENDOR"
+      admin_user_search: "tenji"
+      vendor_portal_url: "https://vendor.portal.int.creditsaison.in/signin"
+      report_file_path: "src/test/resources/testdata/sale deed 25 06 1993.pdf"
+      remarks: "adding the remarks"
+
+      # Vetting form data - Round 1
+      property_value_round1: "25630000"
+      property_visit_option: "Yes"
+      observation: "random text"
+      legal_issues: "random text"
+      marketability_round1: "Poor"
+      marketability_reason_round1: "random text"
+      title_clearance_round1: "Clear"
+
+      # Vetting form data - Round 2
+      property_value_round2: "250000000"
+      marketability_round2: "Very good"
+      marketability_reason_round2: "random text"
+      title_clearance_round2: "Clear"
+
+      # Tag people - Round 1
+      tag_person_r1_1: "niki"
+      tag_person_r1_2: "siva"
+      tag_person_r1_3: "sneha"
+
+      # Tag people - Round 2
+      tag_person_r2_1: "ritik"
+      tag_person_r2_2: "niki"
+
+      # Vendor user search for Round 2
+      vendor_user_search_r2: "ten"
+
+    # CR Mandatory Details (Credit Review → Credit Approval → Terms)
+    cr_mandatory:
+      # Primary Applicant Employment
+      total_work_experience: "13"
+      years_in_current: "8"
+
+      # Financial Co-Applicant Employment
+      co_applicant_work_exp: "8"
+      co_applicant_years_in_current: "8"
+
+      # Entity Co-Applicant Details
+      industry_sector: "IT hardware and peripherals"
+      product_category: "Manufacturing"
+      revenue: "3500000"
+
+      # Stage Movement
+      level: "L4"
+      user_email: "tenjin.user@creditsaison-in."

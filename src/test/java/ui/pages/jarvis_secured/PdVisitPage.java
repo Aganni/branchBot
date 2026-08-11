@@ -541,46 +541,65 @@ public class PdVisitPage extends BaseTest {
         jarvisPage.getByRole(AriaRole.RADIO, new Page.GetByRoleOptions().setName("Positive")).click();
         jarvisPage.waitForTimeout(500);
 
-        // ── Upload 4 images to "Photographs" section ──
-        log.info("Uploading 4 images to Photographs section...");
-        // Scroll to Photographs heading
+        // ── ROUND 1: Upload 1st image to Photographs and Save ──
+        log.info("Round 1: Uploading 1st image to Photographs and saving...");
         jarvisPage.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
         jarvisPage.waitForTimeout(1000);
 
-        for (int i = 0; i < imagePaths.length; i++) {
-            // Always target the first .el-upload file input (Photographs section comes first)
+        Locator firstUpload = jarvisPage.locator(".el-upload input[type='file']").first();
+        firstUpload.setInputFiles(Paths.get(imagePaths[0]));
+        log.info("  Uploaded image 1 of 4 to Photographs");
+        jarvisPage.waitForTimeout(5000);
+        // Scroll down to view the uploaded file
+        jarvisPage.keyboard().press("End");
+        jarvisPage.waitForTimeout(1000);
+
+        // Save to lock in the first upload
+        jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        jarvisPage.waitForLoadState(LoadState.NETWORKIDLE);
+        jarvisPage.waitForTimeout(3000);
+        log.info("Round 1 saved.");
+
+        // ── ROUND 2: Re-enter Edit, upload remaining 3 Photographs + 4 Business Photographs ──
+        jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
+        jarvisPage.waitForTimeout(2000);
+
+        // Upload remaining 3 images to Photographs
+        log.info("Round 2: Uploading remaining 3 images to Photographs...");
+        jarvisPage.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
+        jarvisPage.waitForTimeout(1000);
+
+        for (int i = 1; i < imagePaths.length; i++) {
             Locator uploadInput = jarvisPage.locator(".el-upload input[type='file']").first();
             uploadInput.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Photographs", i + 1);
-            jarvisPage.waitForTimeout(4000); // Wait for upload to complete before next
+            jarvisPage.waitForTimeout(4000);
+            // Scroll down to view the uploaded file
+            jarvisPage.keyboard().press("End");
+            jarvisPage.waitForTimeout(500);
         }
-        log.info("Uploaded 4 images to Photographs section.");
+        log.info("Uploaded 4 images to Photographs section (1 from round 1 + 3 from round 2).");
 
-        // ── Upload 4 images to "Business Photographs" section ──
+        // Upload 4 images to Business Photographs
         log.info("Uploading 4 images to Business Photographs section...");
-        // Scroll to Business Photographs heading
         jarvisPage.getByText("Business Photographs").scrollIntoViewIfNeeded();
         jarvisPage.waitForTimeout(1000);
 
         for (int i = 0; i < imagePaths.length; i++) {
-            // The page has exactly 2 .el-upload wrapper divs (with the drag-drop zone).
-            // The second one belongs to Business Photographs.
-            // Target the upload zone that contains "click to browse" text within Business Photographs section.
             Locator businessUpload = jarvisPage.locator("div.el-upload").nth(1).locator("input[type='file']");
-
-            // Fallback if nth(1) doesn't work after DOM mutation
             if (!businessUpload.isVisible()) {
-                // Find by proximity to "Business Photographs" text
                 businessUpload = jarvisPage.locator("div.el-upload").last().locator("input[type='file']");
             }
-
             businessUpload.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Business Photographs", i + 1);
-            jarvisPage.waitForTimeout(4000); // Wait for upload to complete before next
+            jarvisPage.waitForTimeout(4000);
+            // Scroll down to view the uploaded file
+            jarvisPage.keyboard().press("End");
+            jarvisPage.waitForTimeout(500);
         }
         log.info("Uploaded 4 images to Business Photographs section.");
 
-        // Save
+        // Final Save
         jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
         jarvisPage.waitForLoadState(LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(3000);

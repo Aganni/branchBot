@@ -45,6 +45,7 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.getByText("Move to Credit Approval").click();
         jarvisPage.waitForTimeout(3000);
         log.info("Move to Credit Approval attempted — validation error expected for missing PD form.");
+        jarvisPage.waitForTimeout(3500);
 
         // PHASE 3: PD VISIT (BlackPanther) — delegated to PdVisitSteps
         Page blackPantherPage = telePdPage.getBlackPantherPage();
@@ -74,8 +75,9 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.getByPlaceholder("Application Actions").click();
         jarvisPage.waitForTimeout(1000);
         jarvisPage.getByText("Move to Credit Approval").click();
-        jarvisPage.waitForTimeout(3000);
+        jarvisPage.waitForTimeout(2000);
         log.info("Move to Credit Approval attempted — validation error expected for missing mandatory fields.");
+        jarvisPage.waitForTimeout(3500);
 
         // PHASE 5: BlackPanther - Fill mandatory fields (References + Income) for each applicant
         log.info("Switching to BlackPanther to fill mandatory fields (References + Income)...");
@@ -124,13 +126,38 @@ public class TelePdSteps extends BaseTest {
 
         log.info("All mandatory fields filled and submitted for all applicants.");
 
-        // PHASE 6: JARVIS - Move to Credit Approval (should succeed now)
-        log.info("Switching to Jarvis for final Move to Credit Approval...");
+        // PHASE 6: JARVIS - Move to Credit Approval (should throw validation for missing Property Visit)
+        log.info("Switching to Jarvis — attempting Move to Credit Approval (validation expected)...");
         jarvisPage.bringToFront();
-        // Ensure we're on the appForm page
         String phase6Url = jarvisPage.url();
         if (!phase6Url.contains("/appForm")) {
             String appFormUrl = phase6Url.replaceAll("/application/([^/]+).*", "/application/$1/appForm");
+            jarvisPage.navigate(appFormUrl);
+        } else {
+            jarvisPage.reload();
+        }
+        jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        jarvisPage.waitForTimeout(5000);
+
+        jarvisPage.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
+        jarvisPage.waitForTimeout(500);
+        jarvisPage.getByPlaceholder("Application Actions").click();
+        jarvisPage.waitForTimeout(1000);
+        jarvisPage.getByText("Move to Credit Approval").click();
+        jarvisPage.waitForTimeout(3000);
+        log.info("Move to Credit Approval attempted — validation error expected for missing Property Visit.");
+
+        // PHASE 7: JARVIS - Property Visit (fill details + uploads + submit)
+        log.info("Starting Property Visit flow in Jarvis...");
+        PropertyVisitSteps propertyVisitSteps = new PropertyVisitSteps();
+        propertyVisitSteps.completePropertyVisit(jarvisPage);
+
+        // PHASE 8: JARVIS - Move to Credit Approval (should succeed now)
+        log.info("Switching to Jarvis for final Move to Credit Approval...");
+        jarvisPage.bringToFront();
+        String phase8Url = jarvisPage.url();
+        if (!phase8Url.contains("/appForm")) {
+            String appFormUrl = phase8Url.replaceAll("/application/([^/]+).*", "/application/$1/appForm");
             jarvisPage.navigate(appFormUrl);
         } else {
             jarvisPage.reload();
