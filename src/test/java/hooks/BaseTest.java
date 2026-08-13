@@ -44,6 +44,13 @@ public class BaseTest {
         return pageThreadLocal.get();
     }
 
+    public static BrowserContext getContext() {
+        if (contextThreadLocal.get() == null) {
+            startBrowserInstance();
+        }
+        return contextThreadLocal.get();
+    }
+
     public static void startBrowserInstance() {
         try {
             Playwright playwright = Playwright.create();
@@ -54,7 +61,10 @@ public class BaseTest {
             browserThreadLocal.set(browser);
 
             BrowserContext context = browser.newContext(
-                    new Browser.NewContextOptions().setViewportSize(null));
+                    new Browser.NewContextOptions()
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
+            );
             contextThreadLocal.set(context);
 
             Page page = context.newPage();
@@ -154,6 +164,8 @@ public class BaseTest {
             BrowserContext newContext = browser.newContext(
                     new Browser.NewContextOptions()
                             .setStorageStatePath(Paths.get(stateFilePath))
+                            .setRecordVideoDir(Paths.get("target/videos/"))
+                            .setRecordVideoSize(1280, 720)
             );
             contextThreadLocal.set(newContext);
 
@@ -191,7 +203,7 @@ public class BaseTest {
     }
 
     // ───────────────────────────────────────────────
-    //  Environment & Credentials (mirrors Apollo)
+    //  Environment & Credentials
     // ───────────────────────────────────────────────
 
     public static String initializeEnvironment(String key) throws Exception {

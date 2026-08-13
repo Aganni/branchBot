@@ -150,11 +150,8 @@ public abstract class BasePage {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
     //  TOAST / NOTIFICATION VERIFICATION
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
+    /*
      * Waits for an Element UI notification toast and returns its title.
      * Returns null if no toast appears within timeout.
      */
