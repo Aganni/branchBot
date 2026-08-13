@@ -1,75 +1,36 @@
 package ui.pages.jarvis_secured;
-
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
-
-/**
- * Page Object for CR Mandatory Details validation and stage movements.
- * Handles:
- *   - Filling Primary Applicant Employment details (Work Experience, Years in Current)
- *   - Filling Financial Co-Applicant mandatory fields (Work Exp, Years in Current)
- *   - Filling Entity Co-Applicant mandatory fields (Industry Sector, Product Category, Revenue)
- *   - Move to Credit Approval stage
- *   - Move to Terms stage (with Reg Check resolution)
- *
- * Flow:
- *   1. Open Primary Applicant Details → Employment tab → fill & submit
- *   2. Open Co-Applicant Details → View financial co-applicant → fill & save
- *   3. Edit entity co-applicant → fill industry/product/revenue → verify & submit
- *   4. Move to Credit Approval (level/user dialog)
- *   5. Navigate to Credit Approval stage
- *   6. Move to Terms → handle Reg Check → Move to Terms again
- */
 public class CRMandatoryDetailsPage extends BaseTest {
-
     private final Page page;
-
     public CRMandatoryDetailsPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  PRIMARY APPLICANT — EMPLOYMENT DETAILS
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Opens the Primary Applicant Details section.
-     */
+    // PRIMARY APPLICANT — EMPLOYMENT DETAILS
     public void openPrimaryApplicantDetails() {
         log.info("Opening Primary Applicant Details...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Primary Applicant Details")).click();
-        page.waitForTimeout(2000);
+        page.waitForTimeout(500);
         log.info("Primary Applicant Details opened.");
     }
-
-    /**
-     * Navigates to the Employment tab within Primary Applicant Details.
-     */
     public void clickEmploymentTab() {
         log.info("Clicking Employment tab...");
         page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Employment")).click();
         page.waitForTimeout(500);
         log.info("Employment tab active.");
     }
-
-    /**
-     * Fills the Total Work Experience field.
-     */
     public void fillTotalWorkExperience(String years) {
         log.info("Filling Total Work Experience: {}", years);
         page.getByPlaceholder("Enter Total Work Experience").click();
         page.getByPlaceholder("Enter Total Work Experience").fill(years);
         page.waitForTimeout(300);
     }
-
-    /**
-     * Fills the Total Years in Current field.
-     */
     public void fillTotalYearsInCurrent(String years) {
         log.info("Filling Total Years in Current: {}", years);
         page.getByPlaceholder("Enter Total Years in Current").click();
@@ -77,10 +38,8 @@ public class CRMandatoryDetailsPage extends BaseTest {
         page.waitForTimeout(300);
     }
 
-    /**
-     * Clicks the Submit button to save Primary Applicant details.
-     */
-    public void submitPrimaryApplicant() {
+    //Clicks the Submit button to save Primary Applicant details.
+     public void submitPrimaryApplicant() {
         log.info("Submitting Primary Applicant details...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit")).click();
         page.waitForTimeout(1000);
@@ -95,11 +54,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         dismissNotification();
     }
 
-    /**
-     * Closes the current modal/dialog by clicking the ✕ (close) button.
-     * The close button is: <button class="el-button close-btn el-button--default is-circle">
-     * Waits for the dialog to fully disappear after clicking.
-     */
     public void closeModal() {
         log.info("Closing modal...");
         page.locator("button.close-btn.is-circle").click();
@@ -115,27 +69,13 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Modal closed.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  FINANCIAL CO-APPLICANT — WORK EXPERIENCE DETAILS
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Opens the CoApplicant Details section.
-     */
+    // FINANCIAL CO-APPLICANT — WORK EXPERIENCE DETAILS
     public void openCoApplicantDetails() {
         log.info("Opening CoApplicant Details...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("CoApplicant Details 20.00%")).click();
         page.waitForTimeout(2000);
         log.info("CoApplicant Details opened.");
     }
-
-    /**
-     * Clicks the first "View" button to open the financial co-applicant (Hannah) details modal.
-     */
-    /**
-     * Clicks the "View" button for Hannah in the CoApplicant Details dialog.
-     * XPath: (//h3[normalize-space()='Hannah'])[1]/ancestor::div[3]//button[normalize-space()='View']
-     */
     public void viewFinancialCoApplicant() {
         log.info("Opening financial co-applicant (Hannah) view...");
         // Try multiple ancestor levels to find the container holding both h3 and View button
@@ -151,29 +91,19 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Financial co-applicant (Hannah) view opened.");
     }
 
-    /**
-     * Clicks the EDIT button on the co-applicant details modal to enter edit mode.
-     */
+    //Clicks the EDIT button on the co-applicant details modal to enter edit mode.
     public void clickEditOnCoApplicantModal() {
         log.info("Clicking EDIT on co-applicant details modal...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("EDIT")).click();
         page.waitForTimeout(2000);
         log.info("Edit mode active on co-applicant modal.");
     }
-
-    /**
-     * Opens the employment section for the financial co-applicant by clicking the info icon.
-     */
     public void openCoApplicantEmploymentSection() {
         log.info("Opening co-applicant employment section...");
         page.locator("div:nth-child(29) > .el-col > .cs-fab > .info").click();
         page.waitForTimeout(1000);
         log.info("Employment section opened.");
     }
-
-    /**
-     * Fills the work experience for co-applicant.
-     */
     public void fillCoApplicantWorkExp(String years) {
         log.info("Filling co-applicant work exp: {}", years);
         page.getByPlaceholder("Enter work exp").click();
@@ -181,9 +111,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         page.waitForTimeout(300);
     }
 
-    /**
-     * Fills the total years in current for co-applicant.
-     */
+    //Fills the total years in current for co-applicant.
     public void fillCoApplicantYearsInCurrent(String years) {
         log.info("Filling co-applicant total years in current: {}", years);
         page.waitForLoadState(LoadState.NETWORKIDLE);
@@ -196,9 +124,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         page.waitForTimeout(300);
     }
 
-    /**
-     * Saves the co-applicant employment details by clicking the info icon again.
-     */
+    //Saves the co-applicant employment details by clicking the info icon again.
     public void saveCoApplicantEmployment() {
         log.info("Saving co-applicant employment details...");
         page.locator("div:nth-child(29) > .el-col > .cs-fab > .info").click();
@@ -206,20 +132,12 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Co-applicant employment saved.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  ENTITY CO-APPLICANT — INDUSTRY/REVENUE DETAILS
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Opens the entity co-applicant (Amazon.com Inc.) by clicking its View button
-     * in the CoApplicant Details dialog, then clicks EDIT.
-     */
+    // ENTITY CO-APPLICANT — INDUSTRY/REVENUE DETAILS
     public void openAndEditEntityCoApplicant() {
         log.info("Opening entity co-applicant (Amazon.com Inc.)...");
         // First open the CoApplicant Details dialog
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("CoApplicant Details 20.00%")).click();
         page.waitForTimeout(2000);
-
         // Scroll down within the dialog to see Amazon.com Inc.
         page.locator(".el-dialog__body").last().evaluate("el => el.scrollTop = el.scrollHeight");
         page.waitForTimeout(1000);
@@ -241,9 +159,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Entity co-applicant (Amazon.com Inc.) edit mode active.");
     }
 
-    /**
-     * Opens the entity details section by clicking the info icon.
-     */
     public void openEntityDetailsSection() {
         log.info("Opening entity details section...");
         page.locator("div:nth-child(22) > .el-col > .cs-fab > .info").click();
@@ -251,9 +166,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Entity details section opened.");
     }
 
-    /**
-     * Selects the industry sector from the dropdown.
-     */
     public void selectIndustrySector(String sector) {
         log.info("Selecting industry sector: {}", sector);
         page.getByPlaceholder("Select the industry sector").click();
@@ -263,9 +175,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Industry sector selected: {}", sector);
     }
 
-    /**
-     * Selects the product category from the dropdown.
-     */
     public void selectProductCategory(String category) {
         log.info("Selecting product category: {}", category);
         page.getByPlaceholder("Select the product category").click();
@@ -275,9 +184,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Product category selected: {}", category);
     }
 
-    /**
-     * Fills the revenue field.
-     */
+    //Fills the revenue field.
     public void fillRevenue(String revenue) {
         log.info("Filling revenue: {}", revenue);
         page.getByPlaceholder("Enter the revenue").click();
@@ -285,10 +192,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         page.waitForTimeout(300);
     }
 
-    /**
-     * Clicks Verify, then Submit in the dialog to save entity details.
-     * After submission, refreshes the page.
-     */
+    //Clicks Verify, then Submit in the dialog to save entity details. After submission, refreshes the page.
     public void verifyAndSubmitEntity() {
         log.info("Verifying and submitting entity details...");
         page.getByText("Verify").click();
@@ -296,7 +200,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         page.getByRole(AriaRole.DIALOG).getByText("Submit").click();
         page.waitForTimeout(3000);
         log.info("Entity details submitted.");
-
         // Refresh the page after submission
         page.reload();
         page.waitForLoadState(LoadState.NETWORKIDLE);
@@ -304,9 +207,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Page refreshed after entity submission.");
     }
 
-    /**
-     * Navigates to the entity co-applicant (Amazon.com Inc.) section.
-     */
+    //Navigates to the entity co-applicant (Amazon.com Inc.) section.
     public void openEntityCoApplicant() {
         log.info("Opening entity co-applicant (Amazon.com Inc.)...");
         page.locator("[id=\"Co-Applicant\\ Details\"] div")
@@ -315,14 +216,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Entity co-applicant section opened.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  STAGE MOVEMENTS
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Moves application to Credit Approval stage.
-     * Scrolls right, clicks Application Actions → Move to Credit Approval → fills level/user → Accept.
-     */
+    //STAGE MOVEMENTS
     public void moveToCreditApproval(String level, String userEmail) {
         log.info("Moving to Credit Approval with level [{}], user [{}]...", level, userEmail);
         page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
@@ -344,7 +238,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
 
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Accept")).click();
         page.waitForTimeout(3000);
-
         // Wait for success confirmations
         try {
             page.getByText("Workflow updated").waitFor(new Locator.WaitForOptions().setTimeout(10000));
@@ -361,23 +254,19 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Moved to Credit Approval.");
     }
 
-    /**
-     * Navigates to the Credit Approval stage by clicking the status circle.
-     */
+    //Navigates to the Credit Approval stage by clicking the status circle.
     public void navigateToCreditApprovalStage() {
         log.info("Navigating to Credit Approval stage...");
         page.waitForTimeout(2000);
         page.locator("div:nth-child(6) > .status-circle > .status-dim").click();
         page.waitForTimeout(1000);
-        page.getByText("Credit Approval").click();
+        page.getByText("Credit Approval", new Page.GetByTextOptions().setExact(true)).click();
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
         log.info("On Credit Approval stage.");
     }
 
-    /**
-     * Attempts to move to Terms stage. First attempt triggers Reg Check validation.
-     */
+    //Attempts to move to Terms stage. First attempt triggers Reg Check validation.
     public void attemptMoveToTerms() {
         log.info("Attempting Move to Terms...");
         page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
@@ -389,10 +278,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Move to Terms attempted.");
     }
 
-    /**
-     * Resolves the Regulatory Check by clicking on the Reg. Check link.
-     * Just visiting the Reg Check tab resolves it.
-     */
+    //Resolves the Regulatory Check by clicking on the Reg. Check link. Just visiting the Reg Check tab resolves it.
     public void resolveRegCheck() {
         log.info("Resolving Regulatory Check...");
         // Click "Resolve Regulatory check" message or "Reg. Check" link
@@ -414,10 +300,6 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Back on App Form tab.");
     }
 
-    /**
-     * Moves to Terms stage after Reg Check is resolved.
-     * Uses li filter for "Move to Terms" since it's the second attempt.
-     */
     public void moveToTerms() {
         log.info("Moving to Terms stage...");
         page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
@@ -440,13 +322,7 @@ public class CRMandatoryDetailsPage extends BaseTest {
         log.info("Application moved to Terms stage.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  UTILITIES
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Dismisses any visible notification/alert.
-     */
+    // UTILITIES
     private void dismissNotification() {
         try {
             Locator closeBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(""));

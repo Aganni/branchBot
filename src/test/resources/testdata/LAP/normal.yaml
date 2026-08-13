@@ -13,7 +13,7 @@ dsa_secured:
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310728"
+    phone_number: "9001310729"
     loan_amount: "6850000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -408,8 +408,6 @@ dsa_secured:
       income_particulars: "Business Income"
       income_monthly: "765000"
 
-
-    # Property Visit (Jarvis - PD & Property Visit → Property Visit tab)
     property_visit:
       # Applicant selection
       applicant_1: "Hannah Isaac"
@@ -449,14 +447,13 @@ dsa_secured:
       image_path_3: "src/test/resources/testdata/image1.png"
       image_path_4: "src/test/resources/testdata/image1.png"
 
-    # Technical Vetting (Jarvis - FI/FCU Dashboard → Vendor Portal → Admin Portal)
     technical_vetting:
       level: "L4"
       user_email: "tenjin.user@creditsaison-in."
       vendor_user: "tenjin.user@creditsaison-in."
       vendor_search_text: "tech"
       vendor_name: "Technical Vendor"
-      admin_vendor_search: "tec"
+      admin_vendor_search: "tech"
       admin_vendor_name: "TECH VENDOR"
       admin_user_search: "tenji"
       vendor_portal_url: "https://vendor.portal.int.creditsaison.in/signin"

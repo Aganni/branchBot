@@ -206,10 +206,7 @@ public class TelePdSteps extends BaseTest {
         log.info("Tele PD completed for: {}", pendingName);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  TELE PD SECTION FILLERS
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // TELE PD SECTION FILLERS
     private void fillBasicDetails(TelePdPage pdPage) {
         log.info("Filling Basic Details...");
         pdPage.clickSectionButton("Basic Detail");

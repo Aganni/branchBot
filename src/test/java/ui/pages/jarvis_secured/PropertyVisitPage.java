@@ -1,35 +1,18 @@
 package ui.pages.jarvis_secured;
-
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import hooks.BaseTest;
-
-import java.nio.file.Path;
 import java.nio.file.Paths;
-
-/**
- * Page Object for the Property Visit form in Jarvis.
- * Located under: PD & Property Visit → Property Visit tab.
- * Handles grid-based data entry, applicant selection, file uploads, and visit done by.
- */
 public class PropertyVisitPage extends BaseTest {
-
     private final Page page;
-
     public PropertyVisitPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  NAVIGATION
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Navigates to PD & Property Visit section and clicks the Property Visit tab.
-     */
+    // Navigates to PD & Property Visit section and clicks the Property Visit tab.
     public void navigateToPropertyVisitTab() {
         log.info("Navigating to Property Visit tab...");
         page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("PD & Property Visit")).click();
@@ -41,9 +24,6 @@ public class PropertyVisitPage extends BaseTest {
         log.info("Property Visit tab loaded.");
     }
 
-    /**
-     * Navigates to Property Visit via direct URL (pdForm page, then click tab).
-     */
     public void navigateToPropertyVisitViaUrl() {
         log.info("Navigating to Property Visit tab...");
         String currentUrl = page.url();
@@ -54,16 +34,12 @@ public class PropertyVisitPage extends BaseTest {
             page.waitForLoadState(LoadState.NETWORKIDLE);
             page.waitForTimeout(3000);
         }
-
         page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Property Visit")).click();
         page.waitForTimeout(2000);
         log.info("Property Visit tab loaded.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  EDIT MODE & APPLICANT SELECTION
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // EDIT MODE & APPLICANT SELECTION
     public void clickEdit() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
         page.waitForTimeout(2000);
@@ -88,10 +64,7 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForTimeout(500);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  GRID FIELD INTERACTIONS
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // GRID FIELD INTERACTIONS
     /**
      * Fills a text field in the grid by double-clicking the cell to activate Input Editor.
      * Note: A single click before dblclick can interfere with grid cell activation,
@@ -111,9 +84,7 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForTimeout(300);
     }
 
-    /**
-     * Clicks a grid cell (for dropdowns that open on single click).
-     */
+    //Clicks a grid cell (for dropdowns that open on single click).
     private void clickGridCell(String rowName) {
         Locator cell = page.getByRole(AriaRole.ROW, new Page.GetByRoleOptions().setName(rowName))
                 .getByRole(AriaRole.GRIDCELL).nth(1);
@@ -123,9 +94,7 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForTimeout(500);
     }
 
-    /**
-     * Selects a dropdown option in a grid cell (dblclick to open dropdown).
-     */
+    //Selects a dropdown option in a grid cell (dblclick to open dropdown).
     private void selectGridDropdown(String rowName, String optionText) {
         Locator cell = page.getByRole(AriaRole.ROW, new Page.GetByRoleOptions().setName(rowName))
                 .getByRole(AriaRole.GRIDCELL).nth(1);
@@ -139,9 +108,7 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForTimeout(500);
     }
 
-    /**
-     * Selects an option from a grid cell that uses role=OPTION (dblclick to activate).
-     */
+    //Selects an option from a grid cell that uses role=OPTION (dblclick to activate).
     private void selectGridOption(String rowName, String optionName) {
         Locator cell = page.getByRole(AriaRole.ROW, new Page.GetByRoleOptions().setName(rowName))
                 .getByRole(AriaRole.GRIDCELL).nth(1);
@@ -153,20 +120,15 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForTimeout(500);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  PROPERTY VISIT DETAILS - FILL ALL FIELDS
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // PROPERTY VISIT DETAILS - FILL ALL FIELDS
     public void fillPropertyAddress(String address) {
         log.info("Filling Property Address: {}", address);
         fillGridCell("Property Address", address);
     }
-
     public void selectTypeOfProperty(String type) {
         log.info("Selecting Type Of Property: {}", type);
         selectGridDropdown("Type Of Property", type);
     }
-
     public void selectTypesOfCollateral(String collateral) {
         log.info("Selecting Types of Collateral: {}", collateral);
         Locator cell = page.getByRole(AriaRole.ROW, new Page.GetByRoleOptions().setName("Types of Collateral"))
@@ -318,15 +280,11 @@ public class PropertyVisitPage extends BaseTest {
         fillGridCell("Technical Vendor Remarks", remarks);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  VISIT DONE BY (multi-user selection)
-    // ═══════════════════════════════════════════════════════════════════════════
-
+    // VISIT DONE BY (multi-user selection)
     public void selectVisitDoneByUsers(String searchText, String user1, String user2, String user3, String user4) {
         log.info("Selecting Visit Done By users...");
 
-        // Element UI multi-select: the search input sits inside el-select__tags
-        // and intercepts clicks on the placeholder input underneath.
+        // Element UI multi-select: the search input sits inside el-select__tags and intercepts clicks on the placeholder input underneath.
         Locator searchInput = page.locator(".el-select__tags input.el-select__input");
 
         // Scroll into view and wait for layout to settle
@@ -357,15 +315,7 @@ public class PropertyVisitPage extends BaseTest {
         log.info("Visit Done By users selected.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  FILE UPLOADS (Photographs + Business Photographs)
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Uploads images to the Property Visit form.
-     * Round 1: Upload 1 image to first slot and save.
-     * Round 2: Upload remaining 3 to first slot + 4 to second slot and save.
-     */
+    // FILE UPLOADS (Photographs + Business Photographs)
     public void uploadPropertyVisitImages(String[] imagePaths) {
         log.info("Uploading Property Visit images...");
 
@@ -408,12 +358,6 @@ public class PropertyVisitPage extends BaseTest {
         // Scroll to Business Photographs section before uploading
         page.getByText("Business Photographs").scrollIntoViewIfNeeded();
         page.waitForTimeout(1000);
-
-        // 4 Business Photographs
-        // Locate upload input relative to the Business Photographs section.
-        // After each upload, new thumbnail elements are added to the DOM which shifts
-        // positional indexes. We use the last() el-upload input on the page since
-        // the Business Photographs dropzone is always the last active upload area.
         log.info("Uploading 4 images to Business Photographs section...");
         for (int i = 0; i < imagePaths.length; i++) {
             page.getByText("Business Photographs").scrollIntoViewIfNeeded();
@@ -432,10 +376,7 @@ public class PropertyVisitPage extends BaseTest {
         log.info("Round 2 saved. All Property Visit images uploaded.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
     //  SAVE & SUBMIT
-    // ═══════════════════════════════════════════════════════════════════════════
-
     public void clickSave() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
         page.waitForLoadState(LoadState.NETWORKIDLE);
@@ -443,8 +384,6 @@ public class PropertyVisitPage extends BaseTest {
     }
 
     public void clickSubmit() {
-        // After save, the form is in read-only mode.
-        // Check if Submit button is already visible (some forms show it in read-only after all requirements met)
         Locator submitBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit"));
 
         // Try to find Submit button - it may already be visible or may need Edit first
@@ -467,14 +406,7 @@ public class PropertyVisitPage extends BaseTest {
         log.info("Property Visit form submitted.");
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    //  POST-SUBMIT: NAVIGATE TO APPFORM & VERIFY VALIDATION
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * After Property Visit submit, navigates to Appform and attempts
-     * Move to Credit Approval to trigger validation message.
-     */
+    // POST-SUBMIT: NAVIGATE TO APPFORM & VERIFY VALIDATION
     public void navigateToAppformAndAttemptStageMove() {
         log.info("Navigating to Appform after Property Visit submit...");
 
@@ -495,10 +427,9 @@ public class PropertyVisitPage extends BaseTest {
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Credit Approval")).click();
         page.waitForTimeout(3000);
 
-        // Verify validation message appears
-//        Locator validationMsg = page.getByText("Sales PD visit is mandatory\n" +
-//                "Please complete at least one Sales or Property visit to proceed.");
-//        validationMsg.waitFor(new Locator.WaitForOptions().setTimeout(10000));
-//        log.info("Validation message verified: 'Please complete at least one' displayed.");
+        Locator validationMsg = page.getByText("Sales PD visit is mandatory\n" +
+                "Please complete at least one Sales or Property visit to proceed.");
+        validationMsg.waitFor(new Locator.WaitForOptions().setTimeout(10000));
+        log.info("Validation message verified: 'Please complete at least one' displayed.");
     }
 }

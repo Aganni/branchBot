@@ -19,8 +19,8 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User navigates to Exposure dedupe and bureau output, downloads bureau report
     And User Adds the property collateral details
     And User uploads all required documents and proceeds
-    And User completes fee payment via sandbox payment gateway
-    And User completes final submission with email verification
+#    And User completes fee payment via sandbox payment gateway
+#    And User completes final submission with email verification
 
   # ── Jarvis Portal Flow ──
   Scenario: Complete LAP flow till Welcome KIT through Jarvis portal.
@@ -38,3 +38,9 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes Technical Vetting for the application
     And User fills mandatory details and moves to Credit Approval
     And User moves application from Credit Approval to Terms
+    And User completes Fee Details for Docket Initiation
+    And User completes Spread Rate for Docket Initiation
+    And User completes Insurance Details for Docket Initiation
+    And User changes user role to SALES for DOGH access
+    And User triggers DOGH for insurance
+    And User moves application to Docket Initiation

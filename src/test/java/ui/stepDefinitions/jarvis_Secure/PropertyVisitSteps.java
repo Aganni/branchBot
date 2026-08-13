@@ -1,28 +1,13 @@
 package ui.stepDefinitions.jarvis_Secure;
-
 import com.microsoft.playwright.Page;
 import data.TestDataProvider;
 import hooks.BaseTest;
 import ui.pages.jarvis_secured.PropertyVisitPage;
 
-/**
- * Step definitions for Property Visit flow in Jarvis.
- * Called after PD Visit + References/Income are complete.
- *
- * Flow:
- *   1. Navigate to PD & Property Visit → Property Visit tab
- *   2. Select applicants and owner type
- *   3. Fill all Property Visit Details (grid fields)
- *   4. Select Visit Done By users
- *   5. Save
- *   6. Upload images (Photographs + Business Photographs)
- *   7. Submit
- */
 public class PropertyVisitSteps extends BaseTest {
     private static final String PVT = "dsa_secured.jarvis_secured.property_visit.";
     public void completePropertyVisit(Page jarvisPage) {
         log.info("Starting Property Visit flow in Jarvis...");
-
         PropertyVisitPage pvPage = new PropertyVisitPage(jarvisPage);
 
         // Navigate to Property Visit tab
@@ -85,8 +70,7 @@ public class PropertyVisitSteps extends BaseTest {
         pvPage.clickSubmit();
         log.info("Property Visit flow completed successfully.");
 
-        // Post-submit: Navigate to Appform and attempt Move to Credit Approval
-        // to verify validation message (triggers Physical PD completion requirement)
+        // Post-submit: Navigate to Appform and attempt Move to Credit Approval to verify validation message (triggers Physical PD completion requirement)
         pvPage.navigateToAppformAndAttemptStageMove();
     }
 }

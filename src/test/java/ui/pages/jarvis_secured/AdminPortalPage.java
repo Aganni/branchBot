@@ -172,10 +172,14 @@ public class AdminPortalPage extends BaseTest {
         }
 
         // Click the Vendor Id field and type search text
-        Locator vendorInput = page.locator("form div")
+        // Use a precise label-based locator scoped to the Update User dialog
+        Locator vendorInput = page.getByLabel("Update User")
+                .locator(".el-form-item")
                 .filter(new Locator.FilterOptions().setHasText("Vendor Id"))
-                .getByPlaceholder("Enter");
+                .locator("input")
+                .first();
         vendorInput.click();
+        page.waitForTimeout(500);
         vendorInput.fill(vendorSearchText);
         page.waitForTimeout(1000);
 
