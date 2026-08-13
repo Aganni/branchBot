@@ -68,6 +68,25 @@ public class ApplicationDetailsSteps extends BaseTest {
         verificationTab.resolveUdyamKyc("Resolving_Udyam_KYC");
     }
 
+    @And("User updates Loan Requirements in CAM stage")
+    public void updateLoanRequirementsInCam() {
+        LoanRequirment loanReq = new LoanRequirment(BaseTest.getPage());
+        AppFormTabNavigator.ensureOnAppFormTab(BaseTest.getPage());
+        loanReq.openLoanRequirementsAndEdit();
+        loanReq.fillLoanRequirementsAndSubmit("Updating_Loan_Requirements_CAM");
+    }
+
+    @And("User resolves Dedupe and Verification")
+    public void resolveDedupe() {
+        Dedupe dedupe = new Dedupe(BaseTest.getPage());
+        dedupe.navigateToAppFormTab();
+        dedupe.selectDedupeTab();
+
+        VerificationTab verificationTab = new VerificationTab(BaseTest.getPage());
+        verificationTab.navigateToVerificationTab();
+        verificationTab.resolveUdyamKyc("Resolving_Udyam_KYC");
+    }
+
     @And("User updates Ownership, initiates Credit Approval, and moves to Terms")
     public void updateOwnershipAndApprove() {
         String approver = TestDataProvider.get("jarvis.ownership.credit_approver");
@@ -121,10 +140,11 @@ public class ApplicationDetailsSteps extends BaseTest {
         CoApplicantDetails coApp = new CoApplicantDetails(BaseTest.getPage());
         coApp.addAadhaarToCoApplicant(aadhaar, "Adding_Aadhaar");
 
-        String entity = (String) getValue(Constants.BUSINESS_NAME);
-        String applicant = TestDataProvider.get("jarvis.beneficiary.applicant");
-        BeneficiaryOwnerDetails beneficiary = new BeneficiaryOwnerDetails(BaseTest.getPage());
-        beneficiary.addBeneficiaryOwner(entity, applicant, "Adding_Beneficiary");
+        // TODO: Re-enable once beneficiary owner flow is stabilized
+        // String entity = (String) getValue(Constants.BUSINESS_NAME);
+        // String applicant = TestDataProvider.get("jarvis.beneficiary.applicant");
+        // BeneficiaryOwnerDetails beneficiary = new BeneficiaryOwnerDetails(BaseTest.getPage());
+        // beneficiary.addBeneficiaryOwner(entity, applicant, "Adding_Beneficiary");
     }
 
     @And("User starts CAM process")

@@ -82,7 +82,11 @@ public class BusinessDetails extends BaseTest {
 
         page.waitForTimeout(500);
 
-        Locator verifyBtn = page.locator(".verify-btn").first();
+        Locator verifyBtn = page.locator(".verify-btn")
+                .or(page.locator("button:has-text('verify'), button:has-text('Verify')"))
+                .or(page.getByText("verify", new Page.GetByTextOptions().setExact(true)))
+                .or(page.getByText("Verify", new Page.GetByTextOptions().setExact(true)))
+                .first();
         verifyBtn.click(new Locator.ClickOptions().setForce(true));
         log.info("Clicked Verify button.");
 

@@ -115,7 +115,7 @@ public class DocumentsPage extends BaseTest {
         return pendingDocs;
     }
 
-    public void uploadMandatoryDocumentsAndMarkOsv() {
+    public void uploadMandatoryDocumentsAndMarkOsv(boolean includePhoto) {
         navigateToDocumentsTab();
         processedSectionIds.clear();
         sectionHintCount.clear();
@@ -129,8 +129,28 @@ public class DocumentsPage extends BaseTest {
 
         log.info("Found {} pending mandatory documents: {}", pendingDocs.size(), pendingDocs);
 
+        // Add PHOTO only if requested (CAM stage)
+        if (includePhoto) {
+            boolean hasPhoto = pendingDocs.stream().anyMatch(d -> d.toLowerCase().contains("photo")
+                    && !d.toLowerCase().contains("face") && !d.toLowerCase().contains("selfie"));
+            if (!hasPhoto) {
+                String panProfile = data.TestDataProvider.get("dsa.qde.pan_profile");
+                pendingDocs.add(panProfile + "'s PHOTO");
+                log.info("Added PHOTO to pending documents list");
+            }
+        } else {
+            // TERMS stage — ensure Loan Agreement Signed is processed
+            boolean hasLoanAgreement = pendingDocs.stream().anyMatch(d -> d.toLowerCase().contains("loan agreement signed"));
+            if (!hasLoanAgreement) {
+                pendingDocs.add("Loan Agreement Signed");
+                log.info("Added Loan Agreement Signed to pending documents list");
+            }
+        }
+
         for (String docName : pendingDocs) {
             processDocument(docName);
+            // Wait for page to stabilize after each document operation
+            getPage().waitForTimeout(2000);
         }
 
         log.info("All pending mandatory documents processed successfully.");
@@ -200,6 +220,27 @@ public class DocumentsPage extends BaseTest {
 
         // Find matching section — skips already-processed sections (handles duplicate POA)
         Locator section = findDocumentSection(entityName, sectionHint);
+
+        if (section == null) {
+            // Fallback: try to find the section anywhere on the page by scrolling down
+            log.warn("  Could not locate section via entity wrappers for '{}'. Trying page-wide search...", checklistDocName);
+            String hintClean = sectionHint.toLowerCase().replaceAll("\\*", "").trim();
+            Locator allSections = getPage().locator(SECTION_WRAPPER);
+            int allCount = allSections.count();
+            for (int i = 0; i < allCount; i++) {
+                Locator sec = allSections.nth(i);
+                String secName = sec.locator(SECTION_NAME).textContent().trim();
+                String secNameLower = secName.toLowerCase().replaceAll("\\*", "").trim();
+                if (secNameLower.equals(hintClean)) {
+                    boolean hasOsvOk = sec.locator(OSV_OK_TAG).count() > 0;
+                    if (!hasOsvOk) {
+                        section = sec;
+                        log.info("  Found section '{}' via page-wide search at index {}", secName, i);
+                        break;
+                    }
+                }
+            }
+        }
 
         if (section == null) {
             log.warn("  Could not locate section for '{}'. Skipping.", checklistDocName);
@@ -298,6 +339,16 @@ public class DocumentsPage extends BaseTest {
     }
 
     private void markOsvForExistingDocument(Locator section) {
+        // Wait for any loading overlay to disappear before interacting
+        try {
+            getPage().locator("#applicationLoader .el-loading-mask").waitFor(
+                    new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(15000));
+        } catch (Exception ignore) {}
+        getPage().waitForTimeout(2000);
+
+        // Scroll section into view
+        section.scrollIntoViewIfNeeded();
+
         Locator editBtn = section.locator(EDIT_OSV_BTN).first();
 
         if (editBtn.isVisible()) {
@@ -305,7 +356,7 @@ public class DocumentsPage extends BaseTest {
         } else {
             Locator markOsvBtn = section.locator(MARK_OSV_BTN).first();
             markOsvBtn.scrollIntoViewIfNeeded();
-            markOsvBtn.click();
+            markOsvBtn.click(new Locator.ClickOptions().setTimeout(15000));
         }
 
         getPage().locator(OSV_MODAL).waitFor(
@@ -392,7 +443,7 @@ public class DocumentsPage extends BaseTest {
 
             boolean entityMatches = entityName.isEmpty()
                     || entityText.toLowerCase().contains(entityName.toLowerCase())
-                    || (entityName.equalsIgnoreCase("Others") && entityText.contains("Others"));
+                    || entityName.equalsIgnoreCase("Others");
 
             if (!entityMatches) continue;
 
@@ -403,7 +454,7 @@ public class DocumentsPage extends BaseTest {
                 Locator sec = sections.nth(j);
                 String secName = sec.locator(SECTION_NAME).textContent().trim();
                 String secNameLower = secName.toLowerCase().replaceAll("\\*", "").trim();
-                String hintLower = sectionHint.toLowerCase().trim();
+                String hintLower = sectionHint.toLowerCase().replaceAll("\\*", "").trim();
 
                 // Check if this section was already processed in this run
                 Locator dropZone = sec.locator(".drop-zone");

@@ -2,6 +2,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="BranchBot Test Suite" parallel="methods" thread-count="1">
+    <listeners>
+        <listener class-name="hooks.RetryListener"/>
+    </listeners>
     <test name="UBL End-to-End">
         <classes>
             <class name="testRunner.UblV2RunnerTest"/>

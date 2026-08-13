@@ -36,6 +36,28 @@ public class LoanRequirment extends BaseTest {
     public void fillLoanRequirementsAndSubmit(String scenarioName) {
         log.info("Filling Loan Requirements dynamically...");
 
+        // Fill DROPLINE TERMS if visible (FCL only)
+        Locator droplineInput = page.getByPlaceholder("Enter the tenure (12-48 months)");
+        if (droplineInput.isVisible()) {
+            String tenure = data.TestDataProvider.get("dsa.loan_requirements.tenure");
+            droplineInput.click();
+            droplineInput.fill(tenure);
+            droplineInput.press("Tab");
+            log.info("Filled DROPLINE TERMS: {}", tenure);
+            page.waitForTimeout(500);
+        } else {
+            // Fill TOTAL TENURE for UBL/SEP
+            Locator tenureInput = page.getByPlaceholder("Enter the tenure");
+            if (tenureInput.isVisible()) {
+                String tenure = data.TestDataProvider.get("dsa.loan_requirements.tenure");
+                tenureInput.click();
+                tenureInput.fill(tenure);
+                tenureInput.press("Tab");
+                log.info("Filled TOTAL TENURE: {}", tenure);
+                page.waitForTimeout(500);
+            }
+        }
+
         // Read RACC-displayed ROI and fill it into the input (Vue requires pressSequentially to trigger v-model)
         Locator roiIndicator = page.locator("xpath=//label[contains(text(),'INTEREST RATE')]/following-sibling::div//div[contains(@class,'racc-indicator')]").first();
         String roiValue = roiIndicator.textContent().trim().replaceAll("[^0-9.]", "");
@@ -80,8 +102,16 @@ public class LoanRequirment extends BaseTest {
 
     /** Selects multiple options from the CLM2 Eligible Banks multi-select dropdown. */
     private void selectMultipleBanks(String... banks) {
-        log.info("Selecting CLM2 Eligible Banks...");
+        log.info("Checking for CLM2 Eligible Banks field...");
         Locator dropdownWrapper = page.locator("xpath=//label[contains(text(), 'CLM2 Eligible Banks')]/following-sibling::div//div[contains(@class, 'el-select')]").first();
+
+        // Skip if CLM2 field doesn't exist (e.g. FCL)
+        if (!dropdownWrapper.isVisible()) {
+            log.info("CLM2 Eligible Banks field not found. Skipping.");
+            return;
+        }
+
+        log.info("Selecting CLM2 Eligible Banks...");
         dropdownWrapper.scrollIntoViewIfNeeded();
         dropdownWrapper.click();
         page.waitForTimeout(500);

@@ -2,6 +2,7 @@ package ui.pages.jarvis.AppFormPage;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
@@ -102,6 +103,39 @@ public class ApplicationPage extends BaseTest {
         page.waitForTimeout(2000);
     }
 
+    /**
+     * Simple reassign — only selects user email (no level).
+     * Used in QC Review/Approval where the reassign modal only has "Assigned to" field.
+     */
+    public void reassignToUser(String userEmail) {
+        log.info("Reassigning appForm to user: {}", userEmail);
+
+        selectActionFromDropdown("ReAssign");
+        page.waitForTimeout(1000);
+
+        // Fill the "User email id" input and select from dropdown
+        Locator userInput = page.getByPlaceholder("User email id");
+        userInput.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(10000));
+        userInput.click();
+        userInput.fill(userEmail.substring(0, Math.min(5, userEmail.length())));
+        page.waitForTimeout(1000);
+
+        // Select the user from dropdown
+        Locator userOption = page.locator("li.el-select-dropdown__item")
+                .filter(new Locator.FilterOptions().setHasText(userEmail))
+                .first();
+        userOption.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        userOption.click();
+
+        // Click ReAssign button
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("ReAssign")).click();
+        log.info("Clicked ReAssign button");
+
+        // Wait for success
+        page.waitForTimeout(3000);
+        log.info("Reassigned to {} successfully", userEmail);
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     //  PRIVATE METHODS
     // ═══════════════════════════════════════════════════════════════════════════
@@ -130,11 +164,22 @@ public class ApplicationPage extends BaseTest {
     private void selectActionFromDropdown(String actionName) {
         log.info("Selecting Application Action: [{}]", actionName);
 
+        // Close any toast notification if visible
+        try {
+            Locator closeBtn = page.locator(".el-notification__closeBtn");
+            if (closeBtn.first().isVisible()) {
+                closeBtn.first().click();
+                log.info("Closed toast notification");
+                page.waitForTimeout(500);
+            }
+        } catch (Exception ignore) {}
+
         // Use CSS selector to find either placeholder variant
         Locator actionsDropdown = page.locator(
                 "input[placeholder='Application Actions'], input[placeholder='moveToNextStage']");
         actionsDropdown.first().waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+        actionsDropdown.first().scrollIntoViewIfNeeded();
         actionsDropdown.first().click(new Locator.ClickOptions().setForce(true));
 
         Locator actionOption = page.locator("li.el-select-dropdown__item:visible")

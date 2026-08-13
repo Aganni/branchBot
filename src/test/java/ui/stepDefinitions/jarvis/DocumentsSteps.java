@@ -9,7 +9,12 @@ public class DocumentsSteps {
 
     @And("User uploads mandatory documents and marks OSV in Documents tab")
     public void uploadMandatoryDocumentsAndMarkOsv() {
-        documentsPage.uploadMandatoryDocumentsAndMarkOsv();
+        documentsPage.uploadMandatoryDocumentsAndMarkOsv(true);
+    }
+
+    @And("User uploads mandatory documents and marks OSV in Documents tab without PHOTO")
+    public void uploadMandatoryDocumentsWithoutPhoto() {
+        documentsPage.uploadMandatoryDocumentsAndMarkOsv(false);
     }
 
     @And("User approves the KYC checklist in Documents tab")

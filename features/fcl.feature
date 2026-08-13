@@ -21,18 +21,25 @@ Feature: FCL End-to-End Workflow
     When User switches to Jarvis and opens the application
     Then User moves appForm to Login Desk and updates Business and Bank details
     And User assigns appForm and moves to CAM stage
+    And User updates Loan Requirements in CAM stage
     And User starts CAM process
     And User pulls and downloads the commercial cibil report from Bureau View
     And User uploads mandatory documents and marks OSV in Documents tab
     And User assigns appForm and moves to Credit Review
-    And User updates Loan Requirements and resolves Dedupe and Verification
+    And User resolves Dedupe and Verification
     And User assigns appForm and moves to Credit Approval
     And User updates Ownership, initiates Credit Approval, and moves to Terms
-    And User generates E-Sign documents and completes Insurance details
     And User updates Repayment, adds Aadhaar, and adds Beneficiary Owner
-    And User uploads mandatory documents and marks OSV in Documents tab
+    And User uploads mandatory documents and marks OSV in Documents tab without PHOTO
+    And User generates E-Sign documents and completes Insurance details
     And User moves to Sanction Approval
     And User reassigns and moves to QC Review
-    And User moves to QC Approval stage
+  # ── QC Review (maker user) ──
+    And User logs into Jarvis as "maker" and opens the application
+    And User reassigns appForm to "maker" user
+    And User selects "Move to QC Approval" from Application Actions
+  # ── QC Approval (checker user) ──
+    And User logs into Jarvis as "checker" and opens the application
+    And User reassigns appForm to "checker" user
     And User approves the KYC checklist in Documents tab
     And User approves the application and triggers disbursal

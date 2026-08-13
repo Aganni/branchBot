@@ -3,9 +3,12 @@ package ui.pages.dsa;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import data.TestDataProvider;
 import hooks.BaseTest;
 
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 public class KycDocumentsPage extends BaseTest {
 
@@ -13,78 +16,69 @@ public class KycDocumentsPage extends BaseTest {
 
     private static final String SAMPLE_DOC_PATH = "src/test/resources/testdata/bank_statement.pdf";
 
+    // File input indices (zero-based) for KYC Documents per LPC
+    // Run in browser console to find: document.querySelectorAll('input[type="file"]').forEach((el, i) => console.log(i, el.id))
+    private static final Map<String, List<Integer>> KYC_FILE_INPUT_INDICES = Map.of(
+            "UBL", List.of(10),
+            "FCL", List.of(2, 3, 15),
+            "SEP", List.of()    // To be updated
+    );
+
+    // Document type to select per file input index (default is "Pan")
+    // Key format: "LPC-index" → type name
+    private static final Map<String, String> DOC_TYPE_OVERRIDES = Map.of(
+            "FCL-3", "Aadhaarxml"
+    );
+
     public KycDocumentsPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
     }
 
     public void uploadAllMandatoryDocuments() {
-        log.info("Uploading documents for all mandatory KYC Documents sections");
+        log.info("Uploading mandatory KYC documents by file input index");
 
         java.nio.file.Path absolutePath = Paths.get(SAMPLE_DOC_PATH).toAbsolutePath();
+        String lpc = TestDataProvider.getLpc();
 
-        // Find all <p> tags that contain "KYC Documents" and end with "*"
-        Locator kycLabels = page.locator("p:has-text('KYC Documents')").filter(new Locator.FilterOptions().setHasText("*"));
-        int count = kycLabels.count();
-        log.info("Found {} KYC Documents labels (p tags) on the page", count);
+        List<Integer> indices = KYC_FILE_INPUT_INDICES.getOrDefault(lpc, List.of(10));
+        log.info("Will upload to file input indices {} for LPC: {}", indices, lpc);
 
-        int uploaded = 0;
-        for (int i = 0; i < count; i++) {
-            Locator label = kycLabels.nth(i);
-
-            if (!label.isVisible()) {
-                log.info("Skipping KYC Documents #{} - not visible", i + 1);
-                continue;
-            }
-
-            // Find the UPLOAD link in the parent div (sibling of this p tag)
-            Locator parentDiv = label.locator("xpath=./ancestor::div[1]");
-            Locator uploadLink = parentDiv.locator("a:has-text('UPLOAD')");
-
-            if (uploadLink.count() == 0) {
-                // Try going one level up
-                parentDiv = label.locator("xpath=./ancestor::div[2]");
-                uploadLink = parentDiv.locator("a:has-text('UPLOAD')");
-            }
-
-            if (uploadLink.count() == 0) {
-                log.info("No UPLOAD link found for KYC Documents #{}, skipping", i + 1);
-                continue;
-            }
-
-            log.info("Uploading to KYC Documents section #{}", i + 1);
-
-            page.onFileChooser(fileChooser -> {
-                fileChooser.setFiles(absolutePath);
-            });
-
-            uploadLink.first().scrollIntoViewIfNeeded();
-            uploadLink.first().click();
-            log.info("Clicked UPLOAD for section #{}", i + 1);
-
-            // Wait for upload modal
-            page.waitForTimeout(2000);
-
-            // Select document type as "Pan"
-            Locator docType = page.locator("#docType");
-            if (docType.isVisible()) {
-                docType.click();
-                page.waitForTimeout(500);
-                page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("Pan"))
-                        .or(page.locator("li:has-text('Pan')"))
-                        .first().click();
-                log.info("Selected document type: Pan");
-            }
-
-            // Save
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SAVE")).click();
-            log.info("Saved document for section #{}", i + 1);
-
-            page.waitForTimeout(3000);
-            uploaded++;
+        for (int fileInputIndex : indices) {
+            String docType = DOC_TYPE_OVERRIDES.getOrDefault(lpc + "-" + fileInputIndex, "Pan");
+            uploadToFileInput(fileInputIndex, absolutePath, docType);
         }
 
-        log.info("Uploaded documents for {} KYC Documents sections", uploaded);
+        log.info("All mandatory KYC documents uploaded for LPC: {}", lpc);
+    }
+
+    private void uploadToFileInput(int fileInputIndex, java.nio.file.Path filePath, String docTypeName) {
+        Locator fileInput = page.locator("input[type='file']").nth(fileInputIndex);
+
+        log.info("Setting file on input[type='file'] at index {}", fileInputIndex);
+        fileInput.setInputFiles(filePath);
+
+        // Wait for upload modal
+        page.waitForTimeout(2000);
+
+        // Select document type
+        Locator docType = page.locator("#docType");
+        if (docType.isVisible()) {
+            docType.click();
+            page.waitForTimeout(500);
+            page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(docTypeName))
+                    .or(page.locator("li:has-text('" + docTypeName + "')"))
+                    .first().click();
+            log.info("Selected document type: {}", docTypeName);
+        } else {
+            log.error("docType dropdown not visible after upload at index {}!", fileInputIndex);
+            throw new RuntimeException("Upload modal did not appear for file input at index " + fileInputIndex);
+        }
+
+        // Save
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        page.waitForTimeout(3000);
+        log.info("Saved KYC document for file input index {}", fileInputIndex);
     }
 
     public void submitDocuments() {

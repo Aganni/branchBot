@@ -2,6 +2,7 @@ package ui.pages.jarvis.AppFormPage.AppformTab;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
@@ -36,34 +37,29 @@ public class EsignDocuments extends BaseTest {
                 "and .//span[contains(normalize-space(text()), 'Opt in for offline signatures')]]";
         Locator enabledOfflineLabel = page.locator(enabledCheckboxXpath).first();
 
-        if (!enabledOfflineLabel.isVisible()) {
-            // Click Generate if checkbox is still disabled (documents not yet created)
-            Locator generateBtn = page.locator("xpath=//button[contains(@class, 'el-button') and .//span[normalize-space(text())='Generate']]").first();
-            if (generateBtn.isVisible()) {
-                generateBtn.click(new Locator.ClickOptions().setForce(true));
-                log.info("Clicked 'Generate' — polling for document generation completion...");
-            }
+        // Documents will not be generated already — always click Generate first
+        Locator generateBtn = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Generate"));
+        generateBtn.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(10000));
+        generateBtn.click();
+        log.info("Clicked 'Generate' — polling for document generation completion...");
 
-            // Poll up to 90s (3 × 30s) for the checkbox to become enabled
-            boolean isEnabled = false;
-            for (int i = 1; i <= 3 && !isEnabled; i++) {
-                log.info("Poll attempt {}/3...", i);
-                try {
-                    enabledOfflineLabel.waitFor(new Locator.WaitForOptions()
-                            .setState(WaitForSelectorState.VISIBLE).setTimeout(30_000));
-                    isEnabled = true;
-                    log.info("Document generated — checkbox is now enabled.");
-                } catch (Exception e) {
-                    log.warn("Still generating after {}s...", i * 30);
-                }
+        // Poll up to 90s (3 × 30s) for the checkbox to become enabled
+        boolean isEnabled = false;
+        for (int i = 1; i <= 3 && !isEnabled; i++) {
+            log.info("Poll attempt {}/3...", i);
+            try {
+                enabledOfflineLabel.waitFor(new Locator.WaitForOptions()
+                        .setState(WaitForSelectorState.VISIBLE).setTimeout(30_000));
+                isEnabled = true;
+                log.info("Document generated — checkbox is now enabled.");
+            } catch (Exception e) {
+                log.warn("Still generating after {}s...", i * 30);
             }
+        }
 
-            if (!isEnabled) {
-                ScreenshotUtil.saveScreenshot(page, "DocGenerationTimeout", scenarioName);
-                throw new AssertionError("Document generation timed out after 90s — checkbox remained disabled.");
-            }
-        } else {
-            log.info("Documents already generated — skipping generation step.");
+        if (!isEnabled) {
+            ScreenshotUtil.saveScreenshot(page, "DocGenerationTimeout", scenarioName);
+            throw new AssertionError("Document generation timed out after 90s — checkbox remained disabled.");
         }
 
         log.info("Clicking 'Opt in for offline signatures' checkbox...");
