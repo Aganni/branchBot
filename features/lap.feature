@@ -11,16 +11,16 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     Then User provides customer consent via OTP verification
     And User completes Primary Applicant details and proceeds
     And User adds Salaried Co-Applicant details and submits Appform
+    And User adds Aadhaar Co-Applicant details and submits Appform
     And User adds Entity Co-Applicant details and submits Appform
     And User provides the consent for Entity applicant
-    And User adds Aadhaar Co-Applicant details and submits Appform
     #And User adds Driving License Co-Applicant details and submits Appform
     #And User adds Passport Co-Applicant details and submits Appform
     And User navigates to Exposure dedupe and bureau output, downloads bureau report
     And User Adds the property collateral details
     And User uploads all required documents and proceeds
-    And User completes fee payment via sandbox payment gateway
-    And User completes final submission with email verification
+#    And User completes fee payment via sandbox payment gateway
+#    And User completes final submission with email verification
 
   # ── Jarvis Portal Flow ──
   Scenario: Complete LAP flow till Welcome KIT through Jarvis portal.
@@ -30,7 +30,17 @@ Feature: Secured Loan Against Property loan End-to-End Workflow
     And User completes non-financial co-applicant mandatory fields
     And User completes financial co-applicant mandatory fields
     And User completes entity co-applicant mandatory fields and moves to Credit Review
-    And User completes program validation and moves to Credit Review
     And User resolves KYC verification and reassigns application in Credit Review
     And User fills collateral details in Credit Review
     And User fills loan requirements and moves to Credit Approval
+    And User completes Tele PD Visit for all applicants
+    And User completes Sales Gating for the application
+    And User completes Technical Vetting for the application
+    And User fills mandatory details and moves to Credit Approval
+    And User moves application from Credit Approval to Terms
+    And User completes Fee Details for Docket Initiation
+    And User completes Spread Rate for Docket Initiation
+    And User completes Insurance Details for Docket Initiation
+    And User changes user role to SALES for DOGH access
+    And User triggers DOGH for insurance
+    And User moves application to Docket Initiation

@@ -52,7 +52,7 @@ public class DocumentsPage extends BaseTest {
 
     // ── Test files for upload ────────────────────────────────────────────────
     private static final String DEFAULT_PDF_PATH = "src/test/resources/testdata/bank_statement.pdf";
-    private static final String PHOTO_FILE_PATH = "src/test/resources/testdata/photo.png";
+    private static final String PHOTO_FILE_PATH = "src/test/resources/testdata/image1.png";
 
     // Track which sections have been processed (for duplicate POA handling)
     private final Set<String> processedSectionIds = new HashSet<>();

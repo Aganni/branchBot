@@ -69,4 +69,16 @@ public class ApiClientUtils extends BaseTest {
                 .body(requestBody)
                 .post(endpoint);
     }
+
+    /**
+     * Executes a GET request with Basic Auth.
+     */
+    public static Response doGetWithBasicAuth(String baseUri, String endpoint, String basicAuthToken) throws Exception {
+        RestAssured.baseURI = initializeEnvironment(baseUri);
+        return RestAssured.given()
+                .relaxedHTTPSValidation()
+                .header("Authorization", "Basic " + basicAuthToken)
+                .header("Content-Type", "application/json")
+                .get(endpoint);
+    }
 }

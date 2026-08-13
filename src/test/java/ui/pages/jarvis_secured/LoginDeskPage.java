@@ -17,12 +17,28 @@ public class LoginDeskPage extends BaseTest {
 
     public void login() {
         log.info("Starting Jarvis Secured Login process...");
-        page.getByLabel("Email or phone").fill(getUserEmail());
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        page.getByLabel("Enter your password").click();
-        page.getByLabel("Enter your password").fill(getUserPassword());
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        page.waitForTimeout(10000);
+
+        // Wait for either: Google SSO login page OR Jarvis dashboard to load
+        // Use a race between the email field and the Jarvis application link
+        try {
+            // Wait up to 15 seconds for the email field to appear
+            page.getByLabel("Email or phone").waitFor(
+                    new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
+
+            // Email field found — manual login required
+            page.getByLabel("Email or phone").fill(getUserEmail());
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+            page.getByLabel("Enter your password").click();
+            page.getByLabel("Enter your password").fill(getUserPassword());
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+            page.waitForTimeout(1000);
+        } catch (com.microsoft.playwright.TimeoutError e) {
+            // Email field not found within 15s — Google auto-authenticated
+            log.info("Google SSO auto-authenticated, waiting for Jarvis to load...");
+            page.waitForLoadState(LoadState.NETWORKIDLE);
+            page.waitForTimeout(3000);
+        }
+
         log.info("Jarvis Secured Login submitted.");
     }
 
@@ -60,6 +76,64 @@ public class LoginDeskPage extends BaseTest {
         page.waitForTimeout(2000);
         log.info("Search by Individual Applicant completed.");
     }
+
+    public void copyAppIdFromFirstRow() {
+        log.info("Hovering over App ID in first row to copy...");
+        // Hover over the App ID cell in the first table row to reveal the copy button
+        Locator appIdCell = page.locator("table tbody tr:first-child td:nth-child(3)").first();
+        appIdCell.hover();
+        page.waitForTimeout(1000);
+        // Click the copy button that appears on hover
+        Locator copyButton = appIdCell.locator("button, img, svg, [class*='copy']").first();
+        copyButton.click();
+        page.waitForTimeout(500);
+        log.info("App ID copied from first row.");
+    }
+
+    public void searchByAppId(String appId) {
+        log.info("Searching by App ID: {}", appId);
+        page.getByPlaceholder("Enter App ID").click();
+        page.getByPlaceholder("Enter App ID").fill(appId);
+        page.getByPlaceholder("Enter App ID").press("Enter");
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
+        log.info("App ID search completed.");
+    }
+
+    /**
+     * Copies App ID from the first row by hovering, then pastes it into the App ID filter.
+     * Returns the captured App ID string.
+     */
+    public String copyAndSearchByAppId() {
+        log.info("Copying App ID from first row and searching...");
+        // Hover over the App ID cell in the first table row
+        Locator appIdCell = page.locator("table tbody tr:first-child td:nth-child(3)").first();
+        appIdCell.hover();
+        page.waitForTimeout(1000);
+
+        // Click the copy button that appears on hover
+        Locator copyButton = appIdCell.locator("button, img, svg, [class*='copy']").first();
+        copyButton.click();
+        page.waitForTimeout(500);
+
+        // Get the clipboard content by pasting into the filter field
+        Locator appIdInput = page.getByPlaceholder("Enter App ID");
+        appIdInput.click();
+        page.keyboard().press("ControlOrMeta+v");
+        page.waitForTimeout(500);
+
+        // Capture the pasted value
+        String appId = (String) appIdInput.inputValue();
+        log.info("Copied App ID: {}", appId);
+
+        // Press Enter to search
+        appIdInput.press("Enter");
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(3000);
+        log.info("App ID search completed.");
+        return appId;
+    }
+
     public void openApplicationByName(String applicantName) {
         log.info("Opening application: {}", applicantName);
         page.getByText(applicantName).click();

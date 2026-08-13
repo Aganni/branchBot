@@ -22,4 +22,12 @@ public interface Constants {
     String LANNISTER_BASE_URI = "lannisterUri";
     String REPAYMENT_DETAILS_ENDPOINT = "/api/v1/repaymentdetail/appForm/%s";
 
+    // Shield API keys
+    String SHIELD_BASE_URI = "shieldUri";
+    String SHIELD_APPFORM_ENDPOINT = "/api/v1/appForm/%s";
+
+    // Deathlok API keys (Sales Gating)
+    String DEATHLOK_BASE_URI = "deathlokUri";
+    String SALES_GATING_ADD_DATA_ENDPOINT = "/api/v1/addData";
+
 }

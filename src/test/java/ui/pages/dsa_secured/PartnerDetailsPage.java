@@ -13,6 +13,7 @@ public class PartnerDetailsPage extends BaseTest {
 
     // ── Locators ─────────────────────────────────────────────────────────────
     private static final String PARTNER_NAME = "#partnerName";
+    private static final String PROGRAM_SELECT_ID = "#program";
     private static final String SCHEME_SELECT_ID = "#scheme";
     private static final String SUB_PRODUCT_BTN = "#subProduct";
     private static final String BRANCH_INPUT_ID = "#branch";
@@ -53,22 +54,31 @@ public class PartnerDetailsPage extends BaseTest {
         page.click("#partnerName-option-" + index);
         log.info("Selecting partner name via option index: {}", index);
 
-        // 2. Scheme Dropdown Allocation + Dropdown Dismissal
+        // 2. Program Dropdown (mandatory field)
+        String program = details.get("program");
+        if (program != null && !program.isEmpty()) {
+            page.click(PROGRAM_SELECT_ID);
+            page.click("role=option[name='" + program + "']");
+            page.keyboard().press("Escape");
+            log.info("Selected program: {}", program);
+        }
+
+        // 3. Scheme Dropdown Allocation + Dropdown Dismissal
         page.click(SCHEME_SELECT_ID);
         page.click("role=option[name='" + details.get("Scheme") + "']");
         page.keyboard().press("Escape"); // Dismisses the Material UI overlay immediately
 
-        // 3. Sub Product Field (Now clicks the active dropdown directly)
+        // 4. Sub Product Field (Now clicks the active dropdown directly)
         page.click(SUB_PRODUCT_BTN);
         page.click("role=option[name='" + details.get("subProduct") + "']");
         page.keyboard().press("Escape");
 
-        // 4. Branch Selection
+        // 5. Branch Selection
         page.click(BRANCH_INPUT_ID);
         page.click("role=option[name*='" + details.get("branch") + "']");
         page.keyboard().press("Escape");
 
-        // 5. Sales Manager Combo Routing
+        // 6. Sales Manager Combo Routing
         page.click(SALES_MANAGER_INPUT_ID);
         page.fill(SALES_MANAGER_INPUT_ID, "");
         page.click("role=option[name*='" + details.get("sales Manager") + "']");

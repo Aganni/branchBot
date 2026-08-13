@@ -14,22 +14,18 @@ public class CollateralDetailsPage extends BaseTest {
 
     // FILL COLLATERAL DETAILS
     public void fillCollateralDetails() {
-        log.info("Filling Collateral Details (CERSAI)...");
         // Scroll to the Collateral Details section
         Locator collateralSection = page.locator("[id='Collateral Details'], #Collateral\\ Details").first();
         collateralSection.scrollIntoViewIfNeeded();
         page.waitForTimeout(2000);
-
         // Click the section button to expand it
         collateralSection.locator("button.appform-card").first().click();
         page.waitForTimeout(3000);
-
         // Mortgage Type - click the 3rd Select placeholder dropdown
         page.locator("xpath=(//input[@placeholder='Select'])[3]").click();
         page.waitForTimeout(500);
         page.getByText("Equitable Mortgage").click();
         page.waitForTimeout(500);
-
         // Seller Name
         Locator sellerNameField = page.locator("xpath=//div[@class='el-col el-col-24']//input[@type='text']");
         sellerNameField.scrollIntoViewIfNeeded();
@@ -39,47 +35,38 @@ public class CollateralDetailsPage extends BaseTest {
         sellerNameField.fill("");
         page.keyboard().type("Sadie Luke");
         page.waitForTimeout(500);
-
-        // Construction Start Year
-        page.getByPlaceholder("Enter the Construction Start").click();
-        page.getByPlaceholder("Enter the Construction Start").fill("2002");
+        // Construction Completion Year
+        page.getByPlaceholder("Enter the Construction Completion Year").click();
+        page.getByPlaceholder("Enter the Construction Completion Year").fill("2002");
         page.waitForTimeout(500);
-
         // Built-up area
         page.locator("div:nth-child(14) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
         page.locator("div:nth-child(14) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("1200");
         page.waitForTimeout(500);
-
         // Cost of construction per sqFt/Mtr
         page.getByPlaceholder("Cost of const per sqFt/Mtr").click();
         page.getByPlaceholder("Cost of const per sqFt/Mtr").fill("1200");
         page.waitForTimeout(500);
-
         // Primary agency
         page.locator("div:nth-child(16) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().click();
         page.locator("div:nth-child(16) > div > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").first().fill("primary agecny 1");
         page.waitForTimeout(500);
-
         // Primary valuation amount
         page.locator("div:nth-child(16) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
         page.locator("div:nth-child(16) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("102000000");
         page.waitForTimeout(500);
-
         // Secondary valuation amount
         page.locator("div:nth-child(18) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").click();
         page.locator("div:nth-child(18) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-input > .el-input__inner").fill("102000000");
         page.waitForTimeout(500);
-
         // Nature of property
         page.locator("div:nth-child(20) > div > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").first().click();
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Land & Buildings")).click();
         page.waitForTimeout(500);
-
         // Charge type
         page.locator("div:nth-child(20) > div:nth-child(2) > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").click();
         page.getByText("Primary - First Charge").click();
         page.waitForTimeout(500);
-
         // CERSAI match status
         page.locator("div:nth-child(21) > div > .el-form-item > .el-form-item__content > .el-select > .el-input > .el-input__inner").first().click();
         page.getByText("Match Found", new Page.GetByTextOptions().setExact(true)).click();

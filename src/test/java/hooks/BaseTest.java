@@ -57,11 +57,14 @@ public class BaseTest {
             playwrightThreadLocal.set(playwright);
 
             Browser browser = playwright.chromium()
-                    .launch(new BrowserType.LaunchOptions().setHeadless(false));
+                    .launch(new BrowserType.LaunchOptions()
+                            .setHeadless(false)
+                            .setArgs(java.util.List.of("--start-maximized")));
             browserThreadLocal.set(browser);
 
             BrowserContext context = browser.newContext(
                     new Browser.NewContextOptions()
+                            .setViewportSize(null)
                             .setRecordVideoDir(Paths.get("target/videos/"))
                             .setRecordVideoSize(1280, 720)
             );
@@ -152,6 +155,7 @@ public class BaseTest {
             BrowserContext newContext = browser.newContext(
                     new Browser.NewContextOptions()
                             .setStorageStatePath(Paths.get(stateFilePath))
+                            .setViewportSize(null)
                             .setRecordVideoDir(Paths.get("target/videos/"))
                             .setRecordVideoSize(1280, 720)
             );

@@ -99,4 +99,36 @@ public class ApiPayload {
                 "    \"totalNumberOfCheque\": 0\n" +
                 "}";
     }
+
+    /**
+     * Builds the Sales Gating (Deathlok addData) payload for a single applicant.
+     *
+     * @param appFormId     the appForm UUID
+     * @param applicantId   the linkedIndividual ID from Shield
+     * @param entityName    name of the applicant
+     * @param applicantType e.g. "LinkedIndividual"
+     */
+    public static String getSalesGatingPayload(String appFormId, String applicantId, String entityName, String applicantType) {
+        return "{\n" +
+                "    \"userType\": \"SALES\",\n" +
+                "    \"appFormId\": \"" + appFormId + "\",\n" +
+                "    \"applicantId\": \"" + applicantId + "\",\n" +
+                "    \"entityName\": \"" + entityName + "\",\n" +
+                "    \"employmentType\": \"SALARIED\",\n" +
+                "    \"applicantType\": \"" + applicantType + "\",\n" +
+                "    \"status\": \"COMPLETED\",\n" +
+                "    \"doneBy\": \"Automation\",\n" +
+                "    \"documents\": [],\n" +
+                "    \"visitType\": \"Residential\",\n" +
+                "    \"address\": {\n" +
+                "        \"CURRES\": \"2/21 RAM WADI JOGESHWARI EAST, AGARWAL NGR CAVES RD, 400060, MMB, MH\",\n" +
+                "        \"PER\": \"2/21 RAM WADI JOGESHWARI EAST, AGARWAL NGR CAVES RD, 400060, MMB, MH\"\n" +
+                "    },\n" +
+                "    \"basicDetail\": {\n" +
+                "        \"name\": \"Automation\"\n" +
+                "    },\n" +
+                "    \"recommendation\": \"Positive\",\n" +
+                "    \"remarks\": \"Sales gating completed via automation\"\n" +
+                "}";
+    }
 }

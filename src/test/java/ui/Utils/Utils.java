@@ -24,6 +24,7 @@ public class Utils extends BaseTest {
         String currentUrl = BaseTest.getPage().url();
         BaseTest.log.info("Current browser URL fetched by Playwright: {}", currentUrl);
 
+        // Extract Partner Loan ID
         String partnerLoanId = null;
         Pattern pattern = Pattern.compile("partnerLoanId=([^&]+)");
         Matcher matcher = pattern.matcher(currentUrl);
@@ -36,6 +37,29 @@ public class Utils extends BaseTest {
         }
 
         get().setPartnerLoanId(partnerLoanId);
+        DynamicDataClass.setValue("partnerLoanId", partnerLoanId);
+
+        // Extract AppForm ID if present in URL
+        Pattern appFormPattern = Pattern.compile("appFormId=([^&]+)");
+        Matcher appFormMatcher = appFormPattern.matcher(currentUrl);
+        if (appFormMatcher.find()) {
+            String appFormId = appFormMatcher.group(1);
+            get().setAppFormId(appFormId);
+            DynamicDataClass.setValue("appFormId", appFormId);
+            BaseTest.log.info("Successfully extracted appFormId: {}", appFormId);
+        } else {
+            // Try extracting from URL path (e.g., /application/{appFormId})
+            Pattern pathPattern = Pattern.compile("/application/([a-f0-9\\-]+)");
+            Matcher pathMatcher = pathPattern.matcher(currentUrl);
+            if (pathMatcher.find()) {
+                String appFormId = pathMatcher.group(1);
+                get().setAppFormId(appFormId);
+                DynamicDataClass.setValue("appFormId", appFormId);
+                BaseTest.log.info("Successfully extracted appFormId from path: {}", appFormId);
+            } else {
+                BaseTest.log.warn("Could not find appFormId in URL: {}", currentUrl);
+            }
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
 public class CreditReviewPage extends BaseTest {
     private final Page page;
@@ -53,11 +54,32 @@ public class CreditReviewPage extends BaseTest {
     // Reassigns the application to Tenjin user via Application Actions dropdown.Must be called AFTER navigateBackToAppForm() so the dropdown is in the DOM.
     public void reassignToTenjin(String assigneeEmail) {
         log.info("Reassigning application to Tenjin user [{}]...", assigneeEmail);
-        // Application Actions should now be available on App Form tab
-        page.getByPlaceholder("Application Actions").click();
+        // Reload to ensure we're on the correct page with Application Actions available
+        page.reload();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(5000);
+
+        // Scroll to and click Application Actions dropdown
+        Locator appActions = page.getByPlaceholder("Application Actions");
+        if (!appActions.isVisible()) {
+            // Try navigating back to App Form tab
+            page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("App Form")).click();
+            page.waitForLoadState(LoadState.NETWORKIDLE);
+            page.waitForTimeout(3000);
+            appActions = page.getByPlaceholder("Application Actions");
+        }
+        appActions.scrollIntoViewIfNeeded();
+        page.waitForTimeout(500);
+        appActions.click();
+        page.waitForTimeout(2000);
+
+        // Wait for Re-Assign to become visible in the dropdown
+        Locator reassignOption = page.getByText("Re-Assign");
+        reassignOption.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(10000));
+        reassignOption.click();
         page.waitForTimeout(1000);
-        page.getByText("Re-Assign").click();
-        page.waitForTimeout(1000);
+
         // Select Level
         page.getByPlaceholder("All Level").click();
         page.locator("li").filter(new Locator.FilterOptions().setHasText("L4")).click();
