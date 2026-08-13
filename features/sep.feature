@@ -29,9 +29,9 @@ Feature: SEP End-to-End Workflow
     And User updates Loan Requirements and resolves Dedupe and Verification
     And User assigns appForm and moves to Credit Approval
     And User updates Ownership, initiates Credit Approval, and moves to Terms
-    And User generates E-Sign documents and completes Insurance details
     And User updates Repayment, adds Aadhaar, and adds Beneficiary Owner
-    And User uploads mandatory documents and marks OSV in Documents tab
+    And User uploads mandatory documents and marks OSV in Documents tab without PHOTO
+    And User generates E-Sign documents and completes Insurance details
     And User moves to Sanction Approval
     And User reassigns and moves to QC Review
     And User moves to QC Approval stage

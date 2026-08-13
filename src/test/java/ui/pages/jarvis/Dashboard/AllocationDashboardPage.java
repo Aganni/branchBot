@@ -47,6 +47,8 @@ public class AllocationDashboardPage extends BaseTest {
         searchInput.fill(appFormId);
         page.keyboard().press("Enter");
 
+        page.waitForTimeout(5000);
+
         try {
             page.locator(".el-loading-mask").first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(5000));
         } catch (Exception ignore) {}

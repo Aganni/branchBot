@@ -10,3 +10,9 @@ out/
 .idea/
 *.iml
 .vscode/
+
+# Bureau reports (downloaded during test runs)
+src/test/resources/testdata/bureau-reports/
+
+# Screenshots from test failures
+screenshots/

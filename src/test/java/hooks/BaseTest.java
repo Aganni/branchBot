@@ -53,7 +53,8 @@ public class BaseTest {
                     .launch(new BrowserType.LaunchOptions().setHeadless(false));
             browserThreadLocal.set(browser);
 
-            BrowserContext context = browser.newContext();
+            BrowserContext context = browser.newContext(
+                    new Browser.NewContextOptions().setViewportSize(null));
             contextThreadLocal.set(context);
 
             Page page = context.newPage();
