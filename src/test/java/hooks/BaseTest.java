@@ -257,7 +257,7 @@ public class BaseTest {
                 if (otpVal != null) setOtp(otpVal);
                 
                 log.info("Loaded credentials for {}: User={}, Email={}, OTP={}", 
-                    portal, getUserEmail(), (getOtp() != null ? "****" : "null"), (getsetUserPassWord() != null ? "****" : "null"));
+                    portal, getUserEmail(), (getOtp() != null ? "****" : "null"), (getUserPassword() != null ? "****" : "null"));
             }
         } catch (Exception e) {
             log.error("Exception in getCredentials: " + e.getMessage(), e);
@@ -268,7 +268,7 @@ public class BaseTest {
     public static    String getUserEmail() { return userName.get(); }
 
     public static synchronized void setUserPassWord(String apiKey) { xApiKey.set(apiKey); }
-    public static String getsetUserPassWord() { return xApiKey.get(); }
+    public static String getUserPassword() { return xApiKey.get(); }
 
     public static synchronized void setOtp(String otpValue) { otp.set(otpValue); }
     public static String getOtp() { return otp.get(); }
