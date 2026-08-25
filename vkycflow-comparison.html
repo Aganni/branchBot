@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VKYC · Architecture Atlas</title>
+<style>
+:root{--bg:#ffffff;--panel:#e0f2fe;--neon:#059669;--text:#1e293b;--muted:#64748b;--line:#e2e8f0;--fail:#dc2626;--pause:#d97706;--sqs:#7c3aed;--blue:#0284c7}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100vh;width:100vw}
+.main-layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:200px;flex-shrink:0;background:#f1f5f9;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px 8px;gap:4px}
+.sidebar-btn{text-align:left;background:transparent;border:1px solid transparent;color:var(--muted);border-radius:8px;padding:10px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.sidebar-btn:hover{color:var(--blue);background:#e0f2fe}
+.sidebar-btn.active{color:var(--blue);background:#dbeafe;border-color:var(--blue)}
+.sidebar-btn .num{width:20px;height:20px;border-radius:50%;background:var(--line);color:var(--muted);font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-btn.active .num{background:var(--blue);color:#fff}
+.tab-panel{display:none;flex:1;flex-direction:column;overflow:hidden}
+.tab-panel.active{display:flex}
+.vhead{padding:14px 28px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.vhead h2{font-size:16px;font-weight:700;letter-spacing:.5px;color:var(--text)}
+.vhead h2 b{color:var(--blue)}
+.vhead p{font-size:10px;color:var(--muted);margin-top:2px}
+.nav-bar{display:flex;gap:6px}
+.nav-btn{background:#ffffff;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 16px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.nav-btn:hover{border-color:var(--blue);color:var(--blue)}
+.nav-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nav-btn.new-impl-btn{border-color:var(--sqs);color:var(--sqs)}
+.nav-btn.new-impl-btn:hover,.nav-btn.new-impl-btn.active{background:var(--sqs);color:#fff}
+.nav-btn.compare-btn{border-color:var(--neon);color:var(--neon)}
+.nav-btn.compare-btn:hover,.nav-btn.compare-btn.active{background:var(--neon);color:#fff}
+.stage{flex:1;display:flex;gap:40px;overflow-x:auto;scroll-behavior:smooth;padding:20px;position:relative}
+.stage.compare-mode{gap:16px}
+.stage.compare-mode .panel{min-width:48%!important;flex:1}
+.stage.compare-mode svg{height:100%}
+.panel{min-width:1400px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;flex-shrink:0;display:flex;flex-direction:column}
+.panel-header{padding:10px 20px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-align:center;border-radius:8px 8px 0 0}
+.panel-header.current{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.panel-header.new-impl{background:#ede9fe;color:#5b21b6;border:1px solid #a78bfa}
+.panel svg{flex:1;width:100%;display:block}
+svg{width:100%;height:100%;display:block}
+.box{fill:var(--panel);stroke:var(--blue);stroke-width:2;transition:stroke .2s,filter .2s;cursor:pointer}
+.box:hover,.hot .box{stroke:var(--neon);filter:drop-shadow(0 0 6px rgba(5,150,105,.4))}
+.box.decision{fill:#fef3c7;stroke:#d97706}
+.box.converge{fill:#d1fae5;stroke:#059669;stroke-width:2}
+.box.shortcircuit{fill:#fee2e2;stroke:#dc2626}
+.box.lambda{fill:#ede9fe;stroke:#7c3aed}
+.box.dynamo{fill:#fef9c3;stroke:#ca8a04}
+.box.new-impl{fill:#ede9fe;stroke:#7c3aed;stroke-width:2.5;filter:drop-shadow(0 0 6px rgba(124,58,237,.4))}
+.box.modified{fill:#fff7ed;stroke:#ea580c;stroke-width:2}
+.box.ghost{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.5;stroke-dasharray:6 4}
+.lbl{fill:var(--text);font-size:11px;font-weight:600;text-anchor:middle;pointer-events:none}
+.sub{fill:var(--muted);font-size:8.5px;text-anchor:middle;pointer-events:none}
+.edge{fill:none;stroke-width:1.6}
+.edge.succ{stroke:var(--neon)}
+.edge.fail{stroke:var(--fail)}
+.edge.pause{stroke:var(--pause)}
+.edge.sqs-flow{stroke:var(--sqs)}
+.edge.dashed{stroke-dasharray:6 4}
+.edgelbl{font-size:8px;text-anchor:middle;pointer-events:none;letter-spacing:.2px}
+.edgelbl.succ{fill:#047857}
+.edgelbl.fail{fill:#dc2626}
+.edgelbl.pause{fill:#b45309}
+.edgelbl.sqs-flow{fill:#6d28d9}
+.edgelbl-bg{fill:rgba(255,255,255,.88);stroke:none}
+.g-enter{animation:nodeIn .4s ease both}
+@keyframes nodeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.node-group{cursor:pointer}
+.hot rect,.hot polygon{stroke:var(--neon)!important;filter:drop-shadow(0 0 8px rgba(5,150,105,.5))}
+.legend{padding:10px 28px;background:#f8fafc;border-top:1px solid var(--line);font-size:10px;color:var(--muted);line-height:2;flex-shrink:0}
+.legend b{color:var(--text);display:inline;margin-right:12px;font-size:9px;letter-spacing:1.5px}
+.swatch{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.inspector{position:fixed;top:0;right:0;height:100%;width:400px;background:#ffffff;border-left:2px solid var(--blue);box-shadow:-10px 0 30px rgba(0,0,0,.08);transform:translateX(102%);transition:transform .3s ease;z-index:50;display:flex;flex-direction:column;padding:22px 20px;overflow-y:auto}
+.inspector.open{transform:translateX(0)}
+.inspector .close{position:absolute;top:12px;right:14px;background:transparent;border:1px solid var(--line);color:var(--muted);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.inspector .close:hover{border-color:var(--blue);color:var(--blue)}
+.inspector .kicker{font-size:9px;letter-spacing:2.5px;color:var(--blue);margin-bottom:4px}
+.inspector h3{font-size:18px;font-weight:700;margin-bottom:3px;color:var(--text)}
+.inspector .tag{display:inline-block;font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:16px;padding:2px 8px;margin:0 4px 12px 0}
+.inspector .row{margin:0 0 12px}
+.inspector .row .h{font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;text-transform:uppercase}
+.inspector .row p{font-size:11.5px;color:#334155;line-height:1.6}
+.inspector ul{list-style:none;font-size:11px;color:#334155;line-height:1.5;padding-left:12px}
+.inspector li{padding:3px 0;border-left:1px solid var(--line);padding-left:10px;margin-bottom:2px}
+.inspector code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px;display:block;font-family:"SF Mono",Consolas,monospace;font-size:10px;color:#0f172a;white-space:pre-wrap;line-height:1.5;margin:4px 0}
+.inspector .pill{display:inline-block;font-size:9px;font-family:monospace;background:#f8fafc;border:1px solid var(--line);border-radius:4px;padding:2px 6px;margin:0 3px 3px 0}
+.inspector .pill.g{border-color:var(--neon);color:var(--neon)}
+.inspector .pill.r{border-color:var(--fail);color:var(--fail)}
+.inspector .pill.y{border-color:var(--pause);color:#b45309}
+.inspector .pill.p{border-color:var(--sqs);color:var(--sqs)}
+.tip{position:fixed;z-index:60;pointer-events:none;background:#ffffff;border:1px solid var(--blue);color:var(--text);font-size:10px;padding:5px 9px;border-radius:6px;max-width:240px;box-shadow:0 4px 12px rgba(0,0,0,.1);opacity:0;transition:opacity .1s;line-height:1.4}
+.tip.show{opacity:1}
+.fab{position:fixed;bottom:28px;right:28px;background:var(--sqs);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(124,58,237,.35);z-index:40;transition:transform .2s,box-shadow .2s}
+.fab:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,58,237,.5)}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="vhead">
+<div>
+<h2>VKYC · <b>Architecture </b></h2>
+<p>All flows · Current vs New comparison · Click any node for details</p>
+</div>
+<div class="nav-bar" id="compare-bar">
+<button class="nav-btn active" id="btn-current">⬅ Current Flow</button>
+<button class="nav-btn new-impl-btn" id="btn-new">✨ New Implementation</button>
+<button class="nav-btn compare-btn" id="btn-compare">↔ Compare Side-by-Side</button>
+</div>
+</div>
+<div class="main-layout">
+<nav class="sidebar">
+<button class="sidebar-btn active" data-panel="panel-tab1"><span class="num">1</span>Post-Disbursal Campaign</button>
+<button class="sidebar-btn" data-panel="panel-tab2"><span class="num">2</span>EF VKYC AppForm Journey</button>
+<button class="sidebar-btn" data-panel="panel-tab3"><span class="num">3</span>ReKYC Workflow</button>
+<button class="sidebar-btn" data-panel="panel-tab4"><span class="num">4</span>Pre-AppForm VKYC (PP)</button>
+<button class="sidebar-btn" data-panel="panel-tab5"><span class="num">5</span>PP In-Journey VKYC</button>
+</nav>
+<!-- Tab 1: Post-Disbursal Campaign (Dual Panel) -->
+<div class="tab-panel active" id="panel-tab1">
+<div class="stage" id="stage">
+<div class="panel" id="panel-current">
+<div class="panel-header current">CURRENT ARCHITECTURE</div>
+<svg id="svg-current" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
+</div>
+<div class="panel" id="panel-new">
+<div class="panel-header new-impl">PROPOSED NEW IMPLEMENTATION</div>
+<svg id="svg-new" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
+</div>
+</div>
+<div class="legend">
+<b>ARROWS:</b>
+<span class="swatch" style="background:var(--neon)"></span>Success &nbsp;
+<span class="swatch" style="background:var(--fail)"></span>Failure &nbsp;
+<span class="swatch" style="background:var(--sqs)"></span>SQS / Async &nbsp;
+<span class="swatch" style="background:var(--pause)"></span>Polling / Off-Hours &nbsp;&nbsp;
+<b>NODES:</b>
+<span class="swatch" style="background:#7c3aed"></span>[NEW] &nbsp;
+<span class="swatch" style="background:#ea580c"></span>[MODIFIED] &nbsp;
+<span class="swatch" style="background:#94a3b8"></span>Needs Impl
+</div>
+</div><!-- close panel-tab1 -->
+<!-- Tab 2: EF VKYC AppForm Journey (Dual Panel) -->
+<div class="tab-panel" id="panel-tab2">
+<div style="padding:8px 20px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;gap:6px">
+<button class="nav-btn active" onclick="document.getElementById('stage-ef').scrollTo({left:0,behavior:'smooth'})">⬅ Current Flow</button>
+<button class="nav-btn new-impl-btn" onclick="document.getElementById('stage-ef').scrollTo({left:document.getElementById('stage-ef').scrollWidth/2,behavior:'smooth'})">✨ New Implementation</button>
+<button class="nav-btn compare-btn" onclick="document.getElementById('stage-ef').classList.toggle('compare-mode')">↔ Compare</button>
+</div>
+<div class="stage" id="stage-ef" style="display:flex;gap:40px;overflow-x:auto;scroll-behavior:smooth;padding:20px;flex:1">
+<div class="panel" style="min-width:1400px">
+<div class="panel-header current">EF APPFORM JOURNEY — CURRENT ARCHITECTURE</div>
+<svg id="svg-ef" viewBox="0 0 1550 900" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+<div class="panel" style="min-width:1400px">
+<div class="panel-header new-impl">EF APPFORM JOURNEY — NEW IMPLEMENTATION</div>
+<svg id="svg-ef-new" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+</div>
+</div>
+<!-- Tab 3: ReKYC Workflow -->
+<div class="tab-panel" id="panel-tab3">
+<div class="stage" style="padding:20px;overflow:auto;flex:1">
+<svg id="svg-rekyc" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%"></svg>
+</div>
+</div>
+<!-- Tab 4: Pre-AppForm VKYC (Dual Panel) -->
+<div class="tab-panel" id="panel-tab4">
+<div style="padding:8px 20px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;gap:6px">
+<button class="nav-btn active" onclick="document.getElementById('stage-preapp').scrollTo({left:0,behavior:'smooth'})">⬅ Current Flow</button>
+<button class="nav-btn new-impl-btn" onclick="document.getElementById('stage-preapp').scrollTo({left:document.getElementById('stage-preapp').scrollWidth/2,behavior:'smooth'})">✨ New Implementation</button>
+<button class="nav-btn compare-btn" onclick="document.getElementById('stage-preapp').classList.toggle('compare-mode')">↔ Compare</button>
+</div>
+<div class="stage" id="stage-preapp" style="display:flex;gap:40px;overflow-x:auto;scroll-behavior:smooth;padding:20px;flex:1">
+<div class="panel" style="min-width:1400px">
+<div class="panel-header current">PRE-APPFORM VKYC (PP) — CURRENT ARCHITECTURE</div>
+<svg id="svg-preapp" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+<div class="panel" style="min-width:1400px">
+<div class="panel-header new-impl">PRE-APPFORM VKYC (PP) — NEW IMPLEMENTATION</div>
+<svg id="svg-preapp-new" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+</div>
+</div>
+<!-- Tab 5: PP In-Journey VKYC -->
+<div class="tab-panel" id="panel-tab5">
+<div style="padding:8px 20px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;gap:6px">
+<button class="nav-btn active" onclick="document.getElementById('stage-ppjourney').scrollTo({left:0,behavior:'smooth'})">⬅ Current Flow</button>
+<button class="nav-btn new-impl-btn" onclick="document.getElementById('stage-ppjourney').scrollTo({left:document.getElementById('stage-ppjourney').scrollWidth/2,behavior:'smooth'})">✨ New Implementation</button>
+<button class="nav-btn compare-btn" onclick="document.getElementById('stage-ppjourney').classList.toggle('compare-mode')">↔ Compare</button>
+</div>
+<div class="stage" id="stage-ppjourney" style="display:flex;gap:40px;overflow-x:auto;scroll-behavior:smooth;padding:20px;flex:1">
+<div class="panel" style="min-width:1400px">
+<div class="panel-header current">PP IN-JOURNEY VKYC — CURRENT ARCHITECTURE</div>
+<svg id="svg-ppj-current" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+<div class="panel" style="min-width:1400px">
+<div class="panel-header new-impl">PP IN-JOURNEY VKYC — NEW IMPLEMENTATION</div>
+<svg id="svg-ppj-new" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet" style="flex:1;width:100%"></svg>
+</div>
+</div>
+</div>
+</div><!-- close main-layout -->
+</div>
+<aside class="inspector" id="inspector">
+<button class="close" id="insp-close">✕</button>
+<div class="kicker" id="insp-kicker">DETAIL</div>
+<h3 id="insp-title">—</h3>
+<div id="insp-tag"></div>
+<div id="insp-body"></div>
+</aside>
+<div class="tip" id="tip"></div>
+<button class="fab" id="fab-new" style="display:none"></button>
+<script>
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={})=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n};
+
+function renderSymbol(type,cx,cy){
+const g=el('g');
+if(type==='aws-lambda'){const r=el('rect',{x:cx-12,y:cy-12,width:24,height:24,rx:5,fill:'#7c3aed'});const t=el('text',{x:cx,y:cy+6,fill:'#fff','font-size':'18','font-weight':'900','text-anchor':'middle'});t.textContent='λ';g.appendChild(r);g.appendChild(t)}
+else if(type==='aws-sqs'){const r=el('rect',{x:cx-12,y:cy-12,width:24,height:24,rx:5,fill:'#7c3aed'});for(let i=0;i<3;i++){g.appendChild(el('rect',{x:cx-8,y:cy-7+i*5,width:16,height:3,rx:1,fill:'#fff'}))}g.appendChild(r)}
+else if(type==='dynamo'){const d=el('path',{d:`M${cx-9} ${cy-9}C${cx-9} ${cy-12},${cx+9} ${cy-12},${cx+9} ${cy-9}L${cx+9} ${cy+7}C${cx+9} ${cy+10},${cx-9} ${cy+10},${cx-9} ${cy+7}Z`,fill:'none',stroke:'#ca8a04','stroke-width':'2'});g.appendChild(d)}
+else if(type==='gateway'){const d=el('path',{d:`M${cx} ${cy-11}L${cx+11} ${cy}L${cx} ${cy+11}L${cx-11} ${cy}Z`,fill:'none',stroke:'var(--blue)','stroke-width':'2.2'});g.appendChild(d)}
+else if(type==='check'){const c=el('circle',{cx,cy,r:10,fill:'none',stroke:'var(--neon)','stroke-width':'2'});const p=el('path',{d:`M${cx-5} ${cy}L${cx-1} ${cy+4}L${cx+6} ${cy-4}`,fill:'none',stroke:'var(--neon)','stroke-width':'2','stroke-linecap':'round','stroke-linejoin':'round'});g.appendChild(c);g.appendChild(p)}
+else{const r=el('rect',{x:cx-9,y:cy-9,width:18,height:18,rx:3,fill:'none',stroke:'var(--blue)','stroke-width':'2'});g.appendChild(r)}
+return g}
+
+function curvedPath(x1,y1,x2,y2,type){
+if(type==='smooth-down'){const dy=Math.abs(y2-y1)*.55;return`M${x1} ${y1}C${x1} ${y1+dy},${x2} ${y2-dy},${x2} ${y2}`}
+if(type==='smooth-right'){const dx=Math.abs(x2-x1)*.5;return`M${x1} ${y1}C${x1+dx} ${y1},${x2-dx} ${y2},${x2} ${y2}`}
+if(type==='smooth-left'){const dx=Math.abs(x2-x1)*.5;return`M${x1} ${y1}C${x1-dx} ${y1},${x2+dx} ${y2},${x2} ${y2}`}
+if(type==='poll-up'){const midX=Math.min(x1,x2)-100;return`M${x1} ${y1}C${midX} ${y1},${midX} ${y2},${x2} ${y2}`}
+if(type==='smooth-up-right'){const midY=y2+(y1-y2)*0.5;return`M${x1} ${y1}C${x1} ${midY},${x2} ${midY},${x2} ${y2}`}
+const mx=(x1+x2)/2;return`M${x1} ${y1}C${mx} ${y1},${mx} ${y2},${x2} ${y2}`}
+
+class Diagram{
+constructor(id){this.svg=document.getElementById(id);this.nodeEls={};this.edgeObjs=[];this._defs=null}
+marker(color){
+const id='arr-'+color.replace('#','');
+if(!this._defs){this._defs=el('defs');this.svg.insertBefore(this._defs,this.svg.firstChild)}
+if(!this.svg.querySelector('#'+id)){const m=el('marker',{id,viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6.5',markerHeight:'6.5',orient:'auto-start-reverse'});m.appendChild(el('path',{d:'M 0 1 L 9 5 L 0 9 z',fill:color,opacity:'0.95'}));this._defs.appendChild(m)}
+return'url(#'+id+')'}
+node(n){
+const g=el('g',{class:'node-group g-enter',id:'node-'+n.id});
+if(n.badge){const b=el('text',{x:n.x+n.w/2,y:n.y-8,'font-size':'9','font-weight':'700',fill:'#7c3aed','text-anchor':'middle'});b.textContent=n.badge;g.appendChild(b)}
+if(n.diamond){
+  const cx=n.x+n.w/2, cy=n.y+n.h/2, hw=n.w/2, hh=n.h/2;
+  const pts=`${cx},${n.y} ${n.x+n.w},${cy} ${cx},${n.y+n.h} ${n.x},${cy}`;
+  const p=el('polygon',{points:pts,class:'box '+(n.styleType||'')});
+  g.appendChild(p);
+  const t=el('text',{x:cx,y:cy-2,class:'lbl'});t.textContent=n.label;g.appendChild(t);
+  if(n.sub){const s=el('text',{x:cx,y:cy+14,class:'sub'});s.textContent=n.sub;g.appendChild(s)}
+} else {
+  const r=el('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:12,class:'box '+(n.styleType||'')});
+  g.appendChild(r);
+  g.appendChild(renderSymbol(n.nodeType||'process',n.x+22,n.y+n.h/2));
+  const cx=n.x+n.w/2+10;
+  const t=el('text',{x:cx,y:n.y+(n.sub?n.h/2-4:n.h/2+4),class:'lbl'});t.textContent=n.label;g.appendChild(t);
+  if(n.sub){const s=el('text',{x:cx,y:n.y+n.h/2+13,class:'sub'});s.textContent=n.sub;g.appendChild(s)}
+}
+this.svg.appendChild(g);
+this.nodeEls[n.id]={g,def:n};return this}
+edge(e){
+const A=this.nodeEls[e.from].def,B=this.nodeEls[e.to].def;
+const[x1,y1]=e.p1(A),[x2,y2]=e.p2(B);
+const d=curvedPath(x1,y1,x2,y2,e.curve||'smooth-right');
+const color=e.color||(e.status==='fail'?'#dc2626':e.status==='pause'?'#d97706':e.status==='sqs-flow'?'#7c3aed':'#059669');
+const cls='edge '+(e.status||'succ')+(e.dashed?' dashed':'');
+const path=el('path',{d,class:cls,'marker-end':this.marker(color)});
+if(e.dashed)path.setAttribute('stroke-dasharray','6 4');
+this.svg.appendChild(path);
+if(e.label){const mx=(x1+x2)/2+(e.loffX||0),my=(y1+y2)/2+(e.loff||0);const tw=e.label.length*5+14;
+this.svg.appendChild(el('rect',{x:mx-tw/2,y:my-10,width:tw,height:16,rx:4,class:'edgelbl-bg'}));
+const lt=el('text',{x:mx,y:my,class:'edgelbl '+(e.status||'succ')});lt.textContent=e.label;this.svg.appendChild(lt)}
+if(e.tip){const hit=el('path',{d,fill:'none',stroke:'rgba(0,0,0,0)','stroke-width':'14'});hit.style.pointerEvents='stroke';hit.style.cursor='help';hit.addEventListener('mousemove',ev=>showTip(ev.clientX,ev.clientY,e.tip));hit.addEventListener('mouseleave',hideTip);this.svg.appendChild(hit)}
+const dots=[];[[1,1],[.7,.55],[.4,.28]].forEach(([rf,of])=>{const dot=el('circle',{r:3.5*rf,fill:color,opacity:0});dot.style.filter=`drop-shadow(0 0 4px ${color})`;dot._of=of;this.svg.appendChild(dot);dots.push(dot)});
+this.edgeObjs.push({pathEl:path,dots,speed:e.speed||.0018,phase:Math.random()});return this}
+animate(){for(const o of this.edgeObjs){try{const len=o.pathEl.getTotalLength();if(!len)continue;o.phase=(o.phase+o.speed)%1;for(let i=0;i<o.dots.length;i++){const ph=(o.phase-i*.022+1)%1;const p=o.pathEl.getPointAtLength(ph*len);o.dots[i].setAttribute('cx',p.x);o.dots[i].setAttribute('cy',p.y);o.dots[i].setAttribute('opacity',(Math.sin(ph*Math.PI)*(o.dots[i]._of||1)).toFixed(3))}}catch(e){}}}
+start(){const loop=()=>{this.animate();requestAnimationFrame(loop)};requestAnimationFrame(loop)}}
+
+const R=n=>{return[n.x+n.w,n.y+n.h/2]};
+const L=n=>{return[n.x,n.y+n.h/2]};
+const T=n=>{return[n.x+n.w/2,n.y]};
+const B=n=>{return[n.x+n.w/2,n.y+n.h]};
+
+// ===== PANEL 1: CURRENT ARCHITECTURE =====
+const currentDiag=new Diagram('svg-current');
+
+function buildCurrentFlow(){
+const nodes=[
+// Hercules section
+{id:'hercules_task',label:'Hercules · TriggerVKYCCampaign',sub:'Post-disbursal task starts',x:40,y:50,w:280,h:60,styleType:'',nodeType:'gateway'},
+{id:'get_kyc',label:'VkycWrapper · GET /kyc/details',sub:'Picks expiryDate from response',x:40,y:160,w:260,h:60},
+{id:'biz_check',label:'Hercules · Business Hours?',sub:'8AM–4:30PM IST',x:40,y:290,w:200,h:100,diamond:true,styleType:'decision'},
+// Non-business hours path (outside Hercules)
+{id:'sqs_queue',label:'SQS · hercules-vkyc-campaign-queue',sub:'Overnight buffer · ~20ms release',x:40,y:470,w:280,h:55,styleType:'lambda',nodeType:'aws-sqs'},
+{id:'argos_lambda',label:'Argos Lambda · Shield re-check',sub:'+ calls Morpheus microUiLink + Thor',x:40,y:580,w:280,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+// Business hours path (inside Hercules)
+{id:'morpheus_link',label:'Morpheus · POST /microUiLink',sub:'Generates link + stores in DynamoDB',x:420,y:290,w:260,h:60},
+{id:'thor_sms',label:'Thor · SMS/WhatsApp dispatch',sub:'Notification to customer',x:420,y:400,w:240,h:55},
+// DynamoDB
+{id:'dynamo_db',label:'DynamoDB · KSF_MICROWEB_LINKS',sub:'Morpheus stores link data here',x:420,y:510,w:260,h:55,styleType:'dynamo',nodeType:'dynamo'},
+// Customer journey (Yoda + Morpheus)
+{id:'customer_link',label:'Yoda · Customer Opens Link',sub:'MicroUI journey starts',x:780,y:80,w:220,h:55,styleType:'',nodeType:'gateway'},
+{id:'morpheus_avail',label:'Morpheus · Availability Check',sub:'Active hours validation',x:780,y:185,w:230,h:50},
+{id:'morpheus_okyc',label:'Morpheus · OKYC Expiry Check',sub:'Reads from DynamoDB',x:780,y:285,w:240,h:55},
+{id:'start_vkyc',label:'Start VKYC Session',sub:'Customer connects with agent',x:1100,y:185,w:200,h:55,styleType:'converge',nodeType:'check'},
+// Expired path
+{id:'digilocker',label:'Yoda · DigiLocker Pull',sub:'Customer pulls fresh Aadhaar in MicroUI',x:780,y:400,w:240,h:55},
+{id:'adhar_wait',label:'Yoda · aadhaarStatus Poll Window',sub:'Polls Morpheus → reads DynamoDB',x:780,y:510,w:260,h:60},
+// Parallel background
+{id:'morpheus_rekyc',label:'Morpheus → vkycorchestrator',sub:'ReDoKycWorkflow (parallel)',x:780,y:640,w:260,h:55,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'aquaflow',label:'Aquaflow Lambda → DynamoDB',sub:'Writes aadhaarStatus',x:780,y:750,w:240,h:55,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'reject_vkyc',label:'Reject VKYC',sub:'aadhaarStatus: REJECTED',x:1100,y:510,w:180,h:55,styleType:'shortcircuit'}
+];
+nodes.forEach(n=>currentDiag.node(n));
+
+// Hercules internal flow
+currentDiag.edge({from:'hercules_task',to:'get_kyc',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Shield OK → GET',tip:'After basic Shield vkyc status check, calls GET /api/v1/kyc/details/{partnerLoanId}'});
+currentDiag.edge({from:'get_kyc',to:'biz_check',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Has expiryDate'});
+// Non-business hours
+currentDiag.edge({from:'biz_check',to:'sqs_queue',p1:B,p2:T,curve:'smooth-down',status:'pause',label:'Off-Hours'});
+currentDiag.edge({from:'sqs_queue',to:'argos_lambda',p1:B,p2:T,curve:'smooth-down',status:'sqs-flow',label:'Next morning'});
+currentDiag.edge({from:'argos_lambda',to:'morpheus_link',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'Shield OK → microUiLink'});
+// Business hours
+currentDiag.edge({from:'biz_check',to:'morpheus_link',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'In-Hours'});
+// Morpheus + Thor
+currentDiag.edge({from:'morpheus_link',to:'dynamo_db',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Stores in DynamoDB'});
+currentDiag.edge({from:'morpheus_link',to:'thor_sms',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Returns link',loff:15,loffX:-80});
+currentDiag.edge({from:'thor_sms',to:'customer_link',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'SMS sent'});
+// Customer journey
+currentDiag.edge({from:'customer_link',to:'morpheus_avail',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Check active hours'});
+currentDiag.edge({from:'morpheus_avail',to:'morpheus_okyc',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Hours OK'});
+currentDiag.edge({from:'morpheus_okyc',to:'start_vkyc',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'Fresh OKYC'});
+currentDiag.edge({from:'morpheus_okyc',to:'digilocker',p1:B,p2:T,curve:'smooth-down',status:'fail',label:'Expired'});
+currentDiag.edge({from:'digilocker',to:'adhar_wait',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Customer on wait window'});
+// Parallel background
+currentDiag.edge({from:'digilocker',to:'morpheus_rekyc',p1:B,p2:T,curve:'smooth-down',status:'sqs-flow',label:'Parallel: triggers ReKYC',loff:30,loffX:40});
+currentDiag.edge({from:'morpheus_rekyc',to:'aquaflow',p1:B,p2:T,curve:'smooth-down',status:'sqs-flow',label:'Tasks 1-5 → SQS'});
+currentDiag.edge({from:'aquaflow',to:'dynamo_db',p1:L,p2:B,curve:'poll-up',status:'sqs-flow',label:'Writes aadhaarStatus'});
+// Polling
+currentDiag.edge({from:'dynamo_db',to:'adhar_wait',p1:R,p2:L,curve:'smooth-right',status:'pause',label:'Polls aadhaarStatus'});
+currentDiag.edge({from:'adhar_wait',to:'start_vkyc',p1:R,p2:n=>[n.x+n.w/2,n.y+n.h],curve:'smooth-up-right',status:'succ',label:'SUCCESS'});
+currentDiag.edge({from:'adhar_wait',to:'reject_vkyc',p1:R,p2:L,curve:'smooth-right',status:'fail',label:'REJECTED'});
+
+attachInspect(currentDiag);
+currentDiag.start();
+}
+
+// ===== PANEL 2: NEW IMPLEMENTATION =====
+const newDiag=new Diagram('svg-new');
+
+function buildNewFlow(){
+const nodes=[
+{id:'new_hercules',label:'1. Hercules Campaign Trigger',x:50,y:80,w:240,h:70,styleType:'',nodeType:'gateway'},
+{id:'new_biz_hours',label:'2. Is Business Hours?',sub:'8AM–4:30PM IST',x:50,y:240,w:200,h:120,diamond:true,styleType:'decision'},
+{id:'new_argos',label:'3. argos Lambda (Shield Re-verify)',sub:'(Handles Queue Delay)',x:50,y:450,w:240,h:80,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'new_initiate',label:'4. POST /vkyc/initiate',sub:'Unified API · Checks Aadhaar internally',x:400,y:350,w:260,h:80,styleType:'new-impl',nodeType:'process',badge:'[NEW]'},
+{id:'new_thor',label:'5. Thor SQS (SMS Dispatch)',x:400,y:500,w:220,h:70,styleType:'',nodeType:'aws-sqs'},
+{id:'new_customer',label:'6. Customer Opens Link',sub:'Direct link (no DynamoDB lookup)',x:730,y:200,w:220,h:80,styleType:'',nodeType:'gateway'},
+{id:'new_okyc',label:'7. OKYC Fresh?',sub:'Checks from DMS now',x:730,y:370,w:160,h:100,diamond:true,styleType:'modified'},
+{id:'new_start_vkyc',label:'8. Start VKYC',sub:'POST /vkyc/videocx/link',x:1050,y:200,w:180,h:70,styleType:'converge',nodeType:'check'},
+{id:'new_digilocker',label:'9. DigiLocker Pull',sub:'Stores in local DB → direct to VKYC',x:730,y:550,w:220,h:70,styleType:'modified',nodeType:'process',badge:'[MODIFIED]'},
+{id:'new_needs_impl',label:'⚠️ Needs Implementation',sub:'ReDoKycWorkflow + Polling + Reject UI',x:730,y:700,w:260,h:80,styleType:'ghost',nodeType:'process'}
+];
+nodes.forEach(n=>newDiag.node(n));
+
+newDiag.edge({from:'new_hercules',to:'new_biz_hours',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Check Hours',color:'#64748b',tip:'Campaign triggered, check if within business hours'});
+newDiag.edge({from:'new_biz_hours',to:'new_initiate',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'Yes (In-Hours)',tip:'Within business hours, call new unified initiate API directly'});
+newDiag.edge({from:'new_biz_hours',to:'new_argos',p1:B,p2:T,curve:'smooth-down',status:'pause',label:'No (Off-Hours)',tip:'Outside hours, push to SQS queue for next-day processing'});
+newDiag.edge({from:'new_argos',to:'new_initiate',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'After Delay',tip:'Next-day drain calls new /vkyc/initiate endpoint'});
+newDiag.edge({from:'new_initiate',to:'new_thor',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Link in response → Thor',tip:'Initiate returns link directly, enqueues SMS via Thor SQS'});
+newDiag.edge({from:'new_initiate',to:'new_customer',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'SMS to Customer',tip:'SKIP DynamoDB — link goes directly to customer via Thor SMS. No intermediate storage needed.'});
+newDiag.edge({from:'new_customer',to:'new_okyc',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Check OKYC from DMS',color:'#64748b',tip:'Checks OKYC freshness directly from DMS (not DynamoDB)'});
+newDiag.edge({from:'new_okyc',to:'new_start_vkyc',p1:R,p2:L,curve:'smooth-right',status:'succ',label:'Fresh OKYC',tip:'OKYC not expired, proceed directly to VKYC'});
+newDiag.edge({from:'new_okyc',to:'new_digilocker',p1:B,p2:T,curve:'smooth-down',status:'fail',label:'Expired OKYC',tip:'Must re-pull Aadhaar from DigiLocker'});
+newDiag.edge({from:'new_digilocker',to:'new_start_vkyc',p1:R,p2:n=>[n.x+n.w/2,n.y+n.h],curve:'smooth-up-right',status:'succ',label:'Store in local DB → Start VKYC',tip:'DIRECT path: stores Aadhaar in local DB then starts VKYC immediately. No ReKYC pipeline needed.'});
+newDiag.edge({from:'new_digilocker',to:'new_needs_impl',p1:B,p2:T,curve:'smooth-down',status:'sqs-flow',label:'Future: ReKYC + Polling',dashed:true,tip:'Future implementation: ReDoKycWorkflow integration, aadhaarStatus polling from DynamoDB, reject UI'});
+
+attachInspect(newDiag);
+newDiag.start();
+}
+
+// ===== INSPECTOR DETAILS =====
+const DETAILS={
+// Panel 1 — Current Architecture
+hercules_task:{kicker:'HERCULES',tag:'TriggerVKYCCampaign.kt',html:'<div class="row"><div class="h">Service</div><p>Hercules (Java/Kotlin ECS)</p></div><div class="row"><div class="h">What Happens</div><p>Post-disbursal task starts. First does basic Shield vkyc status check (VKYC_SUCCESSFUL/REJECTED → skip). Then calls GET vkycwrapper API.</p></div>'},
+get_kyc:{kicker:'VKYCWRAPPER',tag:'GET /kyc/details',html:'<div class="row"><div class="h">Service</div><p>vkycwrapper (Go/Gin ECS)</p></div><div class="row"><div class="h">curl</div><code>curl -X GET \\\n  "https://vkycwrapper.uat.creditsaison.corp/api/v1/kyc/details/groRobocop4204918641275015" \\\n  -H "Authorization: Basic ..."</code></div><div class="row"><div class="h">Response (picks expiryDate)</div><code>{\n  "partnerLoanId": "groRobocop...",\n  "type": "OKYC",\n  "expiryDate": "2300-05-26T07:55:41.49Z",\n  "isLatest": true\n}</code></div>'},
+biz_check:{kicker:'HERCULES',tag:'isWithinBusinessHours()',html:'<div class="row"><div class="h">Logic</div><code>8:00 AM – 4:30 PM IST (Asia/Kolkata)</code></div><div class="row"><div class="h">Routing</div><ul><li><b>In-Hours</b>: Hercules calls Morpheus microUiLink directly</li><li><b>Off-Hours</b>: Pushes payload to SQS queue, task completes in ~20ms</li></ul></div>'},
+sqs_queue:{kicker:'AWS SQS',tag:'Campaign Queue',html:'<div class="row"><div class="h">Queue</div><code>hercules-vkyc-campaign-queue-ap-south-1</code></div><div class="row"><div class="h">Payload</div><code>{\n  "appFormId": "4472262",\n  "partnerLoanId": "LN_8823104",\n  "applicantId": "802314",\n  "lpc": "GRO",\n  "okycExpiresAt": "2030-11-16T05:08:58"\n}</code></div>'},
+argos_lambda:{kicker:'ARGOS LAMBDA',tag:'HerculesVKYCCampaignConsumer',html:'<div class="row"><div class="h">Service</div><p>Argos Lambda (AWS Lambda)</p></div><div class="row"><div class="h">Steps</div><ul><li>1. Re-checks Shield vkyc status (prevent duplicates)</li><li>2. Calls Morpheus POST /microUiLink</li><li>3. Builds Thor notification payload</li><li>4. Sends SMS via Thor FIFO queue</li></ul></div>'},
+morpheus_link:{kicker:'MORPHEUS',tag:'POST /microUiLink',html:'<div class="row"><div class="h">Service</div><p>Morpheus (Python Lambda)</p></div><div class="row"><div class="h">curl</div><code>curl -X POST \\\n  "https://morpheus.../api/v1/partnerLoanId/groRobocop.../microUiLink" \\\n  -H "Content-Type: application/json" \\\n  -d \'{\n    "applicant_id": "802314",\n    "form_name": "okyc_and_vkyc",\n    "form_data": {"okycExpiresAt": "2030-11-16T05:08:58"}\n  }\'</code></div><div class="row"><div class="h">What It Does Internally</div><ul><li>Shield validation</li><li>Computes currentStage from OKYC freshness</li><li>Writes to DynamoDB KSF_MICROWEB_LINKS</li><li>Generates JWT (3-day expiry)</li></ul></div><div class="row"><div class="h">Response</div><code>{"link": "https://loans.../micro-ui?token=eyJ...", "token": "..."}</code></div>'},
+thor_sms:{kicker:'THOR',tag:'SQS FIFO Notification',html:'<div class="row"><div class="h">Service</div><p>Thor (AWS SQS → SMS/WhatsApp)</p></div><div class="row"><div class="h">Action</div><p>Formats notification with MicroUI link + partner name + deadline (now+3d). Dispatches SMS to customer.</p></div>'},
+dynamo_db:{kicker:'DYNAMODB',tag:'KSF_MICROWEB_LINKS_TABLE',html:'<div class="row"><div class="h">Service</div><p>DynamoDB (Morpheus-managed)</p></div><div class="row"><div class="h">Stored By</div><p>Morpheus POST /microUiLink writes here during link generation.</p></div><div class="row"><div class="h">Read By</div><p>Morpheus polling endpoints (vkyc_poll.py) read aadhaarStatus from here.</p></div><div class="row"><div class="h">Updated By</div><p>Aquaflow Lambda writes aadhaarStatus (SUCCESS/REJECTED) after ReDoKycWorkflow completes.</p></div>'},
+customer_link:{kicker:'YODA',tag:'MicroUI Frontend',html:'<div class="row"><div class="h">Service</div><p>Yoda (Vue.js/Nuxt SPA)</p></div><div class="row"><div class="h">Action</div><p>Customer clicks SMS link → Yoda loads MicroUI → calls Morpheus for availability and OKYC checks.</p></div>'},
+morpheus_avail:{kicker:'MORPHEUS',tag:'GET /video_kyc/availability',html:'<div class="row"><div class="h">curl</div><code>curl -X GET \\\n  "https://morpheus.../partnerLoanId/groRobocop.../kyc/video_kyc/availability"</code></div><div class="row"><div class="h">Logic</div><p>Checks operational hours (VKYC_FROM_TIME 09:30 → VKYC_TO_TIME 21:00). Returns enabled: true/false.</p></div>'},
+morpheus_okyc:{kicker:'MORPHEUS',tag:'POST /video_kyc/poll (OKYC check)',html:'<div class="row"><div class="h">curl</div><code>curl -X POST \\\n  "https://morpheus.../partnerLoanId/groRobocop.../kyc/video_kyc/poll?applicant_id=802314"</code></div><div class="row"><div class="h">Logic</div><p>check_if_okyc_is_expired() — reads okycExpiresAt from DynamoDB. If expired → triggers DigiLocker flow.</p></div>'},
+start_vkyc:{kicker:'VKYC START',tag:'Customer connects agent',html:'<div class="row"><div class="h">Trigger</div><p>Either: OKYC fresh (direct) or aadhaarStatus polling detects SUCCESS.</p></div>'},
+digilocker:{kicker:'YODA',tag:'DigiLocker Pull in MicroUI',html:'<div class="row"><div class="h">Service</div><p>Yoda MicroUI (customer-facing)</p></div><div class="row"><div class="h">Action</div><p>Customer authenticates with DigiLocker SDK. Morpheus stores raw XML in S3 + tags in DMS.</p></div>'},
+adhar_wait:{kicker:'YODA → MORPHEUS',tag:'aadhaarStatus Poll Window',html:'<div class="row"><div class="h">How It Works</div><p>After DigiLocker pull, customer lands on wait screen. Yoda polls Morpheus every ~5s. Morpheus reads aadhaarStatus from DynamoDB.</p></div><div class="row"><div class="h">curl (poll)</div><code>curl -X POST \\\n  "https://morpheus.../partnerLoanId/.../kyc/video_kyc/poll?applicant_id=802314"</code></div><div class="row"><div class="h">States</div><ul><li>PENDING → keep polling</li><li>SUCCESS → proceed to VKYC</li><li>REJECTED → show error</li></ul></div>'},
+morpheus_rekyc:{kicker:'MORPHEUS → VKYCORCHESTRATOR',tag:'ReDoKycWorkflow (parallel)',html:'<div class="row"><div class="h">Timing</div><p>Triggered IN PARALLEL when customer is on the wait window. Customer doesn\'t wait for this to complete — they poll DynamoDB.</p></div><div class="row"><div class="h">curl</div><code>curl -X POST \\\n  "https://vkycorchestrator.../api/v1/rekyc/async/start-process" \\\n  -d \'{"partnerLoanId":"groRobocop...","lpc":"GRO","flowType":"internal_campaign","docsUrl":{"type":"digilocker","url":"https://s3...aadhaar.xml"}}\'</code></div><div class="row"><div class="h">Pipeline</div><p>Tasks 1-5: Shield → FetchXml → Validate → Compare → EndWorkflowAndSendCallback</p></div>'},
+aquaflow:{kicker:'AQUAFLOW LAMBDA',tag:'Updates DynamoDB',html:'<div class="row"><div class="h">Service</div><p>AquaflowCallbackEngineConsumer (AWS Lambda)</p></div><div class="row"><div class="h">Trigger</div><p>Subscribes to aquaflow-kyc-events-queue-ap-south-1.fifo. Reads status 49 (success) or -49 (rejected).</p></div><div class="row"><div class="h">Action</div><p>Updates DynamoDB KSF_MICROWEB_LINKS with aadhaarStatus → this unblocks the customer polling loop.</p></div>'},
+reject_vkyc:{kicker:'YODA',tag:'Rejection Screen',html:'<div class="row"><div class="h">When</div><p>aadhaarStatus polling detects REJECTED in DynamoDB.</p></div><div class="row"><div class="h">UI</div><code style="color:#dc2626">Oops! Your Aadhaar verification was rejected.</code></div>'},
+
+// Panel 2 — New Implementation
+new_hercules:{kicker:'TRIGGER',tag:'Hercules Campaign (unchanged)',html:'<div class="row"><div class="h">Status</div><p><span class="pill g">UNCHANGED</span> Same as current architecture.</p></div><div class="row"><div class="h">Source</div><code>com.cs.hercules.workflowtasks.common.TriggerVKYCCampaign.kt</code></div>'},
+new_biz_hours:{kicker:'DECISION',tag:'Business Hours Gate (unchanged)',html:'<div class="row"><div class="h">Status</div><p><span class="pill g">UNCHANGED</span> Same business hours check.</p></div>'},
+new_argos:{kicker:'LAMBDA',tag:'argos Lambda (unchanged)',html:'<div class="row"><div class="h">Status</div><p><span class="pill g">UNCHANGED</span> Same Shield re-verify logic.</p></div>'},
+new_initiate:{kicker:'NEW API',tag:'Unified Initiate + Thor SMS',html:'<div class="row"><div class="h">Status</div><p><span class="pill p">[NEW]</span> Replaces 2 separate API calls with one unified endpoint + Thor SMS dispatch.</p></div><div class="row"><div class="h">Endpoint</div><code>POST /api/v1/vkyc/initiate</code></div><div class="row"><div class="h">What It Replaces</div><ul><li><s>GET /api/v1/kyc/details/{partnerLoanId}</s> — Aadhaar freshness check built-in</li><li><s>POST /api/v1/partnerLoanId/{id}/microUiLink</s> — Link generation built-in</li></ul></div><div class="row"><div class="h">Request Payload</div><code>{\n  "correlationId": "F6-FRESH34-AA6teeedeeDHAAR-001",\n  "customerId": "fx4FItwRQeGCkmlpDthTZw",\n  "appFormId": "5aa550bb-ddf6-4cb4-...",\n  "applicantId": "794695",\n  "partnerLoanId": "mtcAutobot736455209670417",\n  "lpc": "MTC",\n  "evalMode": "onDemand",\n  "vkycLoc": "internal",\n  "isRekyc": true,\n  "receiveCallbacks": false,\n  "sendLinkToCustomer": false,\n  "requestPayload": {"dropOffConfig": {"retry": 2}}\n}</code></div><div class="row"><div class="h">Includes Thor SMS Dispatch</div><p>Link from /vkyc/initiate response is pushed to Thor SQS FIFO queue for SMS/WhatsApp dispatch (same queue as current flow).</p></div><div class="row"><div class="h">Key Benefits</div><ul><li>Single API call instead of 2 (GET + POST)</li><li>Aadhaar validation happens internally</li><li>No DynamoDB write needed</li><li>Direct link in response → push to Thor</li></ul></div>'},
+new_thor:{kicker:'SMS DISPATCH',tag:'(Merged into Step 4)',html:'<div class="row"><div class="h">Note</div><p>Thor SMS dispatch is part of Step 4 — after /vkyc/initiate returns the link, it gets pushed to Thor SQS FIFO queue (same as current flow).</p></div>'},
+new_customer:{kicker:'CUSTOMER · ENTRY',tag:'Customer Opens Link',html:'<div class="row"><div class="h">What Happens</div><p>Customer opens link from SMS → token verification happens first → then MicroUI loads the VKYC journey.</p></div>'},
+new_okyc:{kicker:'DECISION · MODIFIED',tag:'OKYC Freshness (from DMS)',html:'<div class="row"><div class="h">Status</div><p><span class="pill y">[MODIFIED]</span> Now checks OKYC freshness from DMS pull date instead of DynamoDB.</p></div>'},
+new_start_vkyc:{kicker:'VKYC START',tag:'VideoCX Session',html:'<div class="row"><div class="h">Convergence Point</div><p>Fresh OKYC (direct) or DigiLocker re-pull → local DB → Start VKYC.</p></div>'},
+new_digilocker:{kicker:'DIGILOCKER · MODIFIED',tag:'Local DB + Direct VKYC',html:'<div class="row"><div class="h">Status</div><p><span class="pill y">[MODIFIED]</span> Stores in local DB, then goes DIRECT to VKYC. No ReKYC pipeline.</p></div><div class="row"><div class="h">Before vs After</div><ul><li><b>Before</b>: DigiLocker → S3 → ReDoKycWorkflow → Polling → VKYC</li><li><b>After</b>: DigiLocker → local DB → Start VKYC immediately</li></ul></div>'},
+new_needs_impl:{kicker:'⚠️ FUTURE WORK',tag:'Needs Implementation',html:'<div class="row"><div class="h">What Needs to Be Built</div><ul><li>ReDoKycWorkflow integration</li><li>aadhaarStatus polling from DynamoDB</li><li>Reject UI for failed Aadhaar validation</li></ul></div>'},
+
+// Tab 2 — EF VKYC AppForm Journey
+ef_partner_api:{kicker:'ENTRY POINT',tag:'Partner API',html:'<div class="row"><div class="h">Description</div><p>Partner triggers VKYC from mobile app during the appform journey.</p></div>'},
+ef_pegasus_lambda:{kicker:'LAMBDA · ROUTER',tag:'pegasus-partner-workflow-vkyc-RequestHandler',html:'<div class="row"><div class="h">Routing Logic</div><ul><li><b>Stateless</b> (AIR, ETC, INC) → VKYC Wrapper path</li><li><b>Stateful</b> (standard) → Direct Lawliet V1 path</li></ul></div>'},
+ef_path_selection:{kicker:'DECISION',tag:'Workflow Path Selection',html:'<div class="row"><div class="h">Criteria</div><p>Product type determines path. Stateless skip AppForm checks, Stateful use Lambda-level validation.</p></div>'},
+ef_validation_stateful:{kicker:'VALIDATION · STATEFUL',tag:'Shield + Status Check',html:'<div class="row"><div class="h">Steps</div><ul><li>Lambda checks AppForm via Shield</li><li>Validates last_vkyc_status using validation_strategy.execute_validatelpc</li></ul></div>'},
+ef_lawliet_v1:{kicker:'API · STATEFUL',tag:'Lawliet V1',html:'<div class="row"><div class="h">Endpoint</div><code>LAWLIET_BASE_URL + /api/v1/vkyc/start</code></div>'},
+ef_400_stateful:{kicker:'ERROR · STATEFUL',tag:'400 Bad Request',html:'<div class="row"><div class="h">When</div><p>Shield check or vkyc_status validation fails.</p></div>'},
+ef_vendor_link_stateful:{kicker:'SUCCESS · STATEFUL',tag:'VideoCX Vendor Link',html:'<div class="row"><div class="h">Description</div><p>Lawliet creates session with VideoCX vendor, returns vendor link.</p></div>'},
+ef_vkyc_wrapper:{kicker:'ORCHESTRATOR',tag:'VKYC Wrapper',html:'<div class="row"><div class="h">Endpoint</div><code>VKYCWRAPPER_BASE_URL + /api/v1/vkyc/videocx/link</code></div><div class="row"><div class="h">Responsibility</div><p>Pre-validation (duplicate check, Aadhaar validity, appform status) before calling Lawliet V2.</p></div>'},
+ef_prevalidation:{kicker:'VALIDATION · STATELESS',tag:'VKYC Wrapper Pre-validation',html:'<div class="row"><div class="h">Checks</div><ul><li>RepeatCase (duplicate requests)</li><li>Aadhaar Validity (expiry check)</li><li>AppForm Status (valid for VKYC)</li></ul></div>'},
+ef_lawliet_v2:{kicker:'API · STATELESS',tag:'Lawliet V2',html:'<div class="row"><div class="h">Description</div><p>Internally called by VKYC Wrapper after pre-validation. Also validates AppForm status + OKYC expiry.</p></div>'},
+ef_400_stateless:{kicker:'ERROR · STATELESS',tag:'400 Bad Request',html:'<div class="row"><div class="h">Common Errors</div><ul><li>"Aadhaar expired, perform ReKYC first"</li><li>"Duplicate VKYC request"</li><li>"AppForm status invalid"</li></ul></div>'},
+ef_vendor_link_stateless:{kicker:'SUCCESS · STATELESS',tag:'VideoCX Vendor Link',html:'<div class="row"><div class="h">Description</div><p>VKYC Wrapper creates session via Lawliet v2, returns vendor link.</p></div>'},
+ef_rekyc_gateway:{kicker:'REKYC · GATEWAY',tag:'Partner ReKYC Trigger',html:'<div class="row"><div class="h">When</div><p>Partner receives 400 with isAadhaarValid: false. Aadhaar in kyc_data table has expired.</p></div><div class="row"><div class="h">Action</div><p>Partner pulls fresh Aadhaar and calls ReKYC API.</p></div>'},
+ef_rekyc_trigger:{kicker:'REKYC · TRIGGER',tag:'vkycorchestrator',html:'<div class="row"><div class="h">Endpoint</div><code>POST /api/v1/rekyc/async/start-process</code></div><div class="row"><div class="h">Starts</div><p>ReDoKycWorkflow (Tasks 1-5).</p></div>'},
+ef_callback_partner:{kicker:'CALLBACK',tag:'Partner Receives Status',html:'<div class="row"><div class="h">Mechanism</div><p>EndWorkflowAndSendCallback → SNS → Thor → Polar → Partner.</p></div>'},
+ef_retry_startvkyc:{kicker:'RETRY',tag:'Start VKYC Again',html:'<div class="row"><div class="h">What Happens</div><p>Partner receives "Approved" callback → retries Start VKYC API with fresh Aadhaar now validated in kyc_data table.</p></div>'},
+
+// Tab 3 — ReKYC Workflow
+rk_trigger:{kicker:'ENTRY',tag:'ReKYC Start',html:'<div class="row"><div class="h">Endpoint</div><code>POST /api/v1/rekyc/async/start-process</code></div><div class="row"><div class="h">Called By</div><ul><li>Campaign flow: Morpheus (internal_campaign)</li><li>EF AppForm: Partner via Senkaimon</li></ul></div>'},
+rk_orchestrator:{kicker:'ORCHESTRATOR',tag:'ReDoKycWorkflow',html:'<div class="row"><div class="h">Workflow</div><code>ReDoKycWorkflow (Async=true, Mode=Express)</code></div>'},
+rk_task1:{kicker:'TASK 1',tag:'InitiateReKycCheck',html:'<div class="row"><div class="h">Action</div><code>GET /api/v1/appForm/findByPartnerLoanId/{id}</code></div>'},
+rk_task2:{kicker:'TASK 2',tag:'FetchAppFormAadhaarXml',html:'<div class="row"><div class="h">Action</div><code>GET /api/v1/kyc/details/{id}?apiSource=AppForm</code></div>'},
+rk_task3:{kicker:'TASK 3',tag:'ValidateReKycAadhaarXML',html:'<div class="row"><div class="h">Action</div><code>POST /api/v1/extract/aadhaar?aadhaarType=digilocker</code></div>'},
+rk_task4:{kicker:'TASK 4',tag:'CompareAadhaarXml',html:'<div class="row"><div class="h">Fields</div><p>Name, DOB, Gender, Address, Last 4 digits of Aadhaar.</p></div>'},
+rk_task5:{kicker:'TASK 5 · ROUTING',tag:'EndWorkflowAndSendCallback',html:'<div class="row"><div class="h">Three-Way Routing</div><ul><li><span class="pill p">internal_campaign</span> → Aquaflow SQS FIFO → DynamoDB update</li><li><span class="pill y">webhook disabled</span> → SNS → Thor → Polar (partner callback)</li><li><b>webhook enabled</b> → Direct HTTP webhook</li></ul></div>'},
+rk_aquaflow:{kicker:'CAMPAIGN PATH',tag:'Aquaflow SQS FIFO',html:'<div class="row"><div class="h">Effect</div><p>AquaflowCallbackEngine Lambda updates DynamoDB aadhaarStatus. MicroUI polling detects the change.</p></div>'},
+rk_partner_callback:{kicker:'EF PARTNER PATH',tag:'SNS/Polar Callback',html:'<div class="row"><div class="h">Effect</div><p>Sends callback to partner via SNS → Polar. Partner retries Start VKYC on success.</p></div>'},
+
+// Tab 4 — Pre-AppForm VKYC
+pa_partner:{kicker:'ENTRY · PP PARTNER',tag:'Pre-AppForm VKYC',html:'<div class="row"><div class="h">Endpoint</div><code>v2/partner/vcip/link</code></div><div class="row"><div class="h">Context</div><p>AppForm NOT yet posted. No Shield checks, no OKYC validation.</p></div>'},
+pa_senkaimon:{kicker:'GATEWAY',tag:'Senkaimon · partnerVcip/handler.go',html:'<div class="row"><div class="h">Handler</div><code>ProcessPartnerVcip()</code></div><div class="row"><div class="h">What It Does</div><p>Schema validation only. Forwards to VkycWrapper.</p></div>'},
+pa_vkycwrapper:{kicker:'PASSTHROUGH',tag:'VkycWrapper /api/v1/vkyc/link',html:'<div class="row"><div class="h">Behavior</div><p>Direct passthrough to Lawliet. No pre-validation since AppForm doesn\'t exist.</p></div>'},
+pa_lawliet:{kicker:'VENDOR SESSION',tag:'Lawliet',html:'<div class="row"><div class="h">Action</div><p>Creates session with VideoCX/HyperVerge. Callbacks go directly to partner webhook.</p></div>'},
+pa_vendor_link:{kicker:'SUCCESS',tag:'Vendor Link Returned',html:'<div class="row"><div class="h">Response</div><p>Partner receives VKYC vendor link. Presents to customer in mobile app.</p></div>'}
+};
+
+// ===== SHARED INSPECTOR LOGIC =====
+function showTip(x,y,text){const t=document.getElementById('tip');t.innerHTML=text;t.classList.add('show');t.style.left=(x+16)+'px';t.style.top=(y+14)+'px'}
+function hideTip(){document.getElementById('tip').classList.remove('show')}
+function openPanel(id){const d=DETAILS[id];if(!d)return;document.getElementById('insp-kicker').textContent=d.kicker||'DETAIL';document.getElementById('insp-title').textContent=id;document.getElementById('insp-tag').innerHTML='<span class="tag">'+(d.tag||'')+'</span>';document.getElementById('insp-body').innerHTML=d.html||'';document.getElementById('inspector').classList.add('open')}
+document.getElementById('insp-close').onclick=()=>document.getElementById('inspector').classList.remove('open');
+
+function attachInspect(diagram){for(const id in diagram.nodeEls){const g=diagram.nodeEls[id].g;g.addEventListener('mousemove',e=>{if(DETAILS[id])showTip(e.clientX,e.clientY,DETAILS[id].kicker||'')});g.addEventListener('mouseleave',hideTip);g.addEventListener('click',()=>{hideTip();openPanel(id)})}}
+
+// ===== NAVIGATION =====
+const stage=document.getElementById('stage');
+const panelNew=document.getElementById('panel-new');
+const btnCurrent=document.getElementById('btn-current');
+const btnNew=document.getElementById('btn-new');
+const btnCompare=document.getElementById('btn-compare');
+const fab=document.getElementById('fab-new');
+
+function clearActive(){btnCurrent.classList.remove('active');btnNew.classList.remove('active');btnCompare.classList.remove('active')}
+
+btnCurrent.onclick=()=>{clearActive();btnCurrent.classList.add('active');stage.classList.remove('compare-mode');stage.scrollTo({left:0,behavior:'smooth'})};
+btnNew.onclick=()=>{clearActive();btnNew.classList.add('active');stage.classList.remove('compare-mode');stage.scrollTo({left:panelNew.offsetLeft-20,behavior:'smooth'})};
+btnCompare.onclick=()=>{clearActive();btnCompare.classList.add('active');stage.classList.toggle('compare-mode');stage.scrollTo({left:0,behavior:'smooth'})};
+fab.onclick=()=>{clearActive();btnNew.classList.add('active');stage.classList.remove('compare-mode');stage.scrollTo({left:panelNew.offsetLeft-20,behavior:'smooth'})};
+
+// ===== SIDEBAR TAB SWITCHING =====
+document.querySelectorAll('.sidebar-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+    document.getElementById('inspector').classList.remove('open');
+    const compareBar=document.getElementById('compare-bar');
+    const fab=document.getElementById('fab-new');
+    if(btn.dataset.panel==='panel-tab1'){compareBar.style.display='flex';fab.style.display='block'}
+    else{compareBar.style.display='none';fab.style.display='none'}
+  });
+});
+
+// ===== TAB 2: EF VKYC AppForm Journey =====
+const efDiag=new Diagram('svg-ef');
+function buildEfFlow(){
+const nodes=[
+{id:'ef_partner_api',label:'Partner API Start VKYC',sub:'Lambda Entry Point',x:550,y:50,w:250,h:60,styleType:'',nodeType:'gateway'},
+{id:'ef_pegasus_lambda',label:'pegasus-partner-workflow-vkyc-RequestHandler',x:510,y:160,w:330,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'ef_path_selection',label:'Workflow Path Selection',sub:'(Stateful vs Stateless)',x:560,y:280,w:240,h:120,diamond:true,styleType:'decision'},
+{id:'ef_validation_stateful',label:'Validation Check',sub:'(Stateful)',x:100,y:450,w:200,h:100,diamond:true,styleType:'decision'},
+{id:'ef_lawliet_v1',label:'Lawliet V1 Start API',sub:'LAWLIET_BASE_URL/api/v1/vkyc/start',x:80,y:620,w:180,h:70,styleType:'converge',nodeType:'check'},
+{id:'ef_400_stateful',label:'400 Request Fails',x:300,y:620,w:180,h:70,styleType:'shortcircuit'},
+{id:'ef_vendor_link_stateful',label:'VKYC Vendor Link (Stateful)',x:80,y:780,w:220,h:60,styleType:'converge',nodeType:'check'},
+{id:'ef_vkyc_wrapper',label:'VKYC Wrapper (Orchestrator)',sub:'VKYCWRAPPER/api/v1/vkyc/videocx/link',x:900,y:430,w:220,h:60,styleType:'',nodeType:'process'},
+{id:'ef_prevalidation',label:'Pre-validation Check',sub:'(Stateless)',x:920,y:560,w:200,h:100,diamond:true,styleType:'decision'},
+{id:'ef_lawliet_v2',label:'Lawliet V2 API',x:850,y:720,w:180,h:70,styleType:'converge',nodeType:'check'},
+{id:'ef_400_stateless',label:'400 Bad Request',sub:'(e.g. Aadhaar expired)',x:1100,y:720,w:200,h:70,styleType:'shortcircuit'},
+{id:'ef_vendor_link_stateless',label:'VKYC Vendor Link (Stateless)',x:880,y:840,w:220,h:60,styleType:'converge',nodeType:'check'},
+// ReKYC path (when Aadhaar expired)
+{id:'ef_rekyc_gateway',label:'ReKYC API Gateway',sub:'Partner hits when Aadhaar expired',x:1250,y:300,w:200,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'ef_rekyc_trigger',label:'Triggers ReDoKycWorkflow',sub:'POST /rekyc/async/start-process',x:1250,y:420,w:200,h:55},
+{id:'ef_callback_partner',label:'Callback to Partner',sub:'Status: Approved → Partner retries',x:1250,y:530,w:200,h:55},
+{id:'ef_retry_startvkyc',label:'Partner Retries Start VKYC',sub:'With fresh Aadhaar validated',x:1250,y:640,w:200,h:55,styleType:'converge',nodeType:'check'}
+];
+nodes.forEach(n=>efDiag.node(n));
+efDiag.edge({from:'ef_partner_api',to:'ef_pegasus_lambda',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+efDiag.edge({from:'ef_pegasus_lambda',to:'ef_path_selection',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+efDiag.edge({from:'ef_path_selection',to:'ef_validation_stateful',p1:L,p2:T,curve:'smooth-down',status:'pause',label:'[1] Stateful Path'});
+efDiag.edge({from:'ef_path_selection',to:'ef_vkyc_wrapper',p1:R,p2:T,curve:'smooth-down',status:'succ',label:'[2] Stateless Path'});
+efDiag.edge({from:'ef_validation_stateful',to:'ef_lawliet_v1',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'validation pass'});
+efDiag.edge({from:'ef_validation_stateful',to:'ef_400_stateful',p1:R,p2:L,curve:'smooth-right',status:'fail',label:'validation fails'});
+efDiag.edge({from:'ef_lawliet_v1',to:'ef_vendor_link_stateful',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'success handshake'});
+efDiag.edge({from:'ef_vkyc_wrapper',to:'ef_prevalidation',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+efDiag.edge({from:'ef_prevalidation',to:'ef_lawliet_v2',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'validation pass'});
+efDiag.edge({from:'ef_prevalidation',to:'ef_400_stateless',p1:R,p2:L,curve:'smooth-right',status:'fail',label:'validation fails'});
+efDiag.edge({from:'ef_lawliet_v2',to:'ef_vendor_link_stateless',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'success handshake'});
+// ReKYC path edges
+efDiag.edge({from:'ef_400_stateless',to:'ef_rekyc_gateway',p1:R,p2:L,curve:'smooth-right',status:'pause',label:'Aadhaar Expired? Do ReKYC'});
+efDiag.edge({from:'ef_rekyc_gateway',to:'ef_rekyc_trigger',p1:B,p2:T,curve:'smooth-down',status:'sqs-flow',label:'Calls vkycorchestrator'});
+efDiag.edge({from:'ef_rekyc_trigger',to:'ef_callback_partner',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Sends callback'});
+efDiag.edge({from:'ef_callback_partner',to:'ef_retry_startvkyc',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'On success'});
+efDiag.edge({from:'ef_retry_startvkyc',to:'ef_pegasus_lambda',p1:T,p2:n=>[n.x+n.w,n.y+n.h*0.7],curve:'poll-up',status:'succ',label:'Retry Start VKYC'});
+attachInspect(efDiag);efDiag.start()}
+
+// ===== TAB 2: EF NEW IMPLEMENTATION =====
+const efNewDiag=new Diagram('svg-ef-new');
+function buildEfNewFlow(){
+const nodes=[
+{id:'efn_partner',label:'1. Partner Hits Start VKYC',sub:'Same entry point',x:500,y:50,w:280,h:60,styleType:'',nodeType:'gateway'},
+{id:'efn_lambda',label:'2. Pegasus Lambda',sub:'Pre-validation: Shield + VKYC repeat + AppForm',x:500,y:160,w:280,h:70,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'efn_validation',label:'3. Validation Check',sub:'Shield + VKYC status + AppForm',x:500,y:310,w:220,h:100,diamond:true,styleType:'decision'},
+{id:'efn_400_validation',label:'400 Error',sub:'Validation failed',x:200,y:340,w:160,h:60,styleType:'shortcircuit'},
+{id:'efn_aadhaar_check',label:'4. GET /kyc/details/{id}',sub:'Check Aadhaar freshness',x:500,y:480,w:280,h:70,styleType:'',nodeType:'process'},
+{id:'efn_400_expired',label:'400 Aadhaar Expired',sub:'Partner must do ReKYC',x:200,y:510,w:180,h:60,styleType:'shortcircuit'},
+{id:'efn_initiate',label:'5. POST /vkyc/initiate',sub:'Unified API → Returns vendor link',x:500,y:630,w:280,h:80,styleType:'new-impl',nodeType:'process',badge:'[NEW]'},
+{id:'efn_vendor_link',label:'6. VKYC Vendor Link → Partner',x:500,y:780,w:280,h:60,styleType:'converge',nodeType:'check'},
+{id:'efn_rekyc',label:'Partner Does ReKYC',sub:'Fresh Aadhaar → ReDoKycWorkflow → Callback',x:100,y:680,w:220,h:70,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'efn_retry',label:'Partner Retries Start VKYC',sub:'Fresh Aadhaar now in kyc_data',x:100,y:810,w:200,h:55,styleType:'converge',nodeType:'check'}
+];
+nodes.forEach(n=>efNewDiag.node(n));
+efNewDiag.edge({from:'efn_partner',to:'efn_lambda',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'API Request'});
+efNewDiag.edge({from:'efn_lambda',to:'efn_validation',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Pre-validation'});
+efNewDiag.edge({from:'efn_validation',to:'efn_400_validation',p1:L,p2:R,curve:'smooth-left',status:'fail',label:'Fails'});
+efNewDiag.edge({from:'efn_validation',to:'efn_aadhaar_check',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Pass'});
+efNewDiag.edge({from:'efn_aadhaar_check',to:'efn_400_expired',p1:L,p2:R,curve:'smooth-left',status:'fail',label:'Expired'});
+efNewDiag.edge({from:'efn_aadhaar_check',to:'efn_initiate',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Fresh → call initiate'});
+efNewDiag.edge({from:'efn_initiate',to:'efn_vendor_link',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Vendor link returned'});
+efNewDiag.edge({from:'efn_400_expired',to:'efn_rekyc',p1:B,p2:T,curve:'smooth-down',status:'pause',label:'Partner does ReKYC'});
+efNewDiag.edge({from:'efn_rekyc',to:'efn_retry',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Callback: Approved'});
+efNewDiag.edge({from:'efn_retry',to:'efn_lambda',p1:T,p2:n=>[n.x,n.y+n.h*0.7],curve:'poll-up',status:'succ',label:'Retry Start VKYC'});
+attachInspect(efNewDiag);efNewDiag.start()}
+
+// DETAILS for new EF nodes
+DETAILS.efn_partner={kicker:'ENTRY',tag:'Partner Start VKYC',html:'<div class="row"><div class="h">Same Entry Point</div><p>Partner calls same Start VKYC endpoint. No change at entry level.</p></div>'};
+DETAILS.efn_lambda={kicker:'LAMBDA',tag:'Pegasus RequestHandler',html:'<div class="row"><div class="h">Pre-validation</div><ul><li>Shield check: AppForm status</li><li>VKYC repeat case check</li><li>AppForm status validation</li></ul></div>'};
+DETAILS.efn_validation={kicker:'DECISION',tag:'Validation Gate',html:'<div class="row"><div class="h">Checks</div><ul><li>AppForm via Shield</li><li>VKYC not terminal</li><li>AppForm in valid state</li></ul></div>'};
+DETAILS.efn_400_validation={kicker:'ERROR',tag:'400 Bad Request',html:'<div class="row"><div class="h">Common Reasons</div><ul><li>AppForm not found</li><li>VKYC already done</li><li>Invalid AppForm status</li></ul></div>'};
+DETAILS.efn_aadhaar_check={kicker:'AADHAAR CHECK',tag:'GET /kyc/details',html:'<div class="row"><div class="h">Endpoint</div><code>GET /api/v1/kyc/details/{partnerLoanId}</code></div><div class="row"><div class="h">Checks</div><p>Returns latest Aadhaar from kyc_data (is_latest=true). If expiryDate > now → fresh. Covers both appform-level and ReKYC Aadhaar.</p></div>'};
+DETAILS.efn_400_expired={kicker:'ERROR',tag:'Aadhaar Expired',html:'<div class="row"><div class="h">Partner Action</div><p>Pull fresh Aadhaar → call ReKYC API → wait for callback → retry Start VKYC.</p></div>'};
+DETAILS.efn_initiate={kicker:'[NEW] API',tag:'POST /vkyc/initiate',html:'<div class="row"><div class="h">Endpoint</div><code>POST /api/v1/vkyc/initiate</code></div><div class="row"><div class="h">Payload</div><code>{\n  "correlationId": "F34-HAPPY-001",\n  "appFormId": "{{appform_id}}",\n  "applicantId": "{{applicant_id}}",\n  "lpc": "AIR",\n  "evalMode": "immediate",\n  "vkycLoc": "partner",\n  "isRekyc": false,\n  "receiveCallbacks": true\n}</code></div>'};
+DETAILS.efn_vendor_link={kicker:'SUCCESS',tag:'Vendor Link',html:'<div class="row"><div class="h">Result</div><p>Partner receives VKYC vendor link and presents to customer.</p></div>'};
+DETAILS.efn_rekyc={kicker:'REKYC',tag:'Partner Does ReKYC',html:'<div class="row"><div class="h">Flow</div><p>Partner pulls fresh Aadhaar → shares via ReKYC API → ReDoKycWorkflow runs → callback on success.</p></div>'};
+DETAILS.efn_retry={kicker:'RETRY',tag:'Retry Start VKYC',html:'<div class="row"><div class="h">What Happens</div><p>After ReKYC callback, GET /kyc/details returns fresh Aadhaar with valid expiryDate → proceeds to /vkyc/initiate.</p></div>'};
+
+// ===== TAB 3: ReKYC Workflow =====
+const rekycDiag=new Diagram('svg-rekyc');
+function buildRekycFlow(){
+const nodes=[
+{id:'rk_trigger',label:'Partner/Morpheus Triggers ReKYC',sub:'POST /api/v1/rekyc/async/start-process',x:500,y:50,w:300,h:70,styleType:'',nodeType:'gateway'},
+{id:'rk_orchestrator',label:'vkycorchestrator · ReDoKycWorkflow',sub:'Async=true, Mode=Express',x:500,y:170,w:300,h:70,styleType:'',nodeType:'process'},
+{id:'rk_task1',label:'Task 1: InitiateReKycCheck',sub:'Shield GET /appForm/findByPartnerLoanId',x:500,y:290,w:280,h:55},
+{id:'rk_task2',label:'Task 2: FetchAppFormAadhaarXml',sub:'GET /kyc/details?apiSource=AppForm',x:500,y:385,w:280,h:55},
+{id:'rk_task3',label:'Task 3: ValidateReKycAadhaarXML',sub:'POST /extract/aadhaar',x:500,y:480,w:280,h:55},
+{id:'rk_task4',label:'Task 4: CompareAadhaarXml',sub:'Name · DOB · Gender · Address · Last 4',x:500,y:575,w:280,h:55},
+{id:'rk_task5',label:'Task 5: EndWorkflowAndSendCallback',sub:'Routes callback based on flowType',x:500,y:680,w:280,h:80,diamond:true,styleType:'decision'},
+{id:'rk_aquaflow',label:'Aquaflow SQS (internal_campaign)',sub:'→ DynamoDB update → MicroUI unblocks',x:100,y:830,w:280,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'rk_partner_callback',label:'Partner Callback via SNS/Polar',sub:'Status: Approved/Rejected',x:900,y:830,w:280,h:60}
+];
+nodes.forEach(n=>rekycDiag.node(n));
+rekycDiag.edge({from:'rk_trigger',to:'rk_orchestrator',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+rekycDiag.edge({from:'rk_orchestrator',to:'rk_task1',p1:B,p2:T,curve:'smooth-down',status:'succ'});
+rekycDiag.edge({from:'rk_task1',to:'rk_task2',p1:B,p2:T,curve:'smooth-down',status:'succ'});
+rekycDiag.edge({from:'rk_task2',to:'rk_task3',p1:B,p2:T,curve:'smooth-down',status:'succ'});
+rekycDiag.edge({from:'rk_task3',to:'rk_task4',p1:B,p2:T,curve:'smooth-down',status:'succ'});
+rekycDiag.edge({from:'rk_task4',to:'rk_task5',p1:B,p2:T,curve:'smooth-down',status:'succ'});
+rekycDiag.edge({from:'rk_task5',to:'rk_aquaflow',p1:L,p2:T,curve:'smooth-down',status:'sqs-flow',label:'internal_campaign'});
+rekycDiag.edge({from:'rk_task5',to:'rk_partner_callback',p1:R,p2:T,curve:'smooth-down',status:'succ',label:'Partner webhook'});
+attachInspect(rekycDiag);rekycDiag.start()}
+
+// ===== TAB 4: Pre-AppForm VKYC (PP) =====
+const preAppDiag=new Diagram('svg-preapp');
+function buildPreAppFlow(){
+const nodes=[
+{id:'pa_partner',label:'PP Partner Calls Start VKYC',sub:'v2/partner/vcip/link (no AppForm yet)',x:500,y:80,w:300,h:70,styleType:'',nodeType:'gateway'},
+{id:'pa_senkaimon',label:'Senkaimon (partnerVcip handler)',sub:'Schema validation only',x:500,y:220,w:300,h:70,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'pa_vkycwrapper',label:'VkycWrapper /api/v1/vkyc/link',sub:'No pre-validation · Direct passthrough',x:500,y:360,w:300,h:70},
+{id:'pa_lawliet',label:'Lawliet · Creates Vendor Session',sub:'VideoCX/HyperVerge handshake',x:500,y:500,w:300,h:70,styleType:'converge',nodeType:'check'},
+{id:'pa_vendor_link',label:'VKYC Vendor Link → Partner',sub:'Partner presents to customer',x:500,y:630,w:300,h:60,styleType:'converge',nodeType:'check'}
+];
+nodes.forEach(n=>preAppDiag.node(n));
+preAppDiag.edge({from:'pa_partner',to:'pa_senkaimon',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'API Request'});
+preAppDiag.edge({from:'pa_senkaimon',to:'pa_vkycwrapper',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'GenerateVcipLink()'});
+preAppDiag.edge({from:'pa_vkycwrapper',to:'pa_lawliet',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Direct to Lawliet'});
+preAppDiag.edge({from:'pa_lawliet',to:'pa_vendor_link',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Vendor session created'});
+attachInspect(preAppDiag);preAppDiag.start()}
+
+// ===== TAB 4: Pre-AppForm NEW IMPLEMENTATION =====
+const preAppNewDiag=new Diagram('svg-preapp-new');
+function buildPreAppNewFlow(){
+const nodes=[
+{id:'pan_partner',label:'1. PP Partner Hits v2/partner/vcip/link',sub:'Same entry point',x:500,y:50,w:300,h:60,styleType:'',nodeType:'gateway'},
+{id:'pan_senkaimon',label:'2. Senkaimon Schema Validation',sub:'Validates request schema only',x:500,y:160,w:300,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'pan_convert',label:'3. Convert proofCreatedDate → aadhaarXmlPullDate',sub:'Maps partner date format to ISO 8601',x:500,y:280,w:320,h:70,styleType:'modified',nodeType:'process',badge:'[NEW]'},
+{id:'pan_initiate',label:'4. POST /vkyc/initiate',sub:'Unified API with personalDetails + selfie',x:500,y:420,w:300,h:80,styleType:'new-impl',nodeType:'process',badge:'[NEW]'},
+{id:'pan_vendor_link',label:'5. VKYC Vendor Link → Partner',sub:'Partner presents to customer',x:500,y:580,w:280,h:60,styleType:'converge',nodeType:'check'},
+{id:'pan_callback',label:'⚡ Callback → Partner Webhook Directly',sub:'No Shield patch, No DMS tagging (no AppForm)',x:500,y:700,w:320,h:70,styleType:'modified',nodeType:'process',badge:'[NOTE]'}
+];
+nodes.forEach(n=>preAppNewDiag.node(n));
+preAppNewDiag.edge({from:'pan_partner',to:'pan_senkaimon',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'API Request'});
+preAppNewDiag.edge({from:'pan_senkaimon',to:'pan_convert',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Schema valid'});
+preAppNewDiag.edge({from:'pan_convert',to:'pan_initiate',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Payload mapped'});
+preAppNewDiag.edge({from:'pan_initiate',to:'pan_vendor_link',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Vendor link returned'});
+preAppNewDiag.edge({from:'pan_vendor_link',to:'pan_callback',p1:B,p2:T,curve:'smooth-down',status:'pause',label:'After VKYC completes'});
+attachInspect(preAppNewDiag);preAppNewDiag.start()}
+
+// DETAILS for new Pre-AppForm nodes
+DETAILS.pan_partner={kicker:'ENTRY',tag:'PP Partner',html:'<div class="row"><div class="h">Endpoint</div><code>v2/partner/vcip/link</code></div><div class="row"><div class="h">Same As Current</div><p>Partner calls same endpoint. No AppForm exists yet.</p></div>'};
+DETAILS.pan_senkaimon={kicker:'GATEWAY',tag:'Senkaimon Schema Validation',html:'<div class="row"><div class="h">What It Does</div><p>Validates request schema using CompiledPartnerVcipSchema(). No business logic validation (no AppForm to check).</p></div>'};
+DETAILS.pan_convert={kicker:'[NEW] MAPPING',tag:'Date Format Conversion',html:'<div class="row"><div class="h">What Changes</div><p>Partner sends <code style="display:inline;padding:2px 4px">"proofCreatedDate": "12313231231"</code> (epoch or raw format).</p><p>Lambda/Senkaimon converts this to <code style="display:inline;padding:2px 4px">"aadhaarXmlPullDate": "2026-08-23T10:00:00Z"</code> (ISO 8601) before passing to /vkyc/initiate.</p></div><div class="row"><div class="h">Why</div><p>The initiate API expects ISO 8601 format for aadhaarXmlPullDate. Partner payload uses a different date format.</p></div>'};
+DETAILS.pan_initiate={kicker:'[NEW] API',tag:'POST /vkyc/initiate',html:'<div class="row"><div class="h">Endpoint</div><code>POST /api/v1/vkyc/initiate</code></div><div class="row"><div class="h">Request Payload</div><code>{\n  "correlationId": "F1-HAPPY-VC33399X-001",\n  "customerId": "CUST-F1-001",\n  "lpc": "MTC",\n  "partnerLoanId": "ftyguhijdeokpw0-9",\n  "evalMode": "immediate",\n  "vkycLoc": "partner",\n  "isRekyc": false,\n  "receiveCallbacks": true,\n  "requestPayload": {\n    "personalDetails": {\n      "workflowId": "ksf_money_tap_standardFlow",\n      "panNumber": "ESWNH7681C",\n      "userName": "Manish Meena",\n      "dob": "2024-06-24",\n      "gender": "male",\n      "fatherName": "Ram meena",\n      "occupation": "engineer",\n      "email": "testing@gmail.com",\n      "mobileNum": "888800000"\n    },\n    "selfieBase64Image": "",\n    "aadhaarXmlPullDate": "2026-08-23T10:00:00Z"\n  }\n}</code></div><div class="row"><div class="h">Key Fields</div><ul><li><b>personalDetails</b>: Customer info for VKYC session</li><li><b>selfieBase64Image</b>: Optional selfie for liveness</li><li><b>aadhaarXmlPullDate</b>: Converted from partner proofCreatedDate</li><li><b>receiveCallbacks: true</b>: Partner wants callback on completion</li></ul></div>'};
+DETAILS.pan_vendor_link={kicker:'SUCCESS',tag:'Vendor Link Returned',html:'<div class="row"><div class="h">Description</div><p>Partner receives VKYC vendor link. Presents to customer in mobile app for video KYC.</p></div>'};
+DETAILS.pan_callback={kicker:'⚡ CALLBACK NOTE',tag:'Direct Partner Webhook',html:'<div class="row"><div class="h">Important</div><p>After VKYC completes, callback goes <b>directly to partner webhook</b>.</p></div><div class="row"><div class="h">What Is SKIPPED</div><ul><li>❌ No Shield patching (no AppForm exists)</li><li>❌ No DMS document tagging (no AppForm)</li><li>❌ No Aquaflow/DynamoDB update</li></ul></div><div class="row"><div class="h">Why</div><p>Since AppForm is not yet posted at this phase, we skip all appform-dependent post-processing. Callback goes straight to partner webhook so they can trigger their downstream processes.</p></div>'};
+
+// ===== TAB 5: PP In-Journey VKYC (CURRENT) =====
+const ppjCurDiag=new Diagram('svg-ppj-current');
+function buildPpjCurrentFlow(){
+const nodes=[
+{id:'ppj_partner',label:'Partner hits /partner/vkyc/link',sub:'Entry Point',x:450,y:40,w:300,h:60,styleType:'',nodeType:'gateway'},
+{id:'ppj_senkaimon',label:'Senkaimon (Gateway)',sub:'Per-LPC schema validation',x:500,y:150,w:220,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'ppj_wrapper',label:'vkycwrapper /vkyc/prevalidate/link',sub:'Orchestrator',x:450,y:260,w:310,h:60},
+{id:'ppj_appform_check',label:'AppForm Validation Check',sub:'Shield: status in [12,14,15], not DISBURSAL_COMPLETE',x:450,y:380,w:300,h:100,diamond:true,styleType:'decision'},
+{id:'ppj_400_appform',label:'400 Bad Request',sub:'Validation Failed',x:120,y:410,w:180,h:60,styleType:'shortcircuit'},
+{id:'ppj_kyc_expiry',label:'KYC Expiration Check',sub:'CKYC or OKYC freshness',x:450,y:550,w:250,h:100,diamond:true,styleType:'decision'},
+{id:'ppj_ckyc',label:'CKYC Pull Date',sub:'GET CKYC API · 72hr validity',x:250,y:700,w:200,h:60},
+{id:'ppj_okyc',label:'Aadhaar Pull Date from XML',sub:'Aadhaar freshness check',x:600,y:700,w:220,h:60},
+{id:'ppj_400_expired',label:'400 Bad Request',sub:'Pull date expired',x:400,y:810,w:200,h:60,styleType:'shortcircuit'},
+{id:'ppj_lawliet',label:'Lawliet V2 API',sub:'Stateless Endpoint',x:450,y:890,w:250,h:60,styleType:'converge',nodeType:'check'}
+];
+nodes.forEach(n=>ppjCurDiag.node(n));
+ppjCurDiag.edge({from:'ppj_partner',to:'ppj_senkaimon',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+ppjCurDiag.edge({from:'ppj_senkaimon',to:'ppj_wrapper',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'PrevalidateVcipLink()'});
+ppjCurDiag.edge({from:'ppj_wrapper',to:'ppj_appform_check',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+ppjCurDiag.edge({from:'ppj_appform_check',to:'ppj_400_appform',p1:L,p2:R,curve:'smooth-left',status:'fail',label:'Validation Failed'});
+ppjCurDiag.edge({from:'ppj_appform_check',to:'ppj_kyc_expiry',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Validation Passed'});
+ppjCurDiag.edge({from:'ppj_kyc_expiry',to:'ppj_ckyc',p1:L,p2:T,curve:'smooth-down',status:'pause',label:'CKYC path'});
+ppjCurDiag.edge({from:'ppj_kyc_expiry',to:'ppj_okyc',p1:R,p2:T,curve:'smooth-down',status:'succ',label:'OKYC path'});
+ppjCurDiag.edge({from:'ppj_ckyc',to:'ppj_400_expired',p1:B,p2:L,curve:'smooth-right',status:'fail',label:'If expired'});
+ppjCurDiag.edge({from:'ppj_okyc',to:'ppj_400_expired',p1:B,p2:R,curve:'smooth-left',status:'fail',label:'If expired'});
+ppjCurDiag.edge({from:'ppj_ckyc',to:'ppj_lawliet',p1:B,p2:L,curve:'smooth-down',status:'succ',label:'If fresh → KYC details'});
+ppjCurDiag.edge({from:'ppj_okyc',to:'ppj_lawliet',p1:B,p2:R,curve:'smooth-down',status:'succ',label:'If fresh → KYC details'});
+attachInspect(ppjCurDiag);ppjCurDiag.start()}
+
+// ===== TAB 5: PP In-Journey VKYC (NEW) =====
+const ppjNewDiag=new Diagram('svg-ppj-new');
+function buildPpjNewFlow(){
+const nodes=[
+{id:'ppjn_partner',label:'1. Partner hits /partner/vkyc/link',sub:'Same entry point',x:450,y:40,w:300,h:60,styleType:'',nodeType:'gateway'},
+{id:'ppjn_senkaimon',label:'2. Senkaimon (Schema Validation)',sub:'Per-LPC schema check',x:500,y:150,w:250,h:60,styleType:'lambda',nodeType:'aws-lambda'},
+{id:'ppjn_appform',label:'3. AppForm + VKYC Validation',sub:'Shield check + repeat case',x:450,y:280,w:280,h:80,diamond:true,styleType:'decision'},
+{id:'ppjn_400_val',label:'400 Error',sub:'Validation failed',x:150,y:310,w:160,h:55,styleType:'shortcircuit'},
+{id:'ppjn_kyc_check',label:'4. KYC Freshness Check',sub:'GET /kyc/details/{partnerLoanId}',x:450,y:430,w:280,h:70},
+{id:'ppjn_400_exp',label:'400 KYC Expired',x:150,y:460,w:160,h:55,styleType:'shortcircuit'},
+{id:'ppjn_initiate',label:'5. POST /vkyc/initiate',sub:'Unified API with KYC data',x:450,y:580,w:280,h:80,styleType:'new-impl',nodeType:'process',badge:'[NEW]'},
+{id:'ppjn_vendor',label:'6. VKYC Vendor URL → Partner',x:450,y:730,w:280,h:60,styleType:'converge',nodeType:'check'},
+{id:'ppjn_callback',label:'⚡ Callback: Shield patch + DMS tag + Partner webhook',sub:'Full post-processing (AppForm exists)',x:400,y:840,w:380,h:60,styleType:'modified',nodeType:'process',badge:'[NOTE]'}
+];
+nodes.forEach(n=>ppjNewDiag.node(n));
+ppjNewDiag.edge({from:'ppjn_partner',to:'ppjn_senkaimon',p1:B,p2:T,curve:'smooth-down',color:'#64748b'});
+ppjNewDiag.edge({from:'ppjn_senkaimon',to:'ppjn_appform',p1:B,p2:T,curve:'smooth-down',color:'#64748b',label:'Schema valid'});
+ppjNewDiag.edge({from:'ppjn_appform',to:'ppjn_400_val',p1:L,p2:R,curve:'smooth-left',status:'fail',label:'Fails'});
+ppjNewDiag.edge({from:'ppjn_appform',to:'ppjn_kyc_check',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Pass'});
+ppjNewDiag.edge({from:'ppjn_kyc_check',to:'ppjn_400_exp',p1:L,p2:R,curve:'smooth-left',status:'fail',label:'Expired'});
+ppjNewDiag.edge({from:'ppjn_kyc_check',to:'ppjn_initiate',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Fresh → call initiate'});
+ppjNewDiag.edge({from:'ppjn_initiate',to:'ppjn_vendor',p1:B,p2:T,curve:'smooth-down',status:'succ',label:'Vendor link returned'});
+ppjNewDiag.edge({from:'ppjn_vendor',to:'ppjn_callback',p1:B,p2:T,curve:'smooth-down',status:'pause',label:'After VKYC completes'});
+attachInspect(ppjNewDiag);ppjNewDiag.start()}
+
+// DETAILS for Tab 5 nodes
+DETAILS.ppj_partner={kicker:'ENTRY',tag:'Partner /partner/vkyc/link',html:'<div class="row"><div class="h">Endpoint</div><code>/api/v1/partner/vkyc/link</code></div><div class="row"><div class="h">Context</div><p>PP in-journey VKYC. AppForm already posted. Partner calls this after appform submission.</p></div>'};
+DETAILS.ppj_senkaimon={kicker:'GATEWAY',tag:'Senkaimon',html:'<div class="row"><div class="h">Handler</div><code>ProcessPartnerVkyc() in handlers/partnerVcip/handler.go</code></div><div class="row"><div class="h">Validation</div><p>Per-LPC schema validation via GetCompiledVkycSchema(lpc). PTT/BPT require ip OR rmn consent identifier.</p></div><div class="row"><div class="h">Downstream</div><code>VkycWrapper.PrevalidateVcipLink() → POST /api/v1/vkyc/prevalidate/link</code></div>'};
+DETAILS.ppj_wrapper={kicker:'ORCHESTRATOR',tag:'vkycwrapper /vkyc/prevalidate/link',html:'<div class="row"><div class="h">Handler</div><code>TrackerHandler.ValidateLinkGenerationRequest()</code></div><div class="row"><div class="h">Steps</div><ul><li>1. Get AppForm from Shield</li><li>2. Validate AppForm status + VKYC status</li><li>3. KYC freshness check (CKYC or OKYC)</li><li>4. If valid → call Lawliet V2 for vendor link</li></ul></div>'};
+DETAILS.ppj_appform_check={kicker:'DECISION',tag:'AppForm Validation',html:'<div class="row"><div class="h">Checks</div><ul><li>AppForm status in ["12", "14", "15"]</li><li>Status NOT "DISBURSAL_COMPLETE"</li><li>VKYC not already terminal (Successful/Rejected)</li></ul></div>'};
+DETAILS.ppj_400_appform={kicker:'ERROR',tag:'400 Bad Request',html:'<div class="row"><div class="h">Returns</div><code>{"error": "Invalid request payload", "details": {"isAppformStatusValid": false}}</code></div>'};
+DETAILS.ppj_kyc_expiry={kicker:'DECISION',tag:'KYC Freshness',html:'<div class="row"><div class="h">Two Paths</div><ul><li><b>CKYC</b>: Calls GET /api/v3/ckyc/partnerLoan/{id}/ckycData, parses xmlDownloadDate, enforces 72-hour validity via isValidCkycPullDate</li><li><b>OKYC</b>: Fetches stored Aadhaar XML metadata and verifies identity freshness from pull date</li></ul></div>'};
+DETAILS.ppj_ckyc={kicker:'CKYC PATH',tag:'CKYC API Response',html:'<div class="row"><div class="h">API</div><code>GET /api/v3/ckyc/partnerLoan/{partnerLoanId}/ckycData</code></div><div class="row"><div class="h">Validation</div><p>Parses xmlDownloadDate from response. Enforces 72-hour validity window. If >72hrs old → expired.</p></div>'};
+DETAILS.ppj_okyc={kicker:'OKYC PATH',tag:'Aadhaar XML Pull Date',html:'<div class="row"><div class="h">Source</div><p>Reads Aadhaar XML metadata (pull date/extracted date) from local store.</p></div><div class="row"><div class="h">Validation</div><p>Checks if pull date is within freshness threshold (config-driven hours).</p></div>'};
+DETAILS.ppj_400_expired={kicker:'ERROR',tag:'KYC Expired',html:'<div class="row"><div class="h">Response</div><code>{"error": "Invalid request", "details": {"isAadhaarValid": false}}</code></div><div class="row"><div class="h">Senkaimon Maps To</div><p>"OVD is expired. It cannot be used for VKYC"</p></div>'};
+DETAILS.ppj_lawliet={kicker:'VENDOR',tag:'Lawliet V2',html:'<div class="row"><div class="h">Action</div><p>Formats vendor payload with KYC details (from CKYC or OKYC path), calls Lawliet V2 API, persists tracking via SaveVKYCTracker.</p></div>'};
+DETAILS.ppjn_partner={kicker:'ENTRY',tag:'Same Endpoint',html:'<div class="row"><div class="h">No Change</div><p>Partner calls same /partner/vkyc/link endpoint.</p></div>'};
+DETAILS.ppjn_senkaimon={kicker:'GATEWAY',tag:'Senkaimon',html:'<div class="row"><div class="h">Schema Validation</div><p>Same per-LPC schema validation. No change at gateway level.</p></div>'};
+DETAILS.ppjn_appform={kicker:'VALIDATION',tag:'AppForm + VKYC Check',html:'<div class="row"><div class="h">Same Checks</div><p>Shield AppForm status + VKYC repeat case. Same as current.</p></div>'};
+DETAILS.ppjn_400_val={kicker:'ERROR',tag:'Validation Failed',html:'<div class="row"><div class="h">Same 400 responses as current.</div></div>'};
+DETAILS.ppjn_kyc_check={kicker:'KYC FRESHNESS',tag:'GET /kyc/details',html:'<div class="row"><div class="h">Endpoint</div><code>GET /api/v1/kyc/details/{partnerLoanId}</code></div><div class="row"><div class="h">What It Checks</div><p>Returns latest KYC data (CKYC or OKYC) from kyc_data table. Checks expiryDate > currentTime.</p></div>'};
+DETAILS.ppjn_400_exp={kicker:'ERROR',tag:'KYC Expired',html:'<div class="row"><div class="h">Response</div><p>"OVD is expired" — partner must do fresh pull first.</p></div>'};
+DETAILS.ppjn_initiate={kicker:'[NEW] API',tag:'POST /vkyc/initiate',html:'<div class="row"><div class="h">Replaces</div><p>Direct Lawliet V2 call + SaveVKYCTracker + KYC detail extraction. All handled internally by initiate API.</p></div><div class="row"><div class="h">Endpoint</div><code>POST /api/v1/vkyc/initiate</code></div>'};
+DETAILS.ppjn_vendor={kicker:'SUCCESS',tag:'Vendor URL',html:'<div class="row"><div class="h">Result</div><p>Partner receives VKYC vendor link.</p></div>'};
+DETAILS.ppjn_callback={kicker:'⚡ CALLBACK',tag:'Full Post-Processing',html:'<div class="row"><div class="h">Difference from Pre-AppForm</div><p>Since AppForm EXISTS in this flow, callbacks include full post-processing:</p><ul><li>✅ Shield patching (update vcipStatus)</li><li>✅ DMS document tagging</li><li>✅ Partner webhook callback</li></ul></div><div class="row"><div class="h">vs Pre-AppForm</div><p>Pre-AppForm flow skips Shield patch + DMS tagging since no AppForm exists yet.</p></div>'};
+
+// ===== BUILD ALL FLOWS =====
+window.addEventListener('load',()=>{
+  buildCurrentFlow();
+  buildNewFlow();
+  buildEfFlow();
+  buildEfNewFlow();
+  buildRekycFlow();
+  buildPreAppFlow();
+  buildPreAppNewFlow();
+  buildPpjCurrentFlow();
+  buildPpjNewFlow();
+});
+</script>
+</body>
+</html>
