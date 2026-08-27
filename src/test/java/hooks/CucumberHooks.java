@@ -34,7 +34,12 @@ public class CucumberHooks {
             }
         }
 
-        // Rename video to scenario name for easy identification
+        // Rename video to scenario name for easy identification.
+        // Playwright only finalizes/flushes the .webm file to disk when the
+        // BrowserContext closes, not when the Page closes. Closing only the page (as
+        // before) meant the rename often raced against an unfinished file. Closing the
+        // context here is safe even though teardownBrowserInstance() closes it again
+        // later, since BrowserContext.close() is a no-op on an already-closed context.
         try {
             var page = BaseTest.getPage();
             if (page != null && page.video() != null) {
@@ -43,8 +48,13 @@ public class CucumberHooks {
                     String safeName = scenario.getName().replaceAll("[^a-zA-Z0-9_\\-]", "_");
                     int videoNumber = videoCounter.incrementAndGet();
                     var renamedPath = videoPath.getParent().resolve(videoNumber + "_" + safeName + ".webm");
-                    // Close page first so video file is finalized
-                    page.close();
+
+                    // Close the page's context (not just the page) so the video is
+                    // guaranteed to be fully written before we try to move it.
+                    var context = BaseTest.getContext();
+                    try { page.close(); } catch (Exception ignore) { /* already closed */ }
+                    try { context.close(); } catch (Exception ignore) { /* already closed */ }
+
                     java.nio.file.Files.move(videoPath, renamedPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                     log.info("Video saved as: {}", renamedPath);
                 }

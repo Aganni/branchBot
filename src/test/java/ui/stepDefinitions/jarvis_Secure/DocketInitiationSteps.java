@@ -1,6 +1,7 @@
 package ui.stepDefinitions.jarvis_Secure;
 
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitUntilState;
 import hooks.BaseTest;
@@ -28,11 +29,11 @@ public class DocketInitiationSteps extends BaseTest {
     private static final String INSURANCE_PROVIDER = "ICICI Lombard";
     private static final String POLICY_HOLDER_NAME = "Hannah Isaac";
     private static final String POLICY_SUM_INSURED = "250000";
-    private static final String POLICY_TENURE = "3 years";
+    private static final String POLICY_TENURE = "1 year";
     private static final String INSURANCE_PREMIUM = "25000";
-    private static final String NOMINEE_NAME = "Noah johnson";
+    private static final String NOMINEE_NAME = "loganathan Sharma";
     private static final String NOMINEE_RELATIONSHIP = "brother";
-    private static final String PROPERTY_INSURANCE_PREMIUM = "6840";
+    private static final String PROPERTY_INSURANCE_PREMIUM = "84000";
 
     // Admin Portal — User Dashboard
     private static final String USER_SEARCH_TEXT = "tenjin";
@@ -131,13 +132,8 @@ public class DocketInitiationSteps extends BaseTest {
 
         Page jarvisPage = BaseTest.getPage();
         InsuranceDetailsPage insuranceDetailsPage = new InsuranceDetailsPage(jarvisPage);
-        FeeDetailsPage feeDetailsPage = new FeeDetailsPage(jarvisPage);
 
-        // Attempt move → get "Trigger DOGH for all" validation
-        feeDetailsPage.attemptMoveToDocketInitiation();
-        jarvisPage.waitForTimeout(1000);
-
-        // Trigger DOGH via Insurance Details
+        // Trigger DOGH via Insurance Details (role already changed to SALES)
         insuranceDetailsPage.triggerDOGH();
 
         log.info("DOGH trigger step completed.");
@@ -150,6 +146,18 @@ public class DocketInitiationSteps extends BaseTest {
         log.info("═══════════════════════════════════════════════════════════════");
 
         Page jarvisPage = BaseTest.getPage();
+
+        // Dismiss any lingering notification toast that could intercept clicks
+        try {
+            Locator notification = jarvisPage.locator(".el-notification__closeBtn");
+            if (notification.first().isVisible()) {
+                notification.first().click();
+                jarvisPage.waitForTimeout(1000);
+            }
+        } catch (Exception e) {
+            log.info("No notification toast to dismiss.");
+        }
+
         FeeDetailsPage feeDetailsPage = new FeeDetailsPage(jarvisPage);
 
         // All validations resolved — final move should succeed

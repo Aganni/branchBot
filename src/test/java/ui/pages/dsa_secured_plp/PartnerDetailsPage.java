@@ -1,6 +1,5 @@
 package ui.pages.dsa_secured_plp;
 
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import hooks.BaseTest;
@@ -13,32 +12,10 @@ public class PartnerDetailsPage extends BaseTest {
 
     // ── Locators ─────────────────────────────────────────────────────────────
     private static final String PARTNER_NAME = "#partnerName";
-    private static final String SCHEME_SELECT_ID = "#scheme";
-    private static final String SUB_PRODUCT_BTN = "#subProduct";
-    private static final String BRANCH_INPUT_ID = "#branch";
-    private static final String SALES_MANAGER_INPUT_ID = "#salesManager";
-
-    private static final String SAVE_AND_NEXT_BTN = "button:has-text('NEXT')";
 
     public PartnerDetailsPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
-    }
-
-    private void fillAutocomplete(String locator, String value) {
-        log.info("Filling autocomplete '{}' with value: {}", locator, value);
-        Locator input = page.locator(locator);
-        input.click();
-        input.clear();
-        input.fill(value);
-
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(value).setExact(true)).click();
-    }
-
-    private void selectDropdown(String locator, String value) {
-        log.info("Selecting dropdown '{}' with value: {}", locator, value);
-        page.locator(locator).click(); 
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(value).setExact(true)).click();
     }
 
     public void selectPartnerNameByOptionIndex(int optionIndex) {
@@ -48,35 +25,59 @@ public class PartnerDetailsPage extends BaseTest {
     }
 
     public void fillMandatoryDetails(Map<String, String> details) {
-        page.click(PARTNER_NAME);
-        String index = details.get("partnerNameOptionIndex");
-        page.click("#partnerName-option-" + index);
-        log.info("Selecting partner name via option index: {}", index);
+        // 1. Partner Name (option-index based select)
+        //    If the field is already disabled (auto-populated based on login context),
+        //    skip the selection — the partner is pre-assigned.
+        boolean partnerDisabled = page.locator(PARTNER_NAME).isDisabled();
+        if (partnerDisabled) {
+            log.info("Partner name field is pre-filled and disabled, skipping selection.");
+        } else {
+            page.click(PARTNER_NAME);
+            String index = details.get("partnerNameOptionIndex");
+            page.click("#partnerName-option-" + index);
+            log.info("Selecting partner name via option index: {}", index);
+        }
 
-        // 2. Scheme Dropdown Allocation + Dropdown Dismissal
-        page.click(SCHEME_SELECT_ID);
-        page.click("role=option[name='" + details.get("Scheme") + "']");
-        page.keyboard().press("Escape"); // Dismisses the Material UI overlay immediately
+        // 2. Program (label-based MUI select). Scheme/Sub Product options are
+        // dependent on Program being selected first, so this must run before them.
+        String program = details.get("program");
+        if (program != null && !program.isEmpty()) {
+            log.info("Selecting program: {}", program);
+            page.getByLabel("Program *").click();
+            page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(program)).click();
+        }
 
-        // 3. Sub Product Field (Now clicks the active dropdown directly)
-        page.click(SUB_PRODUCT_BTN);
-        page.click("role=option[name='" + details.get("subProduct") + "']");
-        page.keyboard().press("Escape");
+        // 3. Scheme (label-based MUI select)
+        String scheme = details.get("Scheme");
+        log.info("Selecting scheme: {}", scheme);
+        page.getByLabel("Scheme *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(scheme).setExact(true)).click();
 
-        // 4. Branch Selection
-        page.click(BRANCH_INPUT_ID);
-        page.click("role=option[name*='" + details.get("branch") + "']");
-        page.keyboard().press("Escape");
+        // 4. Sub Product (label-based MUI select)
+        String subProduct = details.get("subProduct");
+        log.info("Selecting sub product: {}", subProduct);
+        page.getByLabel("Sub Product *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(subProduct)).click();
 
-        // 5. Sales Manager Combo Routing
-        page.click(SALES_MANAGER_INPUT_ID);
-        page.fill(SALES_MANAGER_INPUT_ID, "");
-        page.click("role=option[name*='" + details.get("sales Manager") + "']");
+        // 5. Branch (combobox with partial text fill for autocomplete)
+        String branch = details.get("branch");
+        String branchFullName = details.get("branchFullName");
+        log.info("Selecting branch: {}", branchFullName != null ? branchFullName : branch);
+        page.getByLabel("Branch *").click();
+        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Branch")).fill(branch);
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(branchFullName != null ? branchFullName : branch)).click();
+
+        // 6. Sales Manager (label-based MUI select)
+        String salesManager = details.get("sales Manager");
+        log.info("Selecting sales manager: {}", salesManager);
+        page.getByLabel("Sales Manager *").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(salesManager)).click();
+
         log.info("Successfully populated all data-driven Partner configuration details.");
     }
 
     public void clickSaveAndNext() {
-        page.locator(SAVE_AND_NEXT_BTN).click();
-        log.info("Clicked SAVE AND NEXT button");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
+        log.info("Clicked Next button");
     }
 }

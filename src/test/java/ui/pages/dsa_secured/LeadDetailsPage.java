@@ -13,6 +13,9 @@ public class LeadDetailsPage extends BaseTest {
     private static final String COMBO_LOAN_PURPOSE      = "Loan Purpose";
     private static final String BTN_NEXT                = "Create Lead";
 
+    // ── Next Page Indicator (Customer Consent step) ────────────────────────
+    private static final String CONSENT_PAGE_TEXT = "We would require the customer's consent";
+
     public LeadDetailsPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
@@ -26,6 +29,11 @@ public class LeadDetailsPage extends BaseTest {
     public void fillPhoneNumber(String phone) {
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Phone Number")).fill(phone);
         log.info("Filled Phone Number: {}", phone);
+    }
+
+    public void clearPhoneNumber() {
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Phone Number")).clear();
+        log.info("Cleared Phone Number field.");
     }
 
     public void fillLoanAmount(String amount) {
@@ -64,8 +72,25 @@ public class LeadDetailsPage extends BaseTest {
         log.info("Selected Loan Purpose: {}", purpose);
     }
 
-    public void clickNext() {
+    public void clickCreateLead() {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(BTN_NEXT)).click();
-        log.info("Clicked Next button to proceed to Step 3 - Customer Consent.");
+        log.info("Clicked Create Lead button.");
+    }
+
+    /**
+     * Checks whether the page successfully transitioned to the Customer Consent step
+     * after clicking Create Lead. Waits up to 5 seconds for the consent page text to appear.
+     *
+     * @return true if the consent page loaded (lead created successfully), false otherwise
+     */
+    public boolean isLeadCreatedSuccessfully() {
+        try {
+            page.waitForSelector("text=" + CONSENT_PAGE_TEXT,
+                    new Page.WaitForSelectorOptions().setTimeout(5000));
+            return true;
+        } catch (Exception e) {
+            log.warn("Consent page did not load — phone number likely already has an application.");
+            return false;
+        }
     }
 }

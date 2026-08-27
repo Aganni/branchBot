@@ -4,12 +4,10 @@ import data.TestDataProvider;
 import dynamicData.DynamicDataClass;
 import hooks.BaseTest;
 import io.cucumber.java.en.And;
-import ui.pages.jarvis_secured.PdVisitPage;
 import ui.pages.jarvis_secured.TelePdPage;
 public class TelePdSteps extends BaseTest {
 
     private static final String TP = "dsa_secured.jarvis_secured.tele_pd.";
-    private static final String PV = "dsa_secured.jarvis_secured.pd_visit.";
     @And("User completes Tele PD Visit for all applicants")
 
     public void completePdAndPropertyVisit() throws Exception {
@@ -38,9 +36,7 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(3000);
 
-        jarvisPage.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        jarvisPage.waitForTimeout(500);
-        jarvisPage.getByPlaceholder("Application Actions").click();
+        jarvisPage.getByPlaceholder("Application Actions").click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         jarvisPage.waitForTimeout(1000);
         jarvisPage.getByText("Move to Credit Approval").click();
         jarvisPage.waitForTimeout(3000);
@@ -70,64 +66,17 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(5000);
 
-        jarvisPage.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        jarvisPage.waitForTimeout(500);
-        jarvisPage.getByPlaceholder("Application Actions").click();
+        jarvisPage.getByPlaceholder("Application Actions").click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         jarvisPage.waitForTimeout(1000);
         jarvisPage.getByText("Move to Credit Approval").click();
         jarvisPage.waitForTimeout(2000);
-        log.info("Move to Credit Approval attempted — validation error expected for missing mandatory fields.");
+        log.info("Move to Credit Approval attempted — validation error expected for missing Property Visit.");
         jarvisPage.waitForTimeout(3500);
 
-        // PHASE 5: BlackPanther - Fill mandatory fields (References + Income) for each applicant
-        log.info("Switching to BlackPanther to fill mandatory fields (References + Income)...");
-        blackPantherPage.bringToFront();
-        blackPantherPage.reload();
-        blackPantherPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
-        blackPantherPage.waitForTimeout(3000);
-
-        PdVisitPage pdVisitPage = new PdVisitPage(blackPantherPage);
-
-        String refType = TestDataProvider.get(PV + "ref_type");
-        String refName = TestDataProvider.get(PV + "ref_name");
-        String refContact = TestDataProvider.get(PV + "ref_contact");
-        String refDept = TestDataProvider.get(PV + "ref_department");
-        String refDesig = TestDataProvider.get(PV + "ref_designation");
-        String refRemarks = TestDataProvider.get(PV + "ref_remarks");
-        String incomeParticulars = TestDataProvider.get(PV + "income_particulars");
-        String incomeMonthly = TestDataProvider.get(PV + "income_monthly");
-
-        // ── Noah johnson ──
-        log.info("Filling mandatory fields for: Noah johnson");
-        pdVisitPage.clickPdVisitTab();
-        pdVisitPage.selectApplicantFromCombo("Noah johnson");
-        pdVisitPage.addReference(refType, refName, refContact, refDept, refDesig, refRemarks);
-        pdVisitPage.addIncomeEstimation(incomeParticulars, incomeMonthly);
-        pdVisitPage.clickSubmit();
-        log.info("Mandatory fields submitted for: Noah johnson");
-
-        // ── Hannah Isaac ──
-        log.info("Filling mandatory fields for: Hannah Isaac");
-        pdVisitPage.clickPdVisitTab();
-        pdVisitPage.selectApplicantFromCombo("Hannah Isaac");
-        pdVisitPage.addReference(refType, refName, refContact, refDept, refDesig, refRemarks);
-        pdVisitPage.addIncomeEstimation(incomeParticulars, incomeMonthly);
-        pdVisitPage.clickSubmit();
-        log.info("Mandatory fields submitted for: Hannah Isaac");
-
-        // ── Amazon.com Inc. ──
-        log.info("Filling mandatory fields for: Amazon.com Inc.");
-        pdVisitPage.clickPdVisitTab();
-        pdVisitPage.selectApplicantFromCombo("Amazon.com Inc.");
-        pdVisitPage.addReference(refType, refName, refContact, refDept, refDesig, refRemarks);
-        pdVisitPage.addIncomeEstimation(incomeParticulars, incomeMonthly);
-        pdVisitPage.clickSubmit();
-        log.info("Mandatory fields submitted for: Amazon.com Inc.");
-
-        log.info("All mandatory fields filled and submitted for all applicants.");
-
-        // PHASE 6: JARVIS - Move to Credit Approval (should throw validation for missing Property Visit)
-        log.info("Switching to Jarvis — attempting Move to Credit Approval (validation expected)...");
+        // PHASE 5: JARVIS - Move to Credit Approval (should throw validation for missing Property Visit)
+        // References and Income Estimation are now filled during PD Visit form filling (Step 1),
+        // so we skip the separate BlackPanther pass and go directly to Property Visit.
+        log.info("Switching to Jarvis — attempting Move to Credit Approval (validation expected for missing Property Visit)...");
         jarvisPage.bringToFront();
         String phase6Url = jarvisPage.url();
         if (!phase6Url.contains("/appForm")) {
@@ -139,9 +88,7 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(5000);
 
-        jarvisPage.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        jarvisPage.waitForTimeout(500);
-        jarvisPage.getByPlaceholder("Application Actions").click();
+        jarvisPage.getByPlaceholder("Application Actions").click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         jarvisPage.waitForTimeout(1000);
         jarvisPage.getByText("Move to Credit Approval").click();
         jarvisPage.waitForTimeout(3000);
@@ -165,9 +112,7 @@ public class TelePdSteps extends BaseTest {
         jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(5000);
 
-        jarvisPage.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        jarvisPage.waitForTimeout(500);
-        jarvisPage.getByPlaceholder("Application Actions").click();
+        jarvisPage.getByPlaceholder("Application Actions").click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         jarvisPage.waitForTimeout(1000);
         jarvisPage.getByText("Move to Credit Approval").click();
         jarvisPage.waitForTimeout(5000);

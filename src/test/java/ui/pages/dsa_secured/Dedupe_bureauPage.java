@@ -1,6 +1,5 @@
 package ui.pages.dsa_secured;
 
-import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
@@ -32,8 +31,10 @@ public class Dedupe_bureauPage extends BaseTest {
         log.info("Moved from Dedupe to Bureau Output screen.");
     }
 
-    // Downloads the bureau report via a popup page triggered by "Download Report" button.
+    // Opens the bureau report via the "Download Report" button.
     // Bureau report generation can take time — waits up to 90 seconds for the button to appear.
+    // Clicking the button triggers a download and shows a "Report downloaded successfully" toast.
+    // A popup may briefly open and auto-close — this is handled gracefully.
     public void downloadBureauReport() {
         // Wait for bureau processing to complete and Download Report button to appear
         Locator downloadBtn = page.getByRole(AriaRole.BUTTON,
@@ -45,13 +46,16 @@ public class Dedupe_bureauPage extends BaseTest {
                 .setTimeout(90000));
         log.info("Download Report button is now visible.");
 
-        Download download = page.waitForDownload(() -> {
-            Page popupPage = page.waitForPopup(() -> {
-                downloadBtn.click();
-            });
-            popupPage.close();
-        });
-        log.info("Bureau report downloaded: {}", download.suggestedFilename());
+        // Click the download button — may open a brief popup that auto-closes
+        downloadBtn.click();
+        log.info("Clicked Download Report button.");
+
+        // Wait for the success toast to confirm the report was downloaded
+        page.getByText("Report downloaded successfully").waitFor(
+                new Locator.WaitForOptions()
+                        .setState(WaitForSelectorState.VISIBLE)
+                        .setTimeout(30000));
+        log.info("Bureau report downloaded successfully (toast confirmed).");
     }
 
     // Navigates to Bank Statement screen, selects applicant, fills dates, handles

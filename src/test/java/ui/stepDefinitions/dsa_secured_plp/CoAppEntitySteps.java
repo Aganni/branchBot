@@ -13,13 +13,15 @@ public class CoAppEntitySteps extends BaseTest {
         //String email = TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.email");
         entityPage.clickAddApplicant();
         entityPage.selectApplicantType(TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.applicant_type"));
-        entityPage.verifyCompanyPan(TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.pan"));
+        entityPage.verifyCompanyPan(
+                TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.pan"),
+                TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.business_type")
+        );
         entityPage.verifyUdyamDetails(TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.udyam"));
 
         // 3. Corporate Profile Details
         entityPage.EntityProfileDetails(
                 TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.registration_date"),
-                TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.business_type"),
                 TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.phone_number"),
                 TestDataProvider.get("dsa_secured_plp.co_applicant_entity.kyc.email")
         );

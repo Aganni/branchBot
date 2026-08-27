@@ -1,8 +1,10 @@
 package ui.pages.jarvis_secured;
+import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
 import java.util.regex.Pattern;
 
@@ -18,14 +20,18 @@ public class TelePdPage extends BaseTest {
         return this.page;
     }
     // LOGIN TO BLACKPANTHER
+    // BlackPanther opens as a new tab in the existing browser context (same as Jarvis)
+    // so it shares session cookies (Cloudflare SSO). Both tabs coexist in the same
+    // context and are switched using bringToFront().
     public void navigateToBlackPanther(String url) {
-        Page newTab = page.context().newPage();
+        BrowserContext currentContext = page.context();
+        Page newTab = currentContext.newPage();
         newTab.navigate(url);
         newTab.waitForLoadState(LoadState.NETWORKIDLE);
         newTab.waitForTimeout(2000);
         // Switch all subsequent interactions to the new tab
         this.page = newTab;
-        log.info("BlackPanther opened in new tab.");
+        log.info("BlackPanther opened as a new tab in the existing browser context.");
     }
     public void loginViaGoogleSSO() {
         log.info("Logging in to BlackPanther via Google SSO...");
@@ -33,13 +39,27 @@ public class TelePdPage extends BaseTest {
                 .setName("google Sign in with Google")).click();
         page.waitForTimeout(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("CloudflareSSO")).click();
-        page.waitForTimeout(5000);
+
+        // The redirect back to BlackPanther's dashboard after Cloudflare SSO can
+        // intermittently take longer than a fixed sleep allows. Wait for the network to
+        // actually settle instead of assuming a fixed 5s is always enough.
+        try {
+            page.waitForLoadState(LoadState.NETWORKIDLE, new Page.WaitForLoadStateOptions().setTimeout(20000));
+        } catch (Exception e) {
+            log.warn("Network did not reach idle state within timeout after SSO login, continuing anyway.");
+        }
+        page.waitForTimeout(2000);
         log.info("BlackPanther login submitted.");
     }
 
     // SEARCH & OPEN APPLICATION BY APP ID
     public void searchByAppId(String appFormId) {
-        page.locator("button").filter(new Locator.FilterOptions().setHasText("Search by")).click();
+        // The dashboard may still be finishing its post-login render, so wait
+        // explicitly for the "Search by" button to become visible/clickable instead of
+        // relying on a fixed timeout, which can fail intermittently under slow loads.
+        Locator searchByBtn = page.locator("button").filter(new Locator.FilterOptions().setHasText("Search by"));
+        searchByBtn.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE).setTimeout(45000));
+        searchByBtn.click();
         page.waitForTimeout(500);
         // Select "App ID" search type
         page.getByText("App ID", new Page.GetByTextOptions().setExact(true)).click();
@@ -87,9 +107,30 @@ public class TelePdPage extends BaseTest {
         log.info("Selecting applicant: {}", applicantText);
         page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(1000);
-        page.getByRole(AriaRole.COMBOBOX).first().click();
+
+        // Wait for any loading mask to clear before interacting with the combobox
+        try {
+            page.locator(".el-loading-mask").first()
+                    .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(15000));
+        } catch (Exception ignore) {
+            // No loading mask present, continue
+        }
+
+        // The "Select Applicant/Co-applicant" combobox text also appears in the page
+        // header for the primary applicant (e.g. "Noah johnson"). Using getByText on
+        // the full page picks the header first in DOM order for that name. Instead,
+        // click the combobox to open it, then scope the option search to the dropdown
+        // content area that appears below the combobox trigger.
+        Locator combobox = page.getByText("Select Applicant/Co-applicant");
+        combobox.click();
         page.waitForTimeout(1000);
-        page.getByText(applicantText).first().click();
+
+        // Click the specific applicant text inside the now-open dropdown list.
+        // Use .last() to skip any header match and target the dropdown option which
+        // renders later in DOM. This is safe because the dropdown is only open after
+        // the combobox click above, meaning the option text only appears in two places
+        // max (header + dropdown row), and .last() always picks the dropdown row.
+        page.getByText(applicantText).last().click();
         page.waitForTimeout(1000);
     }
 

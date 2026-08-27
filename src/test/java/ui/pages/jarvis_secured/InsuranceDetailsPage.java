@@ -6,11 +6,14 @@ import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import hooks.BaseTest;
 
+import java.util.regex.Pattern;
+
 /**
  * Page Object for Insurance Details section in the Docket Initiation stage.
  * Handles:
  *   - General Insurance (life insurance for applicant)
  *   - Property Insurance / Collateral insurance
+ *   - DOGH trigger for insurance
  *   - Final submission to complete insurance requirements
  */
 public class InsuranceDetailsPage extends BaseTest {
@@ -31,11 +34,18 @@ public class InsuranceDetailsPage extends BaseTest {
      */
     public void attemptMoveToDocketInitiation() {
         log.info("Attempting Move to Docket Initiation (expecting property/insurance validation)...");
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
+        // Wait for page to fully load — validation can take longer than usual
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForTimeout(5000);
+        page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(1000);
-        page.getByPlaceholder("Application Actions").click();
-        page.waitForTimeout(1000);
-        page.getByText("Move to Docket Initiation").click();
+
+        // Wait for Application Actions to be visible and ready
+        Locator appActions = page.getByPlaceholder("Application Actions");
+        appActions.waitFor(new Locator.WaitForOptions().setTimeout(60000));
+        appActions.click();
+        page.waitForTimeout(2000);
+        page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Docket Initiation")).click();
         page.waitForTimeout(2000);
         log.info("Move to Docket Initiation attempted.");
     }
@@ -45,21 +55,29 @@ public class InsuranceDetailsPage extends BaseTest {
      */
     public void clickPropertyValidationMessage() {
         log.info("Clicking property validation message...");
-        page.getByText("Please add atleast 1 property").click();
+        Locator validationMsg = page.getByText("Please add atleast 1 property");
+        validationMsg.waitFor(new Locator.WaitForOptions().setTimeout(150000)); // 2.5 min timeout
+        validationMsg.click();
         page.waitForTimeout(2000);
         log.info("Navigated to Insurance Details section.");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    //  GENERAL INSURANCE
+    //  INSURANCE DETAILS SECTION
     // ═══════════════════════════════════════════════════════════════════════════
 
     /**
-     * Opens the Insurance Details section (accordion with "No" status).
+     * Opens the Insurance Details section accordion.
      */
     public void openInsuranceDetailsSection() {
         log.info("Opening Insurance Details section...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Insurance Details No")).click();
+        // The accordion button's accessible name can vary (e.g. "Insurance Details Insurance",
+        // "Insurance Details Not Initiated", etc.) depending on the current status badge.
+        // Use a text-based locator with the section heading text instead.
+        Locator insuranceBtn = page.locator("button").filter(
+                new Locator.FilterOptions().setHasText("Insurance Details"));
+        insuranceBtn.first().scrollIntoViewIfNeeded();
+        insuranceBtn.first().click();
         page.waitForTimeout(1000);
         log.info("Insurance Details section opened.");
     }
@@ -74,15 +92,9 @@ public class InsuranceDetailsPage extends BaseTest {
         log.info("Insurance Details in edit mode.");
     }
 
-    /**
-     * Opens the General Insurance form by clicking the "General Insurance" button/accordion.
-     */
-    public void openGeneralInsuranceForm() {
-        log.info("Opening General Insurance form...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("General Insurance ")).click();
-        page.waitForTimeout(1000);
-        log.info("General Insurance form opened.");
-    }
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  GENERAL INSURANCE
+    // ═══════════════════════════════════════════════════════════════════════════
 
     /**
      * Selects an insurance provider from the dropdown.
@@ -91,9 +103,10 @@ public class InsuranceDetailsPage extends BaseTest {
      */
     public void selectInsuranceProvider(String provider) {
         log.info("Selecting insurance provider: {}", provider);
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Insurance Provider")).click();
+        page.getByPlaceholder("Insurance Provider").click();
         page.waitForTimeout(500);
-        page.getByText(provider).nth(1).click();
+        page.locator("span").filter(new Locator.FilterOptions()
+                .setHasText(Pattern.compile("^" + provider + "$"))).click();
         page.waitForTimeout(500);
         log.info("Insurance provider selected: {}", provider);
     }
@@ -105,11 +118,9 @@ public class InsuranceDetailsPage extends BaseTest {
      */
     public void selectPolicyHolderName(String holderName) {
         log.info("Selecting policy holder: {}", holderName);
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Title")).click();
-        page.waitForTimeout(300);
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Select a policy holder name")).click();
+        page.getByPlaceholder("Select a policy holder name").click();
         page.waitForTimeout(500);
-        page.getByText(holderName).nth(3).click();
+        page.getByText(holderName).nth(1).click();
         page.waitForTimeout(500);
         log.info("Policy holder selected: {}", holderName);
     }
@@ -121,7 +132,7 @@ public class InsuranceDetailsPage extends BaseTest {
      */
     public void fillPolicySumInsured(String sumInsured) {
         log.info("Filling policy sum insured: {}", sumInsured);
-        Locator sumInput = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Policy sum insured"));
+        Locator sumInput = page.getByPlaceholder("Policy sum insured");
         sumInput.click();
         sumInput.fill(sumInsured);
         page.waitForTimeout(300);
@@ -131,13 +142,13 @@ public class InsuranceDetailsPage extends BaseTest {
     /**
      * Selects the policy tenure from the dropdown.
      *
-     * @param tenure the policy tenure (e.g. "3 years")
+     * @param tenure the policy tenure (e.g. "1 year")
      */
     public void selectPolicyTenure(String tenure) {
         log.info("Selecting policy tenure: {}", tenure);
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Policy Tenure")).click();
         page.waitForTimeout(500);
-        page.locator("li").filter(new Locator.FilterOptions().setHasText(tenure)).nth(2).click();
+        page.getByText(tenure).nth(1).click();
         page.waitForTimeout(500);
         log.info("Policy tenure selected: {}", tenure);
     }
@@ -158,15 +169,37 @@ public class InsuranceDetailsPage extends BaseTest {
     }
 
     /**
+     * Clicks Update to save the insurance details. First attempt may show
+     * "Please enter mandatory fields" validation for nominee.
+     */
+    public void clickUpdate() {
+        log.info("Clicking Update to save insurance details...");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Update").setExact(true)).click();
+        page.waitForTimeout(2000);
+        log.info("Insurance details updated.");
+    }
+
+    /**
+     * Clicks the "Please enter mandatory fields" validation message (shown after first Update
+     * when nominee is missing).
+     */
+    public void clickMandatoryFieldsValidation() {
+        log.info("Clicking 'Please enter mandatory fields' validation...");
+        page.getByText("Please enter mandatory fields").click();
+        page.waitForTimeout(1000);
+        log.info("Mandatory fields validation acknowledged.");
+    }
+
+    /**
      * Selects a nominee name from the dropdown.
      *
-     * @param nomineeName the nominee name (e.g. "Noah johnson")
+     * @param nomineeName the nominee name (e.g. "loganathan Sharma")
      */
     public void selectNomineeName(String nomineeName) {
         log.info("Selecting nominee: {}", nomineeName);
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Select a nominee name")).click();
+        page.getByPlaceholder("Select a nominee name").click();
         page.waitForTimeout(500);
-        page.getByText(nomineeName).nth(4).click();
+        page.locator("li").filter(new Locator.FilterOptions().setHasText(nomineeName)).nth(1).click();
         page.waitForTimeout(500);
         log.info("Nominee selected: {}", nomineeName);
     }
@@ -185,51 +218,9 @@ public class InsuranceDetailsPage extends BaseTest {
         log.info("Nominee relationship filled: {}", relationship);
     }
 
-    /**
-     * Clicks Update to save the general insurance details.
-     */
-    public void clickUpdate() {
-        log.info("Clicking Update to save insurance details...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Update").setExact(true)).click();
-        page.waitForTimeout(2000);
-        log.info("Insurance details updated.");
-    }
-
-    /**
-     * Clicks SUBMIT to finalize the general insurance entry.
-     */
-    public void clickSubmit() {
-        log.info("Clicking SUBMIT...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
-        page.waitForTimeout(2000);
-        page.waitForLoadState(LoadState.NETWORKIDLE);
-        page.waitForTimeout(1000);
-        log.info("Insurance submitted.");
-    }
-
     // ═══════════════════════════════════════════════════════════════════════════
     //  PROPERTY INSURANCE / COLLATERAL
     // ═══════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Opens the Property Insurance Collateral section.
-     */
-    public void openPropertyInsuranceCollateralSection() {
-        log.info("Opening Property Insurance Collateral section...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Property Insurance Collateral")).click();
-        page.waitForTimeout(1000);
-        log.info("Property Insurance Collateral section opened.");
-    }
-
-    /**
-     * Clicks on the "Property insurance is" validation/info message.
-     */
-    public void clickPropertyInsuranceMessage() {
-        log.info("Clicking Property insurance message...");
-        page.getByText("Property insurance is").click();
-        page.waitForTimeout(1000);
-        log.info("Property insurance message clicked.");
-    }
 
     /**
      * Opens the Collateral 1 section to fill property insurance details.
@@ -242,9 +233,24 @@ public class InsuranceDetailsPage extends BaseTest {
     }
 
     /**
+     * Clicks the property insurance checkbox to enable the premium input field.
+     * The checkbox must be checked before the "Insurance Premium" input becomes editable.
+     */
+    public void enablePropertyInsuranceCheckbox() {
+        log.info("Clicking property insurance checkbox to enable premium input...");
+        Locator checkbox = page.locator("(//span[@class='el-checkbox__inner'])[1]");
+        checkbox.scrollIntoViewIfNeeded();
+        checkbox.click();
+        page.waitForTimeout(1000);
+        log.info("Property insurance checkbox enabled.");
+    }
+
+    /**
      * Fills in the property insurance premium for the collateral.
+     * Note: The property insurance checkbox must be checked first via
+     * {@link #enablePropertyInsuranceCheckbox()} to enable this input.
      *
-     * @param premium the insurance premium value (e.g. "6840")
+     * @param premium the insurance premium value (e.g. "84000")
      */
     public void fillPropertyInsurancePremium(String premium) {
         log.info("Filling property insurance premium: {}", premium);
@@ -257,7 +263,7 @@ public class InsuranceDetailsPage extends BaseTest {
     }
 
     /**
-     * Clicks Update to save property insurance details.
+     * Clicks Update for property insurance.
      */
     public void clickPropertyUpdate() {
         log.info("Clicking Update for property insurance...");
@@ -267,30 +273,45 @@ public class InsuranceDetailsPage extends BaseTest {
     }
 
     /**
-     * Clicks SUBMIT for property insurance collateral.
+     * Clicks SUBMIT to finalize (triggers "Please trigger DOGH for all" validation).
      */
-    public void submitPropertyInsurance() {
-        log.info("Submitting property insurance...");
+    public void clickSubmit() {
+        log.info("Clicking SUBMIT...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
         page.waitForTimeout(2000);
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(1000);
-        log.info("Property insurance submitted.");
+        log.info("Insurance submitted.");
     }
 
     /**
-     * Final submit for the entire General Insurance entry after property insurance is done.
+     * Clicks the "Please trigger DOGH for all" validation message.
      */
-    public void finalSubmitGeneralInsurance() {
-        log.info("Final submit for General Insurance entry...");
-        // Click on the General Insurance accordion to expand/view the final state
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("General Insurance Hannah (")).click();
+    public void clickTriggerDoghValidation() {
+        log.info("Clicking 'Please trigger DOGH for all' validation...");
+        page.getByText("Please trigger DOGH for all").click();
         page.waitForTimeout(1000);
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
+        log.info("DOGH validation acknowledged.");
+    }
+
+    /**
+     * Closes the insurance panel by scrolling up to the close (X) button,
+     * clicking it, then clicking outside to dismiss the panel.
+     */
+    public void closeInsurancePanel() {
+        log.info("Closing insurance panel...");
+        // Scroll up inside the panel to make the close button visible
+        page.keyboard().press("Home");
+        page.waitForTimeout(1000);
+
+        // Click the close (X) button
+        page.locator("//i[@class='el-icon-close']").click();
+        page.waitForTimeout(1000);
+
+        // Click outside to fully dismiss the panel
+        page.mouse().click(50, 400);
         page.waitForTimeout(2000);
-        page.waitForLoadState(LoadState.NETWORKIDLE);
-        page.waitForTimeout(1000);
-        log.info("General Insurance final submission completed.");
+        log.info("Insurance panel closed.");
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -299,23 +320,19 @@ public class InsuranceDetailsPage extends BaseTest {
 
     /**
      * Triggers DOGH (Obtain physical documents) for the General Insurance entry.
-     * Flow: Open Insurance Details → Edit → General Insurance Hannah → See more details → Trigger DOGH → SUBMIT
+     * Flow: Open Insurance Details → Edit → See more details → Trigger DOGH → SUBMIT → Close panel
      * Prerequisite: User must have SALES department/designation assigned via Admin Portal.
      */
     public void triggerDOGH() {
         log.info("── Triggering DOGH for Insurance ──");
 
         // Open Insurance Details section
-        log.info("Opening Insurance Details section for DOGH...");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Insurance Details Insurance")).click();
+        page.locator("button").filter(
+                new Locator.FilterOptions().setHasText("Insurance Details")).first().click();
         page.waitForTimeout(1000);
 
         // Click Edit
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
-        page.waitForTimeout(1000);
-
-        // Open General Insurance Hannah accordion
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("General Insurance Hannah (")).click();
         page.waitForTimeout(1000);
 
         // Click "See more details" to expand the details view
@@ -330,7 +347,10 @@ public class InsuranceDetailsPage extends BaseTest {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("SUBMIT")).click();
         page.waitForTimeout(2000);
         page.waitForLoadState(LoadState.NETWORKIDLE);
-        page.waitForTimeout(1000);
+        page.waitForTimeout(2000);
+
+        // Close the insurance panel — scroll up to find the close button, then click outside
+        closeInsurancePanel();
 
         log.info("DOGH triggered successfully for General Insurance.");
     }
@@ -341,65 +361,57 @@ public class InsuranceDetailsPage extends BaseTest {
 
     /**
      * Completes the full insurance details flow including general and property insurance.
+     * After this method, the "Please trigger DOGH for all" validation has been shown and
+     * the insurance panel is closed, ready for Admin Portal role change and DOGH trigger.
      *
      * @param provider         insurance provider (e.g. "ICICI Lombard")
      * @param holderName       policy holder name (e.g. "Hannah Isaac")
      * @param sumInsured       sum insured (e.g. "250000")
-     * @param tenure           policy tenure (e.g. "3 years")
+     * @param tenure           policy tenure (e.g. "1 year")
      * @param premium          general insurance premium (e.g. "25000")
-     * @param nomineeName      nominee name (e.g. "Noah johnson")
+     * @param nomineeName      nominee name (e.g. "loganathan Sharma")
      * @param relationship     nominee relationship (e.g. "brother")
-     * @param propertyPremium  property insurance premium (e.g. "6840")
+     * @param propertyPremium  property insurance premium (e.g. "84000")
      */
     public void completeInsuranceDetails(String provider, String holderName, String sumInsured,
                                          String tenure, String premium, String nomineeName,
                                          String relationship, String propertyPremium) {
         log.info("── Completing Insurance Details ──");
 
-        // Step 1: Handle validation message and open section
+        // Step 1: Click validation message and open section
         clickPropertyValidationMessage();
         openInsuranceDetailsSection();
         clickEdit();
 
-        // Step 2: Fill General Insurance
-        openGeneralInsuranceForm();
+        // Step 2: Fill General Insurance fields
         selectInsuranceProvider(provider);
         selectPolicyHolderName(holderName);
         fillPolicySumInsured(sumInsured);
         selectPolicyTenure(tenure);
         fillInsurancePremium(premium);
+
+        // Step 3: First Update → triggers mandatory fields validation for nominee
+        clickUpdate();
+        clickMandatoryFieldsValidation();
+
+        // Step 4: Fill nominee details and Update again
         selectNomineeName(nomineeName);
         fillNomineeRelationship(relationship);
         clickUpdate();
-        clickSubmit();
 
-        // Step 3: Fill Property Insurance / Collateral
-        openPropertyInsuranceCollateralSection();
-        clickPropertyInsuranceMessage();
+        // Step 5: Fill Property Insurance / Collateral
         openCollateralSection();
+        enablePropertyInsuranceCheckbox();
         fillPropertyInsurancePremium(propertyPremium);
         clickPropertyUpdate();
-        submitPropertyInsurance();
 
-        // Step 4: Final submission
-        finalSubmitGeneralInsurance();
+        // Step 6: Submit → triggers "Please trigger DOGH for all" validation
+        clickSubmit();
+        clickTriggerDoghValidation();
 
-        // Step 5: Click outside to close the insurance panel/modal
+        // Step 7: Close the insurance panel (cross button + click outside)
         closeInsurancePanel();
 
-        log.info("Insurance Details completed successfully.");
-    }
-
-    /**
-     * Closes the insurance panel by clicking the close (X) button
-     * and then clicking outside the insurance section.
-     */
-    public void closeInsurancePanel() {
-        log.info("Closing insurance panel — clicking close button then clicking outside...");
-        page.locator("//i[@class='el-icon-close']").click();
-        page.waitForTimeout(1000);
-        page.mouse().click(50, 400);
-        page.waitForTimeout(2000);
-        log.info("Insurance panel closed.");
+        log.info("Insurance Details completed. Ready for DOGH trigger after role change.");
     }
 }

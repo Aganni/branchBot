@@ -15,7 +15,7 @@ public class NonFinancialCoApplicantPage extends BaseTest {
         this.page = page;
     }
 
-    //  OPEN CO-APPLICANT DETAILS
+    //  OPEN CO-APPLICANT DETAILS AND CLICK VIEW ON BHASKAR
     public void openCoApplicantDetails(String coApplicantName) {
         log.info("Opening Non-Financial CoApplicant details for: {}", coApplicantName);
         // Wait for any loading masks to disappear before interacting
@@ -32,13 +32,13 @@ public class NonFinancialCoApplicantPage extends BaseTest {
                 .setName(Pattern.compile("CoApplicant Details"))).click();
         page.waitForTimeout(2000);
 
-        // Wait for co-applicant details to load — View buttons appear once loaded
+        // Wait for View buttons to appear
         Locator viewButtons = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("View"));
         viewButtons.first().waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
         page.waitForTimeout(1000);
 
-        // Find the co-applicant by their h3 name heading, then click the View button in the same card
+        // Find BHASKAR by name and click View on that card
         Locator nameHeading = page.locator("h3").filter(new Locator.FilterOptions().setHasText(coApplicantName));
         int count = nameHeading.count();
         log.info("Found {} h3 elements with text '{}' in CoApplicant section", count, coApplicantName);
@@ -55,66 +55,54 @@ public class NonFinancialCoApplicantPage extends BaseTest {
                 .click();
         log.info("Clicked View for non-financial co-applicant: {}", coApplicantName);
         page.waitForTimeout(1000);
+    }
 
+    //  CLICK EDIT IN THE DIALOG
+    public void clickEdit() {
+        log.info("Clicking Edit button...");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
         page.waitForTimeout(1000);
-
-        log.info("Non-Financial CoApplicant details opened for editing.");
+        log.info("Edit button clicked.");
     }
 
-    //  SUBMIT & SELECT OVD
-    public void submitAndSelectOvd(String ovdType) {
-        log.info("Submitting non-financial co-applicant details and selecting OVD: {}", ovdType);
-        // Scroll to the bottom Submit button in the dialog and click it
-        Locator submitBtn = page.getByRole(AriaRole.DIALOG)
-                .locator("div.title >> text=Submit").last();
-        submitBtn.scrollIntoViewIfNeeded();
-        page.waitForTimeout(1000);
-        submitBtn.click();
+    //  CLICK SUBMIT IN DIALOG (triggers mandatory field validation)
+    public void clickSubmitInDialog() {
+        log.info("Clicking Submit in dialog...");
+        page.getByRole(AriaRole.DIALOG).getByText("Submit").click();
         page.waitForTimeout(3000);
-
-        // Handle OVD selection
-        page.getByPlaceholder("Select the OVD").click();
-        page.getByText(ovdType).click();
-        page.waitForTimeout(500);
-
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Yes")).click();
-        page.waitForTimeout(2000);
-        log.info("Non-Financial CoApplicant OVD selected.");
+        log.info("Submit clicked in dialog.");
     }
 
-    //  FILL VOTER ID & VERIFY
-    public void fillVoterIdAndVerify(String voterId) {
-        log.info("Filling Voter ID: {}", voterId);
-        page.getByPlaceholder("Enter voter id").click();
-        page.getByPlaceholder("Enter voter id").fill(voterId);
-        page.getByText("Verify").click();
-        page.waitForTimeout(5000);
-        log.info("Voter ID entered and verification triggered.");
-    }
-
-    //  FILL LAST NAME & RESIDENTIAL STATUS
-    public void fillLastNameAndResidentialStatus(String lastName, String residentialStatus) {
-        page.getByPlaceholder("Enter the last name").click();
-        page.getByPlaceholder("Enter the last name").fill(lastName);
-        page.waitForTimeout(3500);
+    //  FILL RESIDENTIAL STATUS
+    public void fillResidentialStatus(String residentialStatus) {
+        log.info("Selecting residential status: {}", residentialStatus);
         page.getByPlaceholder("Select the residential status").click();
         page.locator("li").filter(new Locator.FilterOptions()
                 .setHasText(Pattern.compile("^" + residentialStatus + "$"))).click();
         page.waitForTimeout(500);
-        log.info("Filled the co-applicant last name [{}] and residential status [{}]", lastName, residentialStatus);
+        log.info("Residential status selected: {}", residentialStatus);
     }
 
     //  SUBMIT FINAL DETAILS
     public void submitFinalDetails() {
-        // Click the submit arrow icon in the dialog
-        page.getByRole(AriaRole.DIALOG).locator("div")
-                .filter(new Locator.FilterOptions().setHasText(Pattern.compile("^Arrow Right icon$"))).click();
+        log.info("Clicking final submit...");
+        page.locator("div:nth-child(25) > .el-col > .cs-fab > .info").click();
         page.waitForTimeout(2000);
-        // Confirm
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Yes")).click();
+        log.info("Non-financial co-applicant details submitted successfully.");
+    }
+
+    //  RELOAD PAGE
+    public void reloadPage() {
+        log.info("Reloading page...");
+        try {
+            page.reload(new Page.ReloadOptions()
+                    .setWaitUntil(com.microsoft.playwright.options.WaitUntilState.DOMCONTENTLOADED)
+                    .setTimeout(30000));
+        } catch (com.microsoft.playwright.PlaywrightException e) {
+            log.warn("Reload encountered an issue: {}. Waiting for page to stabilize.", e.getMessage());
+        }
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
-        log.info("Non-financial co-applicant details submitted successfully.");
+        log.info("Page reloaded.");
     }
 }

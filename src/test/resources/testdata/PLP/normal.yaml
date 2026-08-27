@@ -5,14 +5,16 @@ dsa_secured_plp:
 
   partner_details:
       partnerNameOptionIndex: "1"
+      program: "Repayment Surrogate"
       scheme: "BT"
       subProduct: "Warehouse"
-      branch: "INDIQUBE LEXINGTON AUDUGODI- BENGALURU"
-      sales_manager: "nikitha"
+      branch: "ind"
+      branchFullName: "INDIQUBE LEXINGTON AUDUGODI-"
+      sales_manager: "nikitha.s@creditsaison-in.com"
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001010024"
+    phone_number: "9001010027"
     loan_amount: "45654200"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -200,45 +202,7 @@ dsa_secured_plp:
       ownership: "Rented"
     Consent:
         email: "tenjin.user@creditsaison-in.com"
-        password: "CreditQA@4869"
-
-  co_applicant_aadhaar:
-    kyc:
-      applicant_type: "Individual"
-      type: "Non-Financial"
-      ovd_type: "Aadhaar Last 4 digits"
-      dob: "24/12/1995"
-      aadhaar_last_4: "3205"
-      salutation: "Mr"
-      name: "Chris Taylor"
-      relationship: "Brother"
-      phone_number: "9380802314"
-      email: "nikitha.s@creditsaison-in.com"
-      gender: "Male"
-      father_name: "Isaiah"
-      mother_name: "Sarah"
-      category: "SC"
-      religion: "HINDU"
-      education: "PG"
-      marital_status: "Single"
-      nationality: "NR"
-      disability: "No"
-    addresses:
-      line1: "Door No 45/22 Maple Residency 4th Floor Beside Phoenix Arena"
-      line2: "Behind Tech Park Square Whitefield Main Road IT Corridor"
-      pincode: "600092"
-      ownership: "Self Owned"
-    obligations:
-      type: "Business Loan"
-      financier: "ICICI Bank"
-      emi: "12000"
-      account_number: "50901001983200"
-      outstanding: "120"
-      remaining_tenure: "20"
-      obligate: "No"
-      closure_type: "Bank Close"
-    consent:
-      otp: "123456"
+        password: "CreditQA@4860"
 
   collateral_details:
     owner1: "Noah johnson"

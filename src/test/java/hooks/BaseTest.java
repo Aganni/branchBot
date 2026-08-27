@@ -19,6 +19,10 @@ public class BaseTest {
     private static final ThreadLocal<Browser> browserThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<BrowserContext> contextThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<Page> pageThreadLocal = new ThreadLocal<>();
+    // Tracks secondary contexts (e.g. BlackPanther) opened outside the main Jarvis/DSA
+    // context, so they get closed (and their videos finalized) during teardown too.
+    private static final ThreadLocal<java.util.List<BrowserContext>> extraContextsThreadLocal =
+            ThreadLocal.withInitial(java.util.ArrayList::new);
     private static final ThreadLocal<String> userName = new ThreadLocal<>();
     private static final ThreadLocal<String> userPassword = new ThreadLocal<>(); // Renamed from xApiKey
     private static final ThreadLocal<String> otp = new ThreadLocal<>();
@@ -51,13 +55,29 @@ public class BaseTest {
         return contextThreadLocal.get();
     }
 
+    public static Browser getBrowser() {
+        if (browserThreadLocal.get() == null) {
+            startBrowserInstance();
+        }
+        return browserThreadLocal.get();
+    }
+
+    // Registers a secondary browser context (e.g. BlackPanther) so it gets closed
+    // during teardownBrowserInstance(), ensuring its video is finalized and the
+    // context doesn't leak for the lifetime of the JVM/thread.
+    public static void registerExtraContext(BrowserContext context) {
+        if (context != null) {
+            extraContextsThreadLocal.get().add(context);
+        }
+    }
+
     public static void startBrowserInstance() {
         try {
             Playwright playwright = Playwright.create();
             playwrightThreadLocal.set(playwright);
 
             Browser browser = playwright.chromium()
-                    .launch(new BrowserType.LaunchOptions()
+                    .launch(new BrowserType.LaunchOptions().setChannel("chrome")
                             .setHeadless(false)
                             .setArgs(java.util.List.of("--start-maximized")));
             browserThreadLocal.set(browser);
@@ -93,6 +113,11 @@ public class BaseTest {
             if (context != null) {
                 try { context.close(); } catch (Exception ignore) { log.warn("Failed to close context: " + ignore.getMessage()); }
             }
+            // Close any secondary contexts (e.g. BlackPanther's dedicated context) so
+            // their videos are finalized and they don't leak past this scenario.
+            for (BrowserContext extraContext : extraContextsThreadLocal.get()) {
+                try { extraContext.close(); } catch (Exception ignore) { log.warn("Failed to close extra context: " + ignore.getMessage()); }
+            }
             if (browser != null) {
                 try { browser.close(); } catch (Exception ignore) { log.warn("Failed to close browser: " + ignore.getMessage()); }
             }
@@ -104,6 +129,7 @@ public class BaseTest {
             contextThreadLocal.remove();
             browserThreadLocal.remove();
             playwrightThreadLocal.remove();
+            extraContextsThreadLocal.remove();
             userName.remove();
             userPassword.remove(); // Clean up updated ThreadLocal
             otp.remove();

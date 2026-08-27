@@ -27,15 +27,19 @@ public class DocumentsPage extends BaseTest {
     public void uploadDocument(String filePath, String documentType, int inputIndex) {
         page.waitForTimeout(2000);
         page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+        page.waitForTimeout(1000);
         Locator uploadButton = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Upload")).nth(inputIndex);
         uploadButton.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE).setTimeout(15000));
-        uploadButton.scrollIntoViewIfNeeded();
+        // Re-query the locator to ensure we have a fresh DOM reference after any re-renders
+        final Locator freshUploadButton = page.getByRole(AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("Upload")).nth(inputIndex);
+        freshUploadButton.scrollIntoViewIfNeeded();
         page.waitForTimeout(500);
         // Step 1: Handle the file picker popup using FileChooser API
         FileChooser fileChooser = page.waitForFileChooser(() -> {
-            uploadButton.click();
+            freshUploadButton.click();
         });
         fileChooser.setFiles(Paths.get(filePath));
         log.info("Selected file via file picker: {}", filePath);

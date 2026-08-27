@@ -37,13 +37,20 @@ public class CoAppEntityPage extends BaseTest {
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(applicantType)).click();
     }
 
-    public void verifyCompanyPan(String pan) throws InterruptedException {
+    public void verifyCompanyPan(String pan, String bizType) throws InterruptedException {
         page.waitForTimeout(2500);
         page.getByLabel("Company PAN *").fill(pan);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).click();
         page.waitForTimeout(2500);
+
+        // The "Continue to fetch details" CTA stays disabled until Business type is
+        // selected, so it must be picked before clicking Continue.
+        page.getByLabel(BUSINESS_TYPE).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(bizType)).click();
+        page.waitForTimeout(500);
+
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Continue to fetch details")).click();
-        log.info("Company PAN verified and background details fetched.");
+        log.info("Company PAN verified, business type '{}' selected, and background details fetched.", bizType);
     }
 
     public void verifyUdyamDetails(String udyam) {
@@ -71,10 +78,10 @@ public class CoAppEntityPage extends BaseTest {
         log.info("UDYAM verified successfully.");
     }
 
-    public void EntityProfileDetails(String regDate, String bizType, String phone, String email) {
+    public void EntityProfileDetails(String regDate, String phone, String email) {
+        // Business type is already selected earlier in verifyCompanyPan(), before the
+        // "Continue to fetch details" CTA was clicked.
         page.getByPlaceholder(REGISTRATION_DATE).fill(regDate);
-        page.getByLabel(BUSINESS_TYPE).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(bizType)).click();
         page.getByPlaceholder(PHONE).fill(phone);
         page.getByPlaceholder(EMAIL).fill(email);
     }

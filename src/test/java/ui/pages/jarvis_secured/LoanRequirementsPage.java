@@ -22,9 +22,9 @@ public class LoanRequirementsPage extends BaseTest {
         page.getByPlaceholder("Enter the requested amount").click();
         page.getByPlaceholder("Enter the requested amount").fill("50000000");
         page.waitForTimeout(500);
-        // Sanction amount
-        page.getByPlaceholder("Enter the amount").click();
-        page.getByPlaceholder("Enter the amount").fill("19568400");
+        // Sanction amount (there are two "Enter the amount" inputs on this page; the second one is disabled)
+        page.locator("input[placeholder='Enter the amount']:not([disabled])").click();
+        page.locator("input[placeholder='Enter the amount']:not([disabled])").fill("19568400");
         page.waitForTimeout(500);
         // Tenure
         page.getByPlaceholder("Enter the tenure").click();

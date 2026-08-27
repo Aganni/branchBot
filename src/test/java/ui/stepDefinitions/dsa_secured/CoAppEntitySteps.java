@@ -13,7 +13,10 @@ public class CoAppEntitySteps extends BaseTest {
 
         entityPage.clickAddApplicant();
         entityPage.selectApplicantType(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.applicant_type"));
-        entityPage.verifyCompanyPan(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.pan"));
+        entityPage.verifyCompanyPan(
+                TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.pan"),
+                TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.business_type")
+        );
 
         // Select GSTIN (no verify) then fill and verify UDYAM
         entityPage.verifyUdyamDetails(TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.udyam"));
@@ -21,7 +24,6 @@ public class CoAppEntitySteps extends BaseTest {
         // 3. Corporate Profile Details
         entityPage.EntityProfileDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.registration_date"),
-                TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.business_type"),
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.phone_number"),
                 TestDataProvider.get("dsa_secured.co_applicant_entity.kyc.email")
         );

@@ -64,9 +64,10 @@ public class PdVisitSteps extends BaseTest {
 
     /**
      * Processes PD Visit for a single applicant:
-     *   Step 1: BlackPanther — Fill all PD Visit details
+     *   Step 1: BlackPanther — Fill all PD Visit details (save for individual, submit for entity)
      *   Step 2: Jarvis — Upload Photographs + Business Photographs
-     *   Step 3: BlackPanther — Verify PD Visit status is 'Completed'
+     *   Step 3: BlackPanther — Submit PD Visit form (for individuals, after image uploads)
+     *   Step 4: BlackPanther — Verify PD Visit status is 'Completed'
      */
     private void processApplicantPdVisit(PdVisitPage pdVisitPage, Page blackPantherPage,
                                          Page jarvisPage, String pendingName,
@@ -92,16 +93,32 @@ public class PdVisitSteps extends BaseTest {
         pdVisitPage.uploadPhysicalPdImages(jarvisPage, pendingName, imagePaths);
         log.info("Step 2 complete: Images uploaded in Jarvis for {}", pendingName);
 
-        // ── STEP 3: BlackPanther — Verify PD Visit status is 'Completed' ──
+        // ── STEP 3: BlackPanther — Submit PD Visit form (for individuals) ──
+        if (!isEntity) {
+            log.info("Switching back to BlackPanther to submit PD Visit form for individual...");
+            blackPantherPage.bringToFront();
+            blackPantherPage.reload();
+            blackPantherPage.waitForLoadState(LoadState.NETWORKIDLE);
+            blackPantherPage.waitForTimeout(3000);
+
+            pdVisitPage.clickPdVisitTab();
+            pdVisitPage.selectApplicantFromCombo(inProgressName);
+            pdVisitPage.clickSubmit();
+            log.info("Step 3 complete: PD Visit form submitted for individual {}", pendingName);
+        }
+
+        // ── STEP 4: BlackPanther — Verify PD Visit status is 'Completed' ──
         log.info("Switching back to BlackPanther to verify PD status...");
         blackPantherPage.bringToFront();
-        blackPantherPage.reload();
-        blackPantherPage.waitForLoadState(LoadState.NETWORKIDLE);
-        blackPantherPage.waitForTimeout(3000);
+        if (isEntity) {
+            blackPantherPage.reload();
+            blackPantherPage.waitForLoadState(LoadState.NETWORKIDLE);
+            blackPantherPage.waitForTimeout(3000);
+        }
 
         pdVisitPage.clickPdVisitTab();
         pdVisitPage.verifyApplicantStatus(pendingName, "Completed");
-        log.info("Step 3 complete: PD Visit status verified as 'Completed' for {}", pendingName);
+        log.info("Step 4 complete: PD Visit status verified as 'Completed' for {}", pendingName);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -204,6 +221,20 @@ public class PdVisitSteps extends BaseTest {
                 TestDataProvider.get(PV + "asset_number_of_assets"),
                 TestDataProvider.get(PV + "asset_value"));
 
+        // References
+        pdPage.addReference(
+                TestDataProvider.get(PV + "ref_type"),
+                TestDataProvider.get(PV + "ref_name"),
+                TestDataProvider.get(PV + "ref_contact"),
+                TestDataProvider.get(PV + "ref_department"),
+                TestDataProvider.get(PV + "ref_designation"),
+                TestDataProvider.get(PV + "ref_remarks"));
+
+        // Income Estimation Details
+        pdPage.addIncomeEstimation(
+                TestDataProvider.get(PV + "income_particulars"),
+                TestDataProvider.get(PV + "income_monthly"));
+
         // PD Done By (entity flow)
         pdPage.selectPdDoneByEntity(
                 TestDataProvider.get(PV + "pd_done_by_remark"),
@@ -295,7 +326,21 @@ public class PdVisitSteps extends BaseTest {
                 TestDataProvider.get(PV + "bank_vintage"),
                 TestDataProvider.get(PV + "bank_avg_balance"));
 
-        // Save
+        // References
+        pdPage.addReference(
+                TestDataProvider.get(PV + "ref_type"),
+                TestDataProvider.get(PV + "ref_name"),
+                TestDataProvider.get(PV + "ref_contact"),
+                TestDataProvider.get(PV + "ref_department"),
+                TestDataProvider.get(PV + "ref_designation"),
+                TestDataProvider.get(PV + "ref_remarks"));
+
+        // Income Estimation Details
+        pdPage.addIncomeEstimation(
+                TestDataProvider.get(PV + "income_particulars"),
+                TestDataProvider.get(PV + "income_monthly"));
+
+        // Save (references and income will be submitted after Jarvis image uploads)
         pdPage.clickSave();
     }
 }

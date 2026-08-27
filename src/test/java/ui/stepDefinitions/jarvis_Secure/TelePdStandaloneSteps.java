@@ -101,12 +101,21 @@ public class TelePdStandaloneSteps extends BaseTest {
         pdVisitPage.uploadPhysicalPdImages(jarvisPage, "Noah johnson", imagePaths);
         log.info("[Applicant 1] Images uploaded for: Noah johnson");
 
-        // ── STEP 3 for first applicant: Verify status in BlackPanther ──
-        log.info("[Applicant 1] Verifying PD status in BlackPanther for: Noah johnson");
+        // ── STEP 3 for first applicant: Submit PD Visit form in BlackPanther ──
+        log.info("[Applicant 1] Switching to BlackPanther to submit PD Visit form...");
         blackPantherPage.bringToFront();
         blackPantherPage.reload();
         blackPantherPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         blackPantherPage.waitForTimeout(3000);
+        pdVisitPage.setPage(blackPantherPage);
+        pdVisitPage.clickPdVisitTab();
+        pdVisitPage.selectApplicantFromCombo("Noah johnson");
+        pdVisitPage.clickSubmit();
+        log.info("[Applicant 1] PD Visit form submitted for: Noah johnson");
+
+        // ── STEP 4 for first applicant: Verify status in BlackPanther ──
+        log.info("[Applicant 1] Verifying PD status in BlackPanther for: Noah johnson");
+        blackPantherPage.bringToFront();
         pdVisitPage.setPage(blackPantherPage);
         pdVisitPage.clickPdVisitTab();
         pdVisitPage.verifyApplicantStatus("Noah johnson", "Completed");
@@ -127,7 +136,8 @@ public class TelePdStandaloneSteps extends BaseTest {
      * Processes a single applicant through the complete cycle:
      *   1. BlackPanther: Fill PD Visit form
      *   2. Jarvis: Upload 4 Photographs + 4 Business Photographs
-     *   3. BlackPanther: Verify status = Completed
+     *   3. BlackPanther: Submit PD Visit form (for individuals, after image uploads)
+     *   4. BlackPanther: Verify status = Completed
      */
     private void processApplicantFullFlow(PdVisitPage pdVisitPage, Page blackPantherPage,
                                           Page jarvisPage, String pendingName,
@@ -138,33 +148,49 @@ public class TelePdStandaloneSteps extends BaseTest {
         log.info("═══════════════════════════════════════════════════════════════");
 
         // ── STEP 1: BlackPanther — Fill PD Visit details ──
-        log.info("[Step 1/3] Switching to BlackPanther for PD Visit data entry: {}", pendingName);
+        log.info("[Step 1] Switching to BlackPanther for PD Visit data entry: {}", pendingName);
         blackPantherPage.bringToFront();
         blackPantherPage.waitForTimeout(1000);
         pdVisitPage.setPage(blackPantherPage);
         pdVisitPage.clickPdVisitTab();
         completePdVisitForApplicant(pdVisitPage, pendingName, inProgressName, isEntity);
-        log.info("[Step 1/3] DONE — PD Visit details filled for: {}", pendingName);
+        log.info("[Step 1] DONE — PD Visit details filled for: {}", pendingName);
 
         // ── STEP 2: Jarvis — Upload Photographs + Business Photographs ──
-        log.info("[Step 2/3] Switching to Jarvis for image uploads: {}", pendingName);
+        log.info("[Step 2] Switching to Jarvis for image uploads: {}", pendingName);
         jarvisPage.bringToFront();
         jarvisPage.reload();
         jarvisPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(3000);
         pdVisitPage.uploadPhysicalPdImages(jarvisPage, pendingName, imagePaths);
-        log.info("[Step 2/3] DONE — Images uploaded in Jarvis for: {}", pendingName);
+        log.info("[Step 2] DONE — Images uploaded in Jarvis for: {}", pendingName);
 
-        // ── STEP 3: BlackPanther — Verify PD Visit status = Completed ──
-        log.info("[Step 3/3] Switching to BlackPanther to verify status: {}", pendingName);
+        // ── STEP 3: BlackPanther — Submit PD Visit form (for individuals) ──
+        if (!isEntity) {
+            log.info("[Step 3] Switching to BlackPanther to submit PD Visit form for individual: {}", pendingName);
+            blackPantherPage.bringToFront();
+            blackPantherPage.reload();
+            blackPantherPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+            blackPantherPage.waitForTimeout(3000);
+            pdVisitPage.setPage(blackPantherPage);
+            pdVisitPage.clickPdVisitTab();
+            pdVisitPage.selectApplicantFromCombo(inProgressName);
+            pdVisitPage.clickSubmit();
+            log.info("[Step 3] DONE — PD Visit form submitted for individual: {}", pendingName);
+        }
+
+        // ── STEP 4: BlackPanther — Verify PD Visit status = Completed ──
+        log.info("[Step 4] Verifying PD status in BlackPanther: {}", pendingName);
         blackPantherPage.bringToFront();
-        blackPantherPage.reload();
-        blackPantherPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
-        blackPantherPage.waitForTimeout(3000);
+        if (isEntity) {
+            blackPantherPage.reload();
+            blackPantherPage.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+            blackPantherPage.waitForTimeout(3000);
+        }
         pdVisitPage.setPage(blackPantherPage);
         pdVisitPage.clickPdVisitTab();
         pdVisitPage.verifyApplicantStatus(pendingName, "Completed");
-        log.info("[Step 3/3] DONE — Status verified for: {}", pendingName);
+        log.info("[Step 4] DONE — Status verified for: {}", pendingName);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -305,6 +331,20 @@ public class TelePdStandaloneSteps extends BaseTest {
                     TestDataProvider.get(PV + "asset_number_of_assets"),
                     TestDataProvider.get(PV + "asset_value"));
 
+            // References
+            pdPage.addReference(
+                    TestDataProvider.get(PV + "ref_type"),
+                    TestDataProvider.get(PV + "ref_name"),
+                    TestDataProvider.get(PV + "ref_contact"),
+                    TestDataProvider.get(PV + "ref_department"),
+                    TestDataProvider.get(PV + "ref_designation"),
+                    TestDataProvider.get(PV + "ref_remarks"));
+
+            // Income Estimation Details / Applicant SENP Income
+            pdPage.addIncomeEstimation(
+                    TestDataProvider.get(PV + "income_particulars"),
+                    TestDataProvider.get(PV + "income_monthly"));
+
             // PD Done By (entity flow)
             pdPage.selectPdDoneByEntity(
                     TestDataProvider.get(PV + "pd_done_by_remark"),
@@ -394,6 +434,20 @@ public class TelePdStandaloneSteps extends BaseTest {
                     TestDataProvider.get(PV + "bank_account_number"),
                     TestDataProvider.get(PV + "bank_vintage"),
                     TestDataProvider.get(PV + "bank_avg_balance"));
+
+            // References
+            pdPage.addReference(
+                    TestDataProvider.get(PV + "ref_type"),
+                    TestDataProvider.get(PV + "ref_name"),
+                    TestDataProvider.get(PV + "ref_contact"),
+                    TestDataProvider.get(PV + "ref_department"),
+                    TestDataProvider.get(PV + "ref_designation"),
+                    TestDataProvider.get(PV + "ref_remarks"));
+
+            // Income Estimation Details / Applicant SENP Income
+            pdPage.addIncomeEstimation(
+                    TestDataProvider.get(PV + "income_particulars"),
+                    TestDataProvider.get(PV + "income_monthly"));
 
             // Save
             pdPage.clickSave();

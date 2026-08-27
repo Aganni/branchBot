@@ -17,4 +17,9 @@
             <class name="testRunner.SepRunnerTest"/>
         </classes>
     </test>
+    <test name="HLR End-to-End">
+        <classes>
+            <class name="testRunner.HLRRunnerTest"/>
+        </classes>
+    </test>
 </suite>

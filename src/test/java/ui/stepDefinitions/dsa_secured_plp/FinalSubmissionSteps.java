@@ -24,7 +24,7 @@ public class FinalSubmissionSteps extends BaseTest {
         finalPage.triggerEmailVerification();
 
         // 5. Open Google Groups, sign in, and navigate to the verification email
-        finalPage.loginAndNavigateToGroups("tenjin.user@creditsaison-in.com", "CreditQA@4869");
+        finalPage.loginAndNavigateToGroups("tenjin.user@creditsaison-in.com", "CreditQA@4860");
 
         // 6. Open the latest email, click "Verify My Email" and complete verification
         finalPage.openLatestEmailAndVerify();

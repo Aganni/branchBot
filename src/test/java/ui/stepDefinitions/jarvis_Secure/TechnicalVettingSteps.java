@@ -190,6 +190,7 @@ public class TechnicalVettingSteps extends BaseTest {
 
         // Back to Vendor Portal — upload and submit
         vendorPage.bringToFront();
+        vendorPage.waitForTimeout(2000);
         vendorPortalPage.clickUploadFinalVerdict();
         vendorPortalPage.uploadReport(reportFilePath);
         vendorPortalPage.fillRemarks(remarks);

@@ -20,6 +20,7 @@ public class PrimaryApplicantSteps extends BaseTest {
         String panCard = TestDataProvider.get("dsa_secured.primary_applicant.kyc.pan");
         applicantPage.verifyPanNumber(panCard);
         DynamicDataClass.setValue("pan_card", panCard);
+        applicantPage.fillAadharLastFourDigits(TestDataProvider.get("dsa_secured.primary_applicant.kyc.aadhar_last_four"));
         applicantPage.verifyEmailAddress(TestDataProvider.get("dsa_secured.primary_applicant.kyc.email"));
 
         applicantPage.fillFamilyDetails(

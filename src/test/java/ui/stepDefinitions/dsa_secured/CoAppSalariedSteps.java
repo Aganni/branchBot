@@ -15,6 +15,7 @@ public class CoAppSalariedSteps extends BaseTest {
         coApplicantPage.selectApplicantType(TestDataProvider.get("dsa_secured.co_applicant.kyc.applicant_type"));
         coApplicantPage.selectType(TestDataProvider.get("dsa_secured.co_applicant.kyc.type"));
         coApplicantPage.verifyPanNumber(TestDataProvider.get("dsa_secured.co_applicant.kyc.pan"));
+        coApplicantPage.fillAadharLastFourDigits(TestDataProvider.get("dsa_secured.co_applicant.kyc.aadhar_last_four"));
 
         coApplicantPage.KYCDetails(
                 TestDataProvider.get("dsa_secured.co_applicant.kyc.relationship"),

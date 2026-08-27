@@ -18,9 +18,9 @@ public class CAMStagePage extends BaseTest {
         page.waitForTimeout(5000);
         page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
         page.waitForTimeout(500);
-        page.getByPlaceholder("Application Actions").click();
+        page.getByPlaceholder("Application Actions").click(new com.microsoft.playwright.Locator.ClickOptions().setForce(true));
         page.waitForTimeout(2000);
-        page.getByText("Move to Credit Review").click();
+        page.locator("li").filter(new com.microsoft.playwright.Locator.FilterOptions().setHasText("Move to Credit Review")).click();
         page.waitForTimeout(2000);
         log.info("Mandatory field validation triggered.");
     }

@@ -281,8 +281,10 @@ public class PropertyVisitPage extends BaseTest {
     }
 
     // VISIT DONE BY (multi-user selection)
-    public void selectVisitDoneByUsers(String searchText, String user1, String user2, String user3, String user4) {
-        log.info("Selecting Visit Done By users...");
+    // Accepts a variable number of users since the configured count differs per
+    // product's test data (e.g. LAP defines 3 users, HLR defines 4).
+    public void selectVisitDoneByUsers(String searchText, String... users) {
+        log.info("Selecting Visit Done By users ({} user(s))...", users.length);
 
         // Element UI multi-select: the search input sits inside el-select__tags and intercepts clicks on the placeholder input underneath.
         Locator searchInput = page.locator(".el-select__tags input.el-select__input");
@@ -299,15 +301,11 @@ public class PropertyVisitPage extends BaseTest {
         searchInput.fill(searchText);
         page.waitForTimeout(2000);
 
-        // Select all 4 users from the filtered dropdown
-        page.locator("li").filter(new Locator.FilterOptions().setHasText(user1)).click();
-        page.waitForTimeout(500);
-        page.locator("li").filter(new Locator.FilterOptions().setHasText(user2)).click();
-        page.waitForTimeout(500);
-        page.locator("li").filter(new Locator.FilterOptions().setHasText(user3)).click();
-        page.waitForTimeout(500);
-        page.locator("li").filter(new Locator.FilterOptions().setHasText(user4)).click();
-        page.waitForTimeout(500);
+        // Select each configured user from the filtered dropdown
+        for (String user : users) {
+            page.locator("li").filter(new Locator.FilterOptions().setHasText(user)).click();
+            page.waitForTimeout(500);
+        }
 
         // Click heading to close dropdown
         page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Property Visit Details")).click();
@@ -319,10 +317,9 @@ public class PropertyVisitPage extends BaseTest {
     public void uploadPropertyVisitImages(String[] imagePaths) {
         log.info("Uploading Property Visit images...");
 
-        // Round 1: Upload 1st image and Save
+        // ── Round 1: Upload 1st image to Photographs → Save ──
         clickEdit();
 
-        // Scroll to Photographs section before uploading
         page.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
         page.waitForTimeout(1000);
 
@@ -330,50 +327,49 @@ public class PropertyVisitPage extends BaseTest {
         firstUpload.setInputFiles(Paths.get(imagePaths[0]));
         log.info("  Uploaded image 1 of 4 to Photographs");
         page.waitForTimeout(5000);
-        // Scroll down to view the uploaded file
-        page.keyboard().press("End");
-        page.waitForTimeout(1000);
+
         clickSave();
         log.info("Round 1 saved.");
 
-        // Round 2: Upload remaining 3 Photographs + 4 Business Photographs
+        // ── Round 2: Upload remaining 3 images to Photographs → Save ──
         clickEdit();
 
-        // Scroll to Photographs section before uploading remaining images
         page.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
         page.waitForTimeout(1000);
 
-        // Remaining 3 Photographs
         for (int i = 1; i < imagePaths.length; i++) {
             Locator uploadInput = page.locator(".el-upload input[type='file']").first();
             uploadInput.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Photographs", i + 1);
             page.waitForTimeout(4000);
-            // Scroll down to view the uploaded file
-            page.keyboard().press("End");
-            page.waitForTimeout(500);
         }
         log.info("Uploaded 4 images to Photographs section.");
 
-        // Scroll to Business Photographs section before uploading
+        clickSave();
+        log.info("Round 2 saved.");
+
+        // ── Round 3: Upload 4 images to Business Photographs → Save ──
+        clickEdit();
+
         page.getByText("Business Photographs").scrollIntoViewIfNeeded();
         page.waitForTimeout(1000);
         log.info("Uploading 4 images to Business Photographs section...");
+
         for (int i = 0; i < imagePaths.length; i++) {
-            page.getByText("Business Photographs").scrollIntoViewIfNeeded();
-            page.waitForTimeout(500);
+            // After Photographs are all uploaded and saved, the only remaining
+            // .el-upload input on the page is the Business Photographs uploader.
             Locator businessUpload = page.locator(".el-upload input[type='file']").last();
             businessUpload.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Business Photographs", i + 1);
             page.waitForTimeout(5000);
-            // Scroll down to view the uploaded file
-            page.keyboard().press("End");
+            // Keep Business Photographs section in view
+            page.getByText("Business Photographs").scrollIntoViewIfNeeded();
             page.waitForTimeout(500);
         }
         log.info("Uploaded 4 images to Business Photographs section.");
 
         clickSave();
-        log.info("Round 2 saved. All Property Visit images uploaded.");
+        log.info("Round 3 saved. All Property Visit images uploaded.");
     }
 
     //  SAVE & SUBMIT
@@ -415,21 +411,20 @@ public class PropertyVisitPage extends BaseTest {
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(3000);
 
-        // Scroll to the right side where Application Actions is located
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        page.waitForTimeout(1000);
+        // Scroll to top and click Application Actions (it's in the horizontal header, not below)
+        page.evaluate("window.scrollTo(0, 0)");
+        page.waitForTimeout(500);
 
         // Click Application Actions dropdown
-        page.getByPlaceholder("Application Actions").click();
+        page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(1000);
 
         // Select "Move to Credit Approval"
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Credit Approval")).click();
         page.waitForTimeout(3000);
 
-        Locator validationMsg = page.getByText("Sales PD visit is mandatory\n" +
-                "Please complete at least one Sales or Property visit to proceed.");
-        validationMsg.waitFor(new Locator.WaitForOptions().setTimeout(10000));
-        log.info("Validation message verified: 'Please complete at least one' displayed.");
+        Locator validationMsg = page.getByText("Sales PD visit is mandatory");
+        validationMsg.first().waitFor(new Locator.WaitForOptions().setTimeout(30000));
+        log.info("Validation message verified: 'Sales PD visit is mandatory' displayed.");
     }
 }

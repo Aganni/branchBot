@@ -45,13 +45,21 @@ public class PropertyVisitSteps extends BaseTest {
         pvPage.fillDeviationsRemarks(TestDataProvider.get(PVT + "deviations_remarks"));
         pvPage.fillTechnicalVendorRemarks(TestDataProvider.get(PVT + "technical_vendor_remarks"));
 
-        // Select Visit Done By users
+        // Select Visit Done By users.
+        // The number of users configured can vary by product/test data (e.g. LAP defines
+        // 3, HLR defines 4), so collect only the ones actually present instead of assuming
+        // a fixed count of 4.
+        java.util.List<String> visitDoneByUsers = new java.util.ArrayList<>();
+        for (int i = 1; ; i++) {
+            String user = TestDataProvider.getOrDefault(PVT + "visit_done_by_user_" + i, null);
+            if (user == null) {
+                break;
+            }
+            visitDoneByUsers.add(user);
+        }
         pvPage.selectVisitDoneByUsers(
                 TestDataProvider.get(PVT + "visit_done_by_search"),
-                TestDataProvider.get(PVT + "visit_done_by_user_1"),
-                TestDataProvider.get(PVT + "visit_done_by_user_2"),
-                TestDataProvider.get(PVT + "visit_done_by_user_3"),
-                TestDataProvider.get(PVT + "visit_done_by_user_4"));
+                visitDoneByUsers.toArray(new String[0]));
 
         // Save the form details
         pvPage.clickSave();

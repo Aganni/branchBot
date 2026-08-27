@@ -91,6 +91,7 @@ public class VendorPortalPage extends BaseTest {
      */
     public void clickUploadFinalVerdict() {
         log.info("Opening upload section...");
+        page.waitForTimeout(2000);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Upload Final FI Verdict here")).click();
         page.waitForTimeout(2000);
         log.info("Upload section opened.");
@@ -103,6 +104,10 @@ public class VendorPortalPage extends BaseTest {
     public void uploadReport(String filePath) {
         log.info("Uploading report: {}", filePath);
         Locator uploadBtn = page.locator("button").filter(new Locator.FilterOptions().setHasText("Upload Report"));
+        // Scroll the upload button into view — after expanding the verdict section,
+        // the button may be below the visible area.
+        uploadBtn.scrollIntoViewIfNeeded();
+        page.waitForTimeout(1000);
         // Wait for file chooser triggered by clicking Upload Report
         com.microsoft.playwright.FileChooser fileChooser = page.waitForFileChooser(() -> {
             uploadBtn.click();

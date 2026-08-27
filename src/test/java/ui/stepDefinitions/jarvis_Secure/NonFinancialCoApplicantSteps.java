@@ -11,25 +11,25 @@ public class NonFinancialCoApplicantSteps extends BaseTest {
     public void completeNonFinancialCoApplicantFields() throws Exception {
         NonFinancialCoApplicantPage nonFinancialPage = new NonFinancialCoApplicantPage(BaseTest.getPage());
 
-        // 1. Open non-financial co-applicant details
+        // 1. Open co-applicant details section and click View on BHASKAR
         String coApplicantName = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_name");
         nonFinancialPage.openCoApplicantDetails(coApplicantName);
 
-        // 2. Submit co-applicant and select OVD
-        String coAppOvdType = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_ovd_type");
-        nonFinancialPage.submitAndSelectOvd(coAppOvdType);
+        // 2. Click Edit
+        nonFinancialPage.clickEdit();
 
-        // 3. Fill Voter ID and verify
-        String voterId = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_voter_id");
-        nonFinancialPage.fillVoterIdAndVerify(voterId);
+        // 3. Click Submit in dialog (triggers mandatory field validation)
+        nonFinancialPage.clickSubmitInDialog();
 
-        // 4. Fill last name and residential status
-        String lastName = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_last_name");
-        String coAppResStatus = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_residential_status");
-        nonFinancialPage.fillLastNameAndResidentialStatus(lastName, coAppResStatus);
+        // 4. Fill residential status
+        String residentialStatus = TestDataProvider.get("dsa_secured.jarvis_secured.cam.co_applicant_residential_status");
+        nonFinancialPage.fillResidentialStatus(residentialStatus);
 
-        // 5. Submit non-financial co-applicant final details
+        // 5. Final submit
         nonFinancialPage.submitFinalDetails();
+
+        // 6. Reload page
+        nonFinancialPage.reloadPage();
 
         log.info("Non-financial co-applicant mandatory fields completed.");
     }

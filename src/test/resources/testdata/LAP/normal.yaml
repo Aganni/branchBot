@@ -4,16 +4,16 @@ dsa_secured:
     loan_type: "Loan Against Property"
 
   partner_details:
-      partnerNameOptionIndex: "1"
-      program: "Average Banking Program"
+      program: "Repayment Surrogate"
       scheme: "BT"
-      subProduct: "Warehouse"
-      branch: "INDIQUBE LEXINGTON AUDUGODI- BENGALURU"
-      sales_manager: "nikitha"
+      subProduct: "Residential"
+      branch: "ind"
+      branchFullName: "INDIQUBE LEXINGTON AUDUGODI-"
+      sales_manager: "anurag.vs@creditsaison-in.com"
 
   lead_details:
     name: "Automation - playwright"
-    phone_number: "9001310729"
+    phone_number: "9001310771"
     loan_amount: "6850000"
     tenure: "36"
     rate_of_interest: "12.5"
@@ -26,7 +26,8 @@ dsa_secured:
 
   primary_applicant:
     kyc:
-      pan: "ABGPS7398N"
+      pan: "ABGPS7200A"
+      aadhar_last_four: "0903"
       email: "nikitha.s@creditsaison-in.com"
       father_name: "David Brown"
       mother_name: "Sarah Wilson"
@@ -35,7 +36,7 @@ dsa_secured:
       religion: "HINDU"
       education: "HSC"
       marital_status: "Single"
-      nationality: "IN"
+      nationality: "INDIAN"
       disability: "No"
       preferred_address: "Permanent"
       related_interest: "No"
@@ -95,7 +96,8 @@ dsa_secured:
     kyc:
       applicant_type: "Individual"
       type: "Financial"
-      pan: "ABGPS7398Z"
+      pan: "ABGPS7200B"
+      aadhar_last_four: "1234"
       relationship: "Sister"
       phone_number: "9380800213"
       email: "nikitha.s@creditsaison-in.com"
@@ -105,7 +107,7 @@ dsa_secured:
       category: "SC"
       religion: "HINDU"
       education: "MS"
-      nationality: "IN"
+      nationality: "NRI"
       disability: "No"
     addresses:
       line1: "5th Cross Green Valley"
@@ -118,7 +120,7 @@ dsa_secured:
       designation: "QA Engineer"
       line1: "Near Sri Chaitanya Junior College Old Alwal Main Road"
       line2: "Near Greenwood International School Adjacent to Imperial Banquet Hall"
-      pincode: "400009"
+      pincode: "384325"
       ownership: "Rented"
     consent:
         otp: "123456"
@@ -131,22 +133,23 @@ dsa_secured:
       dob: "14-03-1974"
       dl_number: "WB2320150223071"
       dl_expiry: "12/09/2045"
-      relationship: "Brother"
-      phone_number: "9380802178"
+      aadhar_last_four: "1234"
+      relationship: "Spouse"
+      phone_number: "9380800238"
       email: "nikitha.s@creditsaison-in.com"
-      gender: "Female"
-      father_name: "David Brown"
-      mother_name: "Sarah Wilson"
-      category: "OBC"
-      religion: "MUSLIM"
-      education: "MS"
+      gender: "Male"
+      father_name: "fath"
+      mother_name: "moth"
+      category: "SC"
+      religion: "HINDU"
+      education: "PG"
       marital_status: "Single"
-      nationality: "NR"
+      nationality: "INDIAN"
       disability: "No"
     addresses:
       line1: "Plot No.56 Sree Venkateshwara Nagar 2nd Main Near Lotus Park"
       line2: "Adjoining Blue Diamond Supermarket Outer Ring Road"
-      pincode: "560091"
+      pincode: "384325"
       ownership: "Rented"
     consent:
       otp: "123456"
@@ -171,7 +174,7 @@ dsa_secured:
       education: "PG"
       marital_status: "Married"
       spouse_name: "Jessica White"
-      nationality: "NR"
+      nationality: "NRI"
       disability: "Yes"
       disability_type: "Autism Spectrum Disorder"
       disability_percentage: "25"
@@ -188,7 +191,7 @@ dsa_secured:
   co_applicant_entity:
     kyc:
       applicant_type: "Entity"
-      pan: "ABGTS7399A"
+      pan: "ABGTS7200C"
       udyam: "UDYAM-AD-12-1234567"
       registration_date: "12/09/2000"
       business_type: "Small"
@@ -201,45 +204,7 @@ dsa_secured:
       ownership: "Rented"
     Consent:
         email: "tenjin.user@creditsaison-in.com"
-        password: "CreditQA@4869"
-
-  co_applicant_aadhaar:
-    kyc:
-      applicant_type: "Individual"
-      type: "Non-Financial"
-      ovd_type: "Aadhaar Last 4 digits"
-      dob: "24/12/1995"
-      aadhaar_last_4: "3205"
-      salutation: "Mr"
-      name: "Chris Taylor"
-      relationship: "Brother"
-      phone_number: "9380802314"
-      email: "nikitha.s@creditsaison-in.com"
-      gender: "Male"
-      father_name: "Isaiah"
-      mother_name: "Sarah"
-      category: "SC"
-      religion: "HINDU"
-      education: "PG"
-      marital_status: "Single"
-      nationality: "NR"
-      disability: "No"
-    addresses:
-      line1: "Door No 45/22 Maple Residency 4th Floor Beside Phoenix Arena"
-      line2: "Behind Tech Park Square Whitefield Main Road IT Corridor"
-      pincode: "560098"
-      ownership: "Self Owned"
-    obligations:
-      type: "Business Loan"
-      financier: "ICICI Bank"
-      emi: "12000"
-      account_number: "50901001983200"
-      outstanding: "120"
-      remaining_tenure: "20"
-      obligate: "No"
-      closure_type: "Bank Close"
-    consent:
-      otp: "123456"
+        password: "CreditQA@4860"
 
   collateral_details:
     owner1: "Noah johnson"
@@ -286,7 +251,7 @@ dsa_secured:
       office_contact: "9876543211"
       residential_status: "rented"
       ovd_type: "Voter ID"
-      co_applicant_name: "Chris"
+      co_applicant_name: "BHASKAR"
       co_applicant_ovd_type: "Voter ID"
       co_applicant_voter_id: "YCV0164822"
       co_applicant_last_name: "Sharma"
@@ -393,7 +358,7 @@ dsa_secured:
       business_profile: "random text"
       pd_done_by_search: "ten"
       pd_done_by_user: "Tenjin"
-      pd_done_by_second_user: "Atulatul.dhawale@creditsaison"
+      pd_done_by_second_user: "tenjin.user@creditsaison-in.com"
       physical_pd_status: "Positive"
 
       # References (mandatory for PD Visit completion)
@@ -437,9 +402,6 @@ dsa_secured:
       # Visit Done By (search and select multiple users)
       visit_done_by_search: "tenji"
       visit_done_by_user_1: "tenjin.user@creditsaison-in.com"
-      visit_done_by_user_2: "sukhesh.balegar@creditsaison-"
-      visit_done_by_user_3: "vishal.mishra@creditsaison-in"
-      visit_done_by_user_4: "iranna.korishettar@"
 
       # Upload images (reuse same images from PD Visit)
       image_path_1: "src/test/resources/testdata/image2.png"
@@ -505,3 +467,46 @@ dsa_secured:
       # Stage Movement
       level: "L4"
       user_email: "tenjin.user@creditsaison-in."
+
+    # Transaction Disbursement (Tranche Flow)
+    transaction_disbursement:
+      # Transaction 1
+      transaction_1:
+        mode: "Cheque"
+        favouring_name: "Nikitha P S"
+        payment_amount: "25000"
+        payable_location: "Bangalore"
+        print_location_search: "ban"
+        print_location_select: "BANGALORE"
+
+      # Transaction 2
+      transaction_2:
+        mode: "Cheque"
+        favouring_name: "Sneha"
+        payment_amount: "267500"
+        payable_location: "Pune"
+        print_location_search: "pun"
+        print_location_select: "PUNE"
+
+      # Admin Portal — Role Change to CREDIT for Docket Initiation
+      admin_portal:
+        user_search_text: "tenjin"
+        department: "CREDIT"
+        product_code_search: "la"
+        product_code: "LAP"
+        designation: "L4"
+        approval_amount: "50000000"
+        stage_1: "Login desk"
+        stage_2: "Cam"
+        stage_3: "Credit review"
+        stage_4: "Terms"
+        stage_5: "QC review"
+        stage_6: "QC approve"
+        sub_product: "Regular"
+        # Hierarchy Mapping
+        hierarchy_department: "CREDIT"
+        hierarchy_lpc: "LAP"
+        hierarchy_user_search: "tenj"
+        hierarchy_user: "tenjin.user@creditsaison-in."
+        hierarchy_manager_search: "niv"
+        hierarchy_manager: "nivedita.rawat@creditsaison-"

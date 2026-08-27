@@ -22,6 +22,7 @@ public class CoAppDLSteps extends BaseTest {
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.dl_number"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.dl_expiry")
         );
+        dlPage.fillAadharLastFour(TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.aadhar_last_four"));
         dlPage.KYCDetails(
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.relationship"),
                 TestDataProvider.get("dsa_secured.co_applicant_dl.kyc.phone_number"),
@@ -51,5 +52,7 @@ public class CoAppDLSteps extends BaseTest {
         // 3. Submit Form
         dlPage.submitForm();
 
+        // 4. OTP Consent Verification
+        dlPage.processOtpVerification(TestDataProvider.get("dsa_secured.co_applicant_dl.consent.otp"));
     }
 }

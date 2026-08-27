@@ -26,11 +26,11 @@ public class FeeDetailsPage extends BaseTest {
      */
     public void attemptMoveToDocketInitiation() {
         log.info("Attempting Move to Docket Initiation (expecting fee validation)...");
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
+        page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(1000);
         page.getByPlaceholder("Application Actions").click();
-        page.waitForTimeout(1000);
-        page.getByText("Move to Docket Initiation").click();
+        page.waitForTimeout(2000);
+        page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Docket Initiation")).click();
         page.waitForTimeout(2000);
         log.info("Move to Docket Initiation attempted.");
     }

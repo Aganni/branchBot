@@ -143,26 +143,28 @@ public class TechnicalVettingPage extends BaseTest {
             log.info("Already on App Form tab or tab not found.");
         }
 
-        // Scroll right to make Application Actions visible
-        // Use keyboard End key or scroll the page container to the right
-        page.keyboard().press("End");
-        page.waitForTimeout(2000);
-
-        // Scroll Application Actions into view and click
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
+        // Scroll page to top first (Application Actions is in the top section)
+        page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(1000);
-        page.getByPlaceholder("Application Actions").click();
+
+        // Scroll the horizontal tab/header bar to the right to reveal Application Actions.
+        // The header nav bar uses overflow-x scroll — scroll it to the far right.
+        page.evaluate("document.querySelector('.el-tabs__nav-scroll, .el-tabs__nav-wrap, nav, [class*=nav]')?.scrollBy({left: 500, behavior: 'smooth'})");
+        page.waitForTimeout(1000);
+
+        // Click Application Actions dropdown (use force to bypass any overlay issues)
+        page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(2000);
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Credit Approval")).click();
         page.waitForTimeout(3000);
 
         // Fill level and user in the dialog
-        page.getByPlaceholder("All Level").click();
+        page.getByPlaceholder("All Level").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(500);
         page.locator("li").filter(new Locator.FilterOptions().setHasText(level)).click();
         page.waitForTimeout(500);
 
-        page.getByPlaceholder("User email id").click();
+        page.getByPlaceholder("User email id").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(500);
         page.getByText(userEmail).click();
         page.waitForTimeout(500);

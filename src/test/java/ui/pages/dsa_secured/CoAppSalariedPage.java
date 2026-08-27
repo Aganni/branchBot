@@ -3,6 +3,7 @@ package ui.pages.dsa_secured;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import data.TestDataProvider;
 import hooks.BaseTest;
 
@@ -27,6 +28,7 @@ public class CoAppSalariedPage extends BaseTest {
     private static final String OFFICE_L2             = "Office Address Line 2 *";
     private static final String OFFICE_PINCODE        = "Office Address Pincode *";
     private static final String OFFICE_OWNERSHIP      = "Office Address Ownership *";
+    private static final String AADHAR_L4D            = "(//input[@id='aadharL4d'])[1]";
 
     public CoAppSalariedPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
@@ -73,6 +75,14 @@ public class CoAppSalariedPage extends BaseTest {
         log.info("Verified Co-Applicant PAN: {}", pan);
     }
 
+    public void fillAadharLastFourDigits(String aadharLastFour) {
+        page.waitForSelector(AADHAR_L4D, new Page.WaitForSelectorOptions()
+                .setState(WaitForSelectorState.VISIBLE).setTimeout(10000));
+        page.locator(AADHAR_L4D).click();
+        page.locator(AADHAR_L4D).fill(aadharLastFour);
+        log.info("Filled Co-Applicant Aadhar Number (Last Four Digits): {}", aadharLastFour);
+    }
+
     public void KYCDetails(String relationship, String phone, String email, String gender,
                            String father, String mother, String category, String religion,
                            String education, String nationality, String disability) throws InterruptedException{
@@ -101,8 +111,8 @@ public class CoAppSalariedPage extends BaseTest {
 
         page.getByPlaceholder("Select Marital Status").click();
 
-        page.getByLabel(NATIONALITY).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(nationality)).click();
+        page.getByPlaceholder("Select Nationality").click();
+        page.getByText(nationality).click();
 
         page.getByLabel(DISABILITY).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(disability)).click();

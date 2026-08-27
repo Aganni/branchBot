@@ -3,6 +3,7 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
+import com.microsoft.playwright.options.WaitForSelectorState;
 import hooks.BaseTest;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
@@ -42,9 +43,33 @@ public class PdVisitPage extends BaseTest {
         log.info("Selecting applicant for PD Visit: {}", applicantText);
         page.evaluate("window.scrollTo(0, 0)");
         page.waitForTimeout(500);
-        page.getByRole(AriaRole.COMBOBOX).first().click();
+
+        try {
+            page.locator(".el-loading-mask").first()
+                    .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(15000));
+        } catch (Exception ignore) {
+            // No loading mask present, continue
+        }
+
+        // The combo box may show "Select Applicant/Co-applicant" (placeholder) or
+        // the previously selected applicant name. Try the placeholder first, then
+        // fall back to clicking the combobox/select element directly.
+        Locator combobox = page.getByText("Select Applicant/Co-applicant");
+        if (combobox.isVisible()) {
+            combobox.click();
+        } else {
+            // Fallback: click the select/combobox input element directly
+            Locator selectTrigger = page.locator(".el-select .el-input__inner").first();
+            if (selectTrigger.isVisible()) {
+                selectTrigger.click();
+            } else {
+                // Last resort: click any visible combobox-like element at the top
+                page.locator(".el-select").first().click();
+            }
+        }
         page.waitForTimeout(1000);
-        page.getByText(applicantText).first().click();
+
+        page.getByText(applicantText).last().click();
         page.waitForLoadState(LoadState.NETWORKIDLE);
         page.waitForTimeout(2000);
     }
@@ -121,7 +146,11 @@ public class PdVisitPage extends BaseTest {
             // Contact No
             fillByLabel("Contact No of the Person Met", contactNo);
         } else {
-            // Entity has different field label
+            // Entity: fill Name of the Person Met With and Contact Number
+            page.locator("div").filter(new Locator.FilterOptions()
+                    .setHasText(Pattern.compile("^Name of the Person Met with \\*$"))).click();
+            page.getByLabel("Name of the Person Met with *").fill(personName);
+            page.waitForTimeout(300);
             fillByLabel("Contact Number of the Person Met with", contactNo);
         }
         // Relationship
@@ -387,19 +416,20 @@ public class PdVisitPage extends BaseTest {
         fillByPlaceholder("Type your remark here", remarkText);
         page.waitForTimeout(300);
 
-        // Select first user
-        page.locator("div").filter(new Locator.FilterOptions()
-                .setHasText(Pattern.compile("^Select users$"))).nth(1).click();
+        // Per the actual UI: the "PD Visited By" field shows "Select users" as
+        // placeholder. Click it to reveal the search input, type the search text,
+        // then click the matching user from the filtered results.
+        page.getByText("Select users").last().click();
         page.waitForTimeout(500);
         page.getByPlaceholder("Search users...").fill(searchText);
         page.waitForTimeout(1000);
-        page.getByText(userName, new Page.GetByTextOptions().setExact(true)).click();
+        page.getByText(userName).last().click();
         page.waitForTimeout(500);
 
-        // Select second user
-        page.getByText("Select users").click();
+        // Select second user (re-open the dropdown)
+        page.getByText("Select users").last().click();
         page.waitForTimeout(500);
-        page.getByText(secondUser).click();
+        page.getByText(secondUser).last().click();
         page.waitForTimeout(500);
     }
 
@@ -519,8 +549,12 @@ public class PdVisitPage extends BaseTest {
 
     /**
      * Navigates to Jarvis PD & Property Visit → Physical PD tab → applicant tab
-     * and uploads 4 images to Photographs + 4 images to Business Photographs.
-     * This runs on the Jarvis page instance.
+     * and uploads images to Photographs + Business Photographs.
+     *
+     * Flow:
+     *   Round 1: Upload 1st image to Photographs → Save
+     *   Round 2: Upload remaining 3 images to Photographs → Save
+     *   Round 3: Upload 4 images to Business Photographs → Save
      */
     public void uploadPhysicalPdImages(Page jarvisPage, String applicantTabName, String[] imagePaths) {
         log.info("Uploading Physical PD images for: {}", applicantTabName);
@@ -541,18 +575,16 @@ public class PdVisitPage extends BaseTest {
         jarvisPage.getByRole(AriaRole.RADIO, new Page.GetByRoleOptions().setName("Positive")).click();
         jarvisPage.waitForTimeout(500);
 
-        // ── ROUND 1: Upload 1st image to Photographs and Save ──
+        // ── ROUND 1: Scroll to Photographs, upload 1st image and Save ──
         log.info("Round 1: Uploading 1st image to Photographs and saving...");
         jarvisPage.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
         jarvisPage.waitForTimeout(1000);
 
-        Locator firstUpload = jarvisPage.locator(".el-upload input[type='file']").first();
-        firstUpload.setInputFiles(Paths.get(imagePaths[0]));
+        // The first .el-upload input corresponds to the Photographs section
+        Locator photographsUpload = jarvisPage.locator(".el-upload input[type='file']").first();
+        photographsUpload.setInputFiles(Paths.get(imagePaths[0]));
         log.info("  Uploaded image 1 of 4 to Photographs");
         jarvisPage.waitForTimeout(5000);
-        // Scroll down to view the uploaded file
-        jarvisPage.keyboard().press("End");
-        jarvisPage.waitForTimeout(1000);
 
         // Save to lock in the first upload
         jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
@@ -560,11 +592,10 @@ public class PdVisitPage extends BaseTest {
         jarvisPage.waitForTimeout(3000);
         log.info("Round 1 saved.");
 
-        // ── ROUND 2: Re-enter Edit, upload remaining 3 Photographs + 4 Business Photographs ──
+        // ── ROUND 2: Re-enter Edit, upload remaining 3 images to Photographs, Save ──
         jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
         jarvisPage.waitForTimeout(2000);
 
-        // Upload remaining 3 images to Photographs
         log.info("Round 2: Uploading remaining 3 images to Photographs...");
         jarvisPage.getByText("Photographs", new Page.GetByTextOptions().setExact(true)).first().scrollIntoViewIfNeeded();
         jarvisPage.waitForTimeout(1000);
@@ -574,27 +605,32 @@ public class PdVisitPage extends BaseTest {
             uploadInput.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Photographs", i + 1);
             jarvisPage.waitForTimeout(4000);
-            // Scroll down to view the uploaded file
-            jarvisPage.keyboard().press("End");
-            jarvisPage.waitForTimeout(500);
         }
-        log.info("Uploaded 4 images to Photographs section (1 from round 1 + 3 from round 2).");
+        log.info("Uploaded all 4 images to Photographs section.");
 
-        // Upload 4 images to Business Photographs
-        log.info("Uploading 4 images to Business Photographs section...");
+        // Save after Photographs are complete
+        jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save")).click();
+        jarvisPage.waitForLoadState(LoadState.NETWORKIDLE);
+        jarvisPage.waitForTimeout(3000);
+        log.info("Round 2 saved.");
+
+        // ── ROUND 3: Re-enter Edit, scroll to Business Photographs, upload 4 images, Save ──
+        jarvisPage.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
+        jarvisPage.waitForTimeout(2000);
+
+        log.info("Round 3: Uploading 4 images to Business Photographs...");
         jarvisPage.getByText("Business Photographs").scrollIntoViewIfNeeded();
         jarvisPage.waitForTimeout(1000);
 
         for (int i = 0; i < imagePaths.length; i++) {
-            Locator businessUpload = jarvisPage.locator("div.el-upload").nth(1).locator("input[type='file']");
-            if (!businessUpload.isVisible()) {
-                businessUpload = jarvisPage.locator("div.el-upload").last().locator("input[type='file']");
-            }
+            // After Photographs are uploaded, the Business Photographs upload is the
+            // last visible .el-upload on the page. Use last() to target it.
+            Locator businessUpload = jarvisPage.locator(".el-upload input[type='file']").last();
             businessUpload.setInputFiles(Paths.get(imagePaths[i]));
             log.info("  Uploaded image {} of 4 to Business Photographs", i + 1);
             jarvisPage.waitForTimeout(4000);
-            // Scroll down to view the uploaded file
-            jarvisPage.keyboard().press("End");
+            // Scroll down to keep the upload area visible
+            jarvisPage.getByText("Business Photographs").scrollIntoViewIfNeeded();
             jarvisPage.waitForTimeout(500);
         }
         log.info("Uploaded 4 images to Business Photographs section.");
@@ -604,7 +640,7 @@ public class PdVisitPage extends BaseTest {
         jarvisPage.waitForLoadState(LoadState.NETWORKIDLE);
         jarvisPage.waitForTimeout(3000);
 
-        log.info("Physical PD images uploaded for: {}", applicantTabName);
+        log.info("Physical PD images uploaded successfully for: {}", applicantTabName);
     }
 
     /**

@@ -26,9 +26,21 @@ public class DashboardPage extends BaseTest {
                 .filter(new Locator.FilterOptions().setHasText(DROPDOWN_PLACEHOLDER))
                 .click();
 
-        page.locator(SELECT_ITEM_OPTION)
-                .filter(new Locator.FilterOptions().setHasText(loanType))
-                .click();
+        // Ant Design uses a virtual-scroll dropdown, so options below the fold are not
+        // rendered in the DOM until the popup container is scrolled. We scroll inside
+        // the dropdown popup until the target option becomes visible and clickable.
+        Locator dropdownPopup = page.locator(".ant-select-dropdown .rc-virtual-list-holder");
+        Locator loanTypeOption = page.locator(SELECT_ITEM_OPTION)
+                .filter(new Locator.FilterOptions().setHasText(loanType));
+
+        int maxScrollAttempts = 10;
+        for (int i = 0; i < maxScrollAttempts; i++) {
+            if (loanTypeOption.isVisible()) break;
+            dropdownPopup.evaluate("el => el.scrollTop += 100");
+            page.waitForTimeout(300);
+        }
+
+        loanTypeOption.click();
 
         page.getByRole(AriaRole.BUTTON,
                         new Page.GetByRoleOptions().setName(ADD_APPLICATION_BTN_TEXT))

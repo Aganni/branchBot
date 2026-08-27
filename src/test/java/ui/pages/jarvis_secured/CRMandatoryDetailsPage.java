@@ -219,9 +219,9 @@ public class CRMandatoryDetailsPage extends BaseTest {
     //STAGE MOVEMENTS
     public void moveToCreditApproval(String level, String userEmail) {
         log.info("Moving to Credit Approval with level [{}], user [{}]...", level, userEmail);
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        page.waitForTimeout(1000);
-        page.getByPlaceholder("Application Actions").click();
+        page.evaluate("window.scrollTo(0, 0)");
+        page.waitForTimeout(500);
+        page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(1000);
         page.getByText("Move to Credit Approval").click();
         page.waitForTimeout(2000);
@@ -269,9 +269,9 @@ public class CRMandatoryDetailsPage extends BaseTest {
     //Attempts to move to Terms stage. First attempt triggers Reg Check validation.
     public void attemptMoveToTerms() {
         log.info("Attempting Move to Terms...");
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        page.waitForTimeout(1000);
-        page.getByPlaceholder("Application Actions").click();
+        page.evaluate("window.scrollTo(0, 0)");
+        page.waitForTimeout(500);
+        page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(1000);
         page.getByText("Move to Terms").click();
         page.waitForTimeout(3000);
@@ -302,9 +302,9 @@ public class CRMandatoryDetailsPage extends BaseTest {
 
     public void moveToTerms() {
         log.info("Moving to Terms stage...");
-        page.getByPlaceholder("Application Actions").scrollIntoViewIfNeeded();
-        page.waitForTimeout(1000);
-        page.getByPlaceholder("Application Actions").click();
+        page.evaluate("window.scrollTo(0, 0)");
+        page.waitForTimeout(500);
+        page.getByPlaceholder("Application Actions").click(new Locator.ClickOptions().setForce(true));
         page.waitForTimeout(1000);
         page.locator("li").filter(new Locator.FilterOptions().setHasText("Move to Terms")).click();
         page.waitForTimeout(2000);

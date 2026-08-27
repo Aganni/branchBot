@@ -36,6 +36,7 @@ public class PrimaryApplicantPage extends BaseTest {
     private static final String OFFICE_L2         = "Office Address Line 2 *";
     private static final String OFFICE_PINCODE    = "Office Address Pincode *";
     private static final String OFFICE_OWNERSHIP  = "Office Address Ownership *";
+    private static final String AADHAR_L4D        = "(//input[@id='aadharL4d'])[1]";
     public PrimaryApplicantPage(Page page) {
         if (page == null) throw new IllegalArgumentException("Page instance cannot be null");
         this.page = page;
@@ -58,6 +59,11 @@ public class PrimaryApplicantPage extends BaseTest {
         panInput.fill(pan);
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Verify")).nth(0).click();
         log.info("Submitted and verified PAN: {}", pan);
+    }
+
+    public void fillAadharLastFourDigits(String aadharLastFour) {
+        page.locator(AADHAR_L4D).fill(aadharLastFour);
+        log.info("Filled Aadhar Number (Last Four Digits): {}", aadharLastFour);
     }
 
     public void verifyEmailAddress(String email) {
@@ -85,8 +91,8 @@ public class PrimaryApplicantPage extends BaseTest {
         page.getByPlaceholder(SELECT_MARITAL_STATUS).click();
         page.getByText(maritalStatus).click();
 
-        page.getByLabel(NATIONALITY).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(nationality)).click();
+        page.getByPlaceholder("Select Nationality").click();
+        page.getByText(nationality).click();
 
         page.getByLabel(DISABILITY).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName(disability)).click();
